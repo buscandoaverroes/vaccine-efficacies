@@ -12,7 +12,7 @@ library(readr)
     user <- 1 
 
 if (user == 1) {
-  root     <- "/Volumes/projects/vaccines/vaccine-efficacies" # copy path to repo folder here.
+  root     <- "/Volumes/projects/vaccines" # copy path to repo folder here.
     code   <- file.path(root, "vaccine-efficacies")
     data   <- file.path(root, "data")
 }
@@ -22,7 +22,8 @@ if (user == 1) {
 
 # scripts 
 
-s1  <- 1 # imports data 
+s1  <- 1 # imports, calculates data
+s2  <- 1 # sandbox, static visuals.
 
 
 if (s1==1) {source(file.path(code, "clinical-data.R"))}
