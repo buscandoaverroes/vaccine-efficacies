@@ -4,6 +4,12 @@ library(tidyverse)
 library(shiny)
 library(shinyWidgets)
 library(shinydashboard)
+library(shinycssloaders)
+library(reactlog)
+
+
+options(shiny.reactlog = TRUE)
+
 
 # load data 
 load("app-data.Rdata")
@@ -22,14 +28,14 @@ ui <- fluidPage(
              radioGroupButtons('vaxname', "Vaccine",
                            choiceNames = c("Pfizer", "Moderna", "J&J"), 
                            choiceValues = c("Pfizer-BioNTech", "Moderna","Johnson&Johnson"),
-                           selected = "Pfizer", size = "lg", width = '300px',
+                           selected = "Pfizer-BioNTech", size = "lg", width = '300px',
                             justified = TRUE, individual = TRUE, direction = 'horizontal')),
              fluidRow(
                awesomeRadio('indicator', "Indicator",
                             choices = c("Covid Infections" = 'covid',
                                             "Severe Covid Infections" = 'severe',
                                             "Deaths" = 'mortality'),
-                            selected = "Covid Infections", inline = TRUE)
+                            selected = "covid", inline = TRUE)
              ), 
              
             
@@ -49,9 +55,9 @@ ui <- fluidPage(
     )),
     
     fluidRow( # placebo/treatment ---------------------------------------------------------
-      
-      plotlyOutput('plotly', height = '400px')
-    ),
+      column(12, align='center',
+      withSpinner(plotlyOutput('plotly', height = '400px', width = '400px'), type = 1)
+    )),
 
     #tags$body("Adn this is :"), htmlOutput('text')
 ) # end fluidpage
@@ -60,7 +66,8 @@ ui <- fluidPage(
 server <- function(input, output) {
 
   # key reactive values -------------------------------------------------------------------
-  
+  vaccine   <- reactive({ input$vaxname})
+  indicator <- reactive({ input$indicator})
   
   
   
@@ -79,12 +86,25 @@ server <- function(input, output) {
   
   # data work -------------------------------------------------------------------------------
 
+  data <- reactive({
+    sim_data %>%
+      filter(vax_name == input$vaxname,
+             arm == paste0(input$indicator, "_placebo") | arm == paste0(input$indicator, "_vaccinated")) 
+  })
   
+    
   
   
   
   # graphs ----------------------------------------------------------------------------------
   
+  p1 <- reactive({
+    plot_ly(data = data()) %>%
+      add_trace(type = 'scatter', mode = 'markers', x = ~x, y = ~y, color=~outcome, alpha=0.8, frame = ~arm) %>%
+      animation_opts(frame = 1000, transition = 100, easing = "linear", redraw = F)
+  })
+  
+  output$plotly <- renderPlotly({p1()})
   
 }
 
