@@ -15,7 +15,7 @@ if (user == 1) {
   root     <- "/Volumes/projects/vaccines" # copy path to repo folder here.
     data   <- file.path(root, "data")
     code   <- file.path(root, "vaccine-efficacies")
-      app  <- file.path(code, "app")
+      app  <- file.path(code, "app/vaccines-app")
     
 }
 

@@ -4,12 +4,13 @@
 library(RColorBrewer)
 library(plotly)
 
+
 # import data
 vax_data <- readRDS(file.path(data, "vax_data.rda"))
 
 # generate data ============================================================
 
-gen_sim_data <- function(name, max) {
+gen_sim_data <- function(name, max, long) {
   
   ## Coordinate data 
   sim_data <- 
@@ -52,30 +53,58 @@ gen_sim_data <- function(name, max) {
     sim_data$mortality_vaccinated[1:vax_data$treatment_mortality_rate10k[vax_data$vaccine_name   %in% as.character(name)]] <- TRUE
   } else {sim_data$mortality_vaccinated <- NA}
   
+  
+  # pivot, optionally 
+  if (long==TRUE) {
+    sim_data <- sim_data %>%
+      select(c(starts_with("covid"), starts_with("severe"), starts_with("mortality")),
+               x, y) %>%
+      pivot_longer(cols = c(starts_with("covid"), starts_with("severe"), starts_with("mortality")),
+                   names_to = 'arm', values_to = 'outcome') %>%
+      mutate(vax_name = as.character(name))
+
+    
+  }
+  
+  
   sim_data
 }
 
 
 # Generate simulated clinical data ===========================================================
-pfizer_sim_data  <- gen_sim_data("Pfizer-BioNTech", 100)
-moderna_sim_data <- gen_sim_data("Moderna", 100)
+pfizer_sim_data  <- gen_sim_data("Pfizer-BioNTech", 100, long = TRUE)
+moderna_sim_data <- gen_sim_data("Moderna", 100, long = TRUE)
 
-## export
+
+sim_data <- rbind(pfizer_sim_data, moderna_sim_data)
+
+# Generate plotly objects  ===========================================================
+
+# to be deteremined...will have to write a function
+# 
+# 
 
 save(
   vax_data, 
   moderna_sim_data,
   pfizer_sim_data,
+  sim_data,
   file = file.path(data, "app-data.Rdata")
 )
 
+### save a copy to the app directory
+save(
+  vax_data, 
+  sim_data,
+  file = file.path(app, "app-data.Rdata")
+)
 
-
-p1 <- ggplot(sim_data, aes(x, y, color = covid_placebo)) +
-  geom_point(alpha = 0.7, size = 0.8, shape=16) +
-  scale_color_manual(values = c("TRUE"="red", "FALSE"="lightblue")) +
-  theme_minimal()
-p1
+# 
+# p1 <- ggplot(sim_data, aes(x, y, color = covid_placebo)) +
+#   geom_point(alpha = 0.7, size = 0.8, shape=16) +
+#   scale_color_manual(values = c("TRUE"="red", "FALSE"="lightblue")) +
+#   theme_minimal()
+# p1
 # 
 # plot_ly() %>%
 #   add_trace(data = sim_data, x = ~x, y = ~y, type = 'scatter', mode = 'markers',
