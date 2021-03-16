@@ -23,7 +23,8 @@ if (user == 1) {
 # scripts 
 
 s1  <- 1 # imports, calculates data
-s2  <- 1 # creates graph data
+s2  <- 1 # creates graph/app data
 
 
 if (s1==1) {source(file.path(code, "clinical-data.R"))}
+if (s2==1) {source(file.path(code, "graph-data.R"))}
