@@ -98,17 +98,3 @@ save(
   sim_data,
   file = file.path(app, "app-data.Rdata")
 )
-
-# 
-# p1 <- ggplot(sim_data, aes(x, y, color = covid_placebo)) +
-#   geom_point(alpha = 0.7, size = 0.8, shape=16) +
-#   scale_color_manual(values = c("TRUE"="red", "FALSE"="lightblue")) +
-#   theme_minimal()
-# p1
-# 
-# plot_ly() %>%
-#   add_trace(data = sim_data, x = ~x, y = ~y, type = 'scatter', mode = 'markers',
-#             color = ~covid_placebo, alpha = 0.6)
-# 
-# 
-# RColorBrewer::display.brewer.all(type = 'qual', n = 2)
