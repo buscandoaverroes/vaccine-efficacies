@@ -13,8 +13,10 @@ library(readr)
 
 if (user == 1) {
   root     <- "/Volumes/projects/vaccines" # copy path to repo folder here.
-    code   <- file.path(root, "vaccine-efficacies")
     data   <- file.path(root, "data")
+    code   <- file.path(root, "vaccine-efficacies")
+      app  <- file.path(code, "app")
+    
 }
 
 
