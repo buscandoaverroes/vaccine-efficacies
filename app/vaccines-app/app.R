@@ -86,10 +86,10 @@ server <- function(input, output) {
   
   # data work -------------------------------------------------------------------------------
 
-  data <- reactive({
+  data <- reactive({ withProgress(message = "Fetching the Data",
     sim_data %>%
       filter(vax_name == input$vaxname,
-             arm == paste0(input$indicator, "_placebo") | arm == paste0(input$indicator, "_vaccinated")) 
+             arm == paste0(input$indicator, "_placebo") | arm == paste0(input$indicator, "_vaccinated"))) 
   })
   
     
@@ -98,10 +98,13 @@ server <- function(input, output) {
   
   # graphs ----------------------------------------------------------------------------------
   
-  p1 <- reactive({
+  p1 <- reactive({ withProgress(message = "Building the Graph",
     plot_ly(data = data()) %>%
-      add_trace(type = 'scatter', mode = 'markers', x = ~x, y = ~y, color=~outcome, alpha=0.8, frame = ~arm) %>%
-      animation_opts(frame = 1000, transition = 100, easing = "linear", redraw = F)
+      add_trace(type = 'scatter', mode = 'markers',
+                x = ~x, y = ~y,
+                color=~outcome, alpha=0.8,
+                frame = ~arm) %>%
+      animation_opts(frame = 1000, transition = 100, easing = "linear", redraw = F))
   })
   
   output$plotly <- renderPlotly({p1()})
