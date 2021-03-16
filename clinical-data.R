@@ -51,6 +51,19 @@ vax_data <- vax_data %>%
   )
 
 
+## rate per 10,000: Taking many assumptions into account, particularly the uniformity of the
+## clinical rates in 'outside-trial' conditions, how many people per 10,000 could hypotethically
+## be expected to develop symptons: [variable_rate] * 10,000
+
+vax_data <- vax_data %>%
+  mutate(across(ends_with("_rate"), ~ round((10000 * .x)), .names = "{.col}10k")) 
+  
+
+
 ### create percent variables 
 vax_data <- vax_data %>%
   mutate(across(ends_with(c("_rate", "_efficacy")), ~ round((100 *.x), 3), .names = "{.col}_pct"))
+
+
+## export 
+saveRDS(vax_data, file.path(data, "vax_data.rda"))

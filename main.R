@@ -23,7 +23,7 @@ if (user == 1) {
 # scripts 
 
 s1  <- 1 # imports, calculates data
-s2  <- 1 # sandbox, static visuals.
+s2  <- 1 # creates graph data
 
 
 if (s1==1) {source(file.path(code, "clinical-data.R"))}
