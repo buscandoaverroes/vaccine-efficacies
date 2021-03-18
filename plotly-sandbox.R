@@ -74,12 +74,17 @@ data <- sim_data %>%
   select(-group, -r)
 
   
+p1 <- subplot(
+  plot_ly(data = data[data$arm == "Placebo",]) %>%
+    add_trace(type= 'scatter', mode='markers',
+              marker=list(size=5),
+              x = ~x, y=~y, #z=~outcome,
+              color=~outcome) %>%
+  plot_ly(data = data[data$arm == "Treatment",]) %>%
+    add_trace(type= 'scatter', mode='markers',
+              marker=list(size=5),
+              x = ~x, y=~y, #z=~outcome,
+              color=~outcome)
 
-plot_ly(data = data) %>%
-  add_trace(type= 'scatter', mode='markers',
-            marker=list(size=5),
-            x = ~x, y=~y, #z=~outcome,
-            color=~outcome,
-            frame=~arm
-  ) %>%
-  animation_opts(frame = 500, transition = 0, easing = "linear", redraw = TRUE)
+  ) 
+p1
