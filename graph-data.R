@@ -26,7 +26,7 @@ gen_sim_data <- function(name, max, long) {
   # the thinking here is to generate a binary variable that turns to "yes" at an equivalent
   # rate over the 10,000 observations that reflects the clinical trial data
   
-  sim_data <- sim_data %>% # for pfizer
+  sim_data <- sim_data %>% 
     mutate(
       covid_placebo        = F, 
       severe_placebo       = F, 
@@ -65,6 +65,7 @@ gen_sim_data <- function(name, max, long) {
 
     
   }
+
   
   
   sim_data
@@ -72,7 +73,7 @@ gen_sim_data <- function(name, max, long) {
 
 
 # Generate simulated clinical data ===========================================================
-pfizer_sim_data  <- gen_sim_data("Pfizer-BioNTech", 100, long = TRUE)
+pfizer_sim_data  <- gen_sim_data("Pfizer-BioNTech", 100, long = FALSE)
 moderna_sim_data <- gen_sim_data("Moderna", 100, long = TRUE)
 
 
