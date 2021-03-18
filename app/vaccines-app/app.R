@@ -92,7 +92,7 @@ server <- function(input, output) {
   
   
   # output values ---------------------------------------------------------------------------
-  output$oddsratio <- renderText({
+  output$oddsratio <- renderText({ # containers should go for each of these three?
     paste0("<b><font color=\"#737373\" size=5>","Overall Efficacy",
            "</b></font>", "<br>",
            "<b><font color=\"#737373\" size=6>",stat_eff(), "%",
