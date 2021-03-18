@@ -6,7 +6,9 @@ library(shinyWidgets)
 library(shinydashboard)
 library(shinycssloaders)
 library(reactlog)
+library(plotly)
 
+reactlog_enable()
 
 options(shiny.reactlog = TRUE)
 
@@ -44,15 +46,13 @@ ui <- fluidPage(
     ),
     
     fluidRow(column(12, align='center', # effectiveness value boxs -------------------------
-                    valueBoxOutput('valuebox'),
+                    htmlOutput('oddsratio'))),
     fluidRow(column(6, align='center',
                     htmlOutput('placeboText'),           
             ),
             column(6, align='center',
                    htmlOutput('treatmentText'),           
-            )
-    )
-    )),
+            )),
     
     fluidRow( # placebo/treatment ---------------------------------------------------------
       column(12, align='center',
@@ -68,19 +68,61 @@ server <- function(input, output) {
   # key reactive values -------------------------------------------------------------------
   vaccine   <- reactive({ input$vaxname})
   indicator <- reactive({ input$indicator})
+  suffix    <- reactive({ case_when(
+      input$indicator == "covid" ~ paste0("of people tested positive","<br>","for COVID-19"),
+      input$indicator == "severe"~ paste0("of people experienced","<br>", "severe COVID symptoms"),
+      input$indicator == "mortality"~ paste0("of people died after","<br>", "COVID symptoms"))
+  })
   
+  stat_eff  <- reactive({ case_when(
+    input$indicator=="covid" ~ vax_data$stated_efficacy_pct[vax_data$vaccine_name == as.character(input$vaxname)],
+    input$indicator=="severe"~vax_data$severe_efficacy_pct[vax_data$vaccine_name == as.character(input$vaxname)],
+    input$indicator=="mortality"~vax_data$mortality_efficacy_pct[vax_data$vaccine_name == as.character(input$vaxname)]
+  )})
+  stat_placebo  <- reactive({ case_when(
+    input$indicator=="covid" ~ vax_data$placebo_covid_rate_pct[vax_data$vaccine_name == as.character(input$vaxname)],
+    input$indicator=="severe"~vax_data$placebo_severe_rate_pct[vax_data$vaccine_name == as.character(input$vaxname)],
+    input$indicator=="mortality"~vax_data$placebo_mortality_rate_pct[vax_data$vaccine_name == as.character(input$vaxname)]
+  )})
+  stat_treatment  <- reactive({ case_when(
+    input$indicator=="covid" ~ vax_data$treatment_covid_rate_pct[vax_data$vaccine_name == as.character(input$vaxname)],
+    input$indicator=="severe"~vax_data$treatment_severe_rate_pct[vax_data$vaccine_name == as.character(input$vaxname)],
+    input$indicator=="mortality"~vax_data$treatment_mortality_rate_pct[vax_data$vaccine_name == as.character(input$vaxname)]
+  )})
   
   
   # output values ---------------------------------------------------------------------------
-  output$valuebox <- renderValueBox({ valueBox("Effectiveness", 47, color = 'aqua')})
+  output$oddsratio <- renderText({
+    paste0("<b><font color=\"#737373\" size=5>","Overall Efficacy",
+           "</b></font>", "<br>",
+           "<b><font color=\"#737373\" size=6>",stat_eff(), "%",
+           "</b></font>", "<br>"
+    )
+    })
   
   output$placeboText <- renderText({ 
-    paste("the key stat is:", "<b><font color=\"#DEEBF7\" size=20>","47", "</b></font>"
-          )})
+    paste0("<font color=\"#000000\" size=2>",
+           "In the Placebo group, about",
+           "</font>", "<br>",
+           "<b><font color=\"#CB181D\" size=12>",stat_placebo(), "%",
+          "</b></font>", "<br>",
+          "<font color=\"#000000\" size=2>",
+          suffix(),
+          "</font>"
+          )
+    })
   
   output$treatmentText <- renderText({ 
-    paste("the key stat is:", "<b><font color=\"#DEEBF7\" size=20>","47", "</b></font>"
-    )})
+      paste0("<font color=\"#000000\" size=2>",
+             "In the Vaccinated group, about",
+             "</font>", "<br>",
+             "<b><font color=\"#41AB5D\" size=12>",stat_treatment(), "%",
+             "</b></font>", "<br>",
+             "<font color=\"#000000\" size=2>",
+             suffix(),
+             "</font>"
+              )
+    })
   
   
   
@@ -104,7 +146,7 @@ server <- function(input, output) {
                 x = ~x, y = ~y,
                 color=~outcome, alpha=0.8,
                 frame = ~arm) %>%
-      animation_opts(frame = 1000, transition = 100, easing = "linear", redraw = F))
+      animation_opts(frame = 300, transition = 100, easing = "linear", redraw = F))
   })
   
   output$plotly <- renderPlotly({p1()})
