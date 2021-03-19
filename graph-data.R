@@ -62,20 +62,24 @@ gen_sim_data <- function(name, max) {
   
   ## replace values -------------------------
   # replace for covid Positive
-  sim_data$placebo_outcomes[1:f.plaCov] <- "COVID Positive"
+  sim_data$placebo_outcomes[1:f.plaCov] <- "COVID Positive" 
   sim_data$treatment_outcomes[1:f.treCov] <- "COVID Positive"
   
   # replace for covid Severe
-  sim_data$placebo_outcomes[(f.plaCov+1):((f.plaCov+1)+f.plaSev)] <- "Severe COVID"
-  sim_data$treatment_outcomes[(f.treCov+1):((f.treCov+1)+f.treSev)] <- "Severe COVID"
+  if (f.plaSev >0) {
+    sim_data$placebo_outcomes[(f.plaCov+1):((f.plaCov+1)+(f.plaSev-1))] <- "Severe COVID" # avoid adding an extra datum
+  }
+  if (f.treSev >0) {
+    sim_data$treatment_outcomes[(f.treCov+1):((f.treCov+1)+(f.treSev-1))] <- "Severe COVID"
+  }
   
   
   # replace for mortality only if the stat is non-missing
   if (!is.na(f.plaMort) ) {
-    sim_data$placebo_outcomes[(((f.plaCov+1)+f.plaSev)+1):((((f.plaCov+1)+f.plaSev)+1)+1)] <- "COVID Death"
+    sim_data$placebo_outcomes[1001:f.plaSev] <- "COVID Death" # start from row 1001, assuming that totals above won't add up to 1000
   } 
   if (!is.na(f.treMort) ) {
-    sim_data$treatment_outcomes[(((f.treCov+1)+f.treSev)+1):((((f.treCov+1)+f.treSev)+1)+1)] <- "COVID Death"
+    sim_data$treatment_outcomes[1001:f.treSev] <- "COVID Death"
   } 
   
   # pivot
