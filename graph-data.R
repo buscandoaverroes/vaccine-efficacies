@@ -89,7 +89,7 @@ gen_sim_data <- function(name, max) {
       group == "placebo_outcomes" ~ "Placebo", 
       TRUE ~ "Treatment"
     ))) %>%
-    select(-group, -r)
+    select(-group)
   
   
   sim_data

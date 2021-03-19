@@ -46,13 +46,14 @@ ui <- fluidPage(
     ),
     
     fluidRow(column(12, align='center', # effectiveness value boxs -------------------------
-                    htmlOutput('oddsratio'))),
+                    htmlOutput('oddsratio'))), tags$br(),
     fluidRow(column(6, align='center',
                     htmlOutput('placeboText'),           
             ),
             column(6, align='center',
                    htmlOutput('treatmentText'),           
             )),
+    tags$br(),
     
     fluidRow( # placebo/treatment ---------------------------------------------------------
       column(12, align='center',
@@ -69,9 +70,9 @@ server <- function(input, output) {
   vaccine   <- reactive({ input$vaxname})
   indicator <- reactive({ input$indicator})
   suffix    <- reactive({ case_when(
-      input$indicator == "covid" ~ paste0("of people tested positive","<br>","for COVID-19"),
-      input$indicator == "severe"~ paste0("of people experienced","<br>", "severe COVID symptoms"),
-      input$indicator == "mortality"~ paste0("of people died after","<br>", "COVID symptoms"))
+      input$indicator == "covid" ~ paste0("tested positive","<br>","for COVID-19"),
+      input$indicator == "severe"~ paste0("experienced","<br>", "severe COVID symptoms"),
+      input$indicator == "mortality"~ paste0("died after","<br>", "COVID symptoms"))
   })
   
   stat_eff  <- reactive({ case_when(
@@ -101,24 +102,22 @@ server <- function(input, output) {
     })
   
   output$placeboText <- renderText({ 
-    paste0("<font color=\"#000000\" size=2>",
-           "In the Placebo group, about",
-           "</font>", "<br>",
-           "<b><font color=\"#CB181D\" size=12>",stat_placebo(), "%",
+    paste0(
+           "<b><font color=\"#CB181D\" size=7>",stat_placebo(), "%",
           "</b></font>", "<br>",
           "<font color=\"#000000\" size=2>",
+          "of the Placebo group ",
           suffix(),
           "</font>"
           )
     })
   
   output$treatmentText <- renderText({ 
-      paste0("<font color=\"#000000\" size=2>",
-             "In the Vaccinated group, about",
-             "</font>", "<br>",
-             "<b><font color=\"#41AB5D\" size=12>",stat_treatment(), "%",
+      paste0(
+             "<b><font color=\"#41AB5D\" size=7>",stat_treatment(), "%",
              "</b></font>", "<br>",
              "<font color=\"#000000\" size=2>",
+             "of the Vaccine group ",
              suffix(),
              "</font>"
               )
