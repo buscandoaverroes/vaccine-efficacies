@@ -28,9 +28,9 @@ ui <- fluidPage(
       column(12, align='center',
              fluidRow(
              radioGroupButtons('vaxname', "Vaccine",
-                           choiceNames = c("Pfizer", "Moderna", "J&J"), 
-                           choiceValues = c("Pfizer-BioNTech", "Moderna","Johnson&Johnson"),
-                           selected = "Pfizer-BioNTech", size = "lg", width = '300px',
+                           choices = c("Pfizer", "Moderna", "J&J"), 
+                           #choiceValues = c("Pfizer-BioNTech", "Moderna","Johnson&Johnson"),
+                           selected = "Pfizer", size = "lg", width = '300px',
                             justified = TRUE, individual = TRUE, direction = 'horizontal')),
              fluidRow(
                awesomeRadio('indicator', "Indicator",
@@ -56,7 +56,7 @@ ui <- fluidPage(
     
     fluidRow( # placebo/treatment ---------------------------------------------------------
       column(12, align='center',
-      withSpinner(plotlyOutput('plotly', height = '400px', width = '400px'), type = 1)
+      withSpinner(plotOutput('plotly', height = '400px', width = '400px'), type = 1)
     )),
 
     #tags$body("Adn this is :"), htmlOutput('text')
@@ -75,19 +75,19 @@ server <- function(input, output) {
   })
   
   stat_eff  <- reactive({ case_when(
-    input$indicator=="covid" ~ vax_data$stated_efficacy_pct[vax_data$vaccine_name == as.character(input$vaxname)],
-    input$indicator=="severe"~vax_data$severe_efficacy_pct[vax_data$vaccine_name == as.character(input$vaxname)],
-    input$indicator=="mortality"~vax_data$mortality_efficacy_pct[vax_data$vaccine_name == as.character(input$vaxname)]
+    input$indicator=="covid" ~ vax_data$stated_efficacy_pct[vax_data$short_name == as.character(input$vaxname)],
+    input$indicator=="severe"~vax_data$severe_efficacy_pct[vax_data$short_name == as.character(input$vaxname)],
+    input$indicator=="mortality"~vax_data$mortality_efficacy_pct[vax_data$short_name == as.character(input$vaxname)]
   )})
   stat_placebo  <- reactive({ case_when(
-    input$indicator=="covid" ~ vax_data$placebo_covid_rate_pct[vax_data$vaccine_name == as.character(input$vaxname)],
-    input$indicator=="severe"~vax_data$placebo_severe_rate_pct[vax_data$vaccine_name == as.character(input$vaxname)],
-    input$indicator=="mortality"~vax_data$placebo_mortality_rate_pct[vax_data$vaccine_name == as.character(input$vaxname)]
+    input$indicator=="covid" ~ vax_data$placebo_covid_rate_pct[vax_data$short_name == as.character(input$vaxname)],
+    input$indicator=="severe"~vax_data$placebo_severe_rate_pct[vax_data$short_name == as.character(input$vaxname)],
+    input$indicator=="mortality"~vax_data$placebo_mortality_rate_pct[vax_data$short_name == as.character(input$vaxname)]
   )})
   stat_treatment  <- reactive({ case_when(
-    input$indicator=="covid" ~ vax_data$treatment_covid_rate_pct[vax_data$vaccine_name == as.character(input$vaxname)],
-    input$indicator=="severe"~vax_data$treatment_severe_rate_pct[vax_data$vaccine_name == as.character(input$vaxname)],
-    input$indicator=="mortality"~vax_data$treatment_mortality_rate_pct[vax_data$vaccine_name == as.character(input$vaxname)]
+    input$indicator=="covid" ~ vax_data$treatment_covid_rate_pct[vax_data$short_name == as.character(input$vaxname)],
+    input$indicator=="severe"~vax_data$treatment_severe_rate_pct[vax_data$short_name == as.character(input$vaxname)],
+    input$indicator=="mortality"~vax_data$treatment_mortality_rate_pct[vax_data$short_name == as.character(input$vaxname)]
   )})
   
   
@@ -130,8 +130,7 @@ server <- function(input, output) {
 
   data <- reactive({ withProgress(message = "Fetching the Data",
     sim_data %>%
-      filter(vax_name == input$vaxname,
-             arm == paste0(input$indicator, "_placebo") | arm == paste0(input$indicator, "_vaccinated"))) 
+      filter(vax_name == input$vaxname)) 
   })
   
     
@@ -141,15 +140,31 @@ server <- function(input, output) {
   # graphs ----------------------------------------------------------------------------------
   
   p1 <- reactive({ withProgress(message = "Building the Graph",
-    plot_ly(data = data()) %>%
-      add_trace(type = 'scatter', mode = 'markers',
-                x = ~x, y = ~y,
-                color=~outcome, alpha=0.8,
-                frame = ~arm) %>%
-      animation_opts(frame = 300, transition = 100, easing = "linear", redraw = F))
+        ggplot(data = data(), aes(x, y)) + # use raster since high perferfmance and all same size
+          geom_raster(aes(fill = outcome, alpha = outcome)) +
+          scale_fill_manual(values = c(
+            "COVID Negative" = brewer.pal(9, "Blues")[2],
+            "COVID Positive" = brewer.pal(9, "Purples")[6],
+            "Severe COVID"   = brewer.pal(9, "Set1")[1]),
+            name = NULL,
+            labels = c("COVID Negative" = "No COVID",
+                       "COVID Positive" = "COVID",
+                       "Severe COVID"   = "Severe COVID")
+          ) +
+          scale_alpha_manual(values = c(0.4, 1.0, 1.0), guide = NULL) +
+          facet_grid(cols = vars(arm)) +
+          theme_void() +
+          theme(legend.position = 'top',
+                legend.key.size = unit(5,'mm'),
+                legend.spacing.x = unit(5,'mm'),
+                legend.justification = 'center',
+                legend.margin = margin(2,0,0,0),
+                panel.spacing.x = unit(0,'mm'),
+                plot.margin = margin(0,0,0,0))
+  )
   })
   
-  output$plotly <- renderPlotly({p1()})
+  output$plotly <- renderPlot({p1()})
   
 }
 
