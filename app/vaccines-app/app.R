@@ -94,7 +94,7 @@ server <- function(input, output) {
   
   # output values ---------------------------------------------------------------------------
   output$oddsratio <- renderText({ # containers should go for each of these three?
-    paste0("<b><font color=\"#737373\" size=5>","Overall Efficacy",
+    paste0("<b><font color=\"#737373\" size=5>","Efficacy",
            "</b></font>", "<br>",
            "<b><font color=\"#737373\" size=6>",stat_eff(), "%",
            "</b></font>", "<br>"
@@ -103,10 +103,12 @@ server <- function(input, output) {
   
   output$placeboText <- renderText({ 
     paste0(
-           "<b><font color=\"#CB181D\" size=7>",stat_placebo(), "%",
+           "<b><font color=\"#CB181D\" size=6>",
+           "Without the Vaccine:<br>",
+           stat_placebo(), "%",
           "</b></font>", "<br>",
           "<font color=\"#000000\" size=2>",
-          "of the Placebo group ",
+          "",
           suffix(),
           "</font>"
           )
@@ -114,10 +116,12 @@ server <- function(input, output) {
   
   output$treatmentText <- renderText({ 
       paste0(
-             "<b><font color=\"#41AB5D\" size=7>",stat_treatment(), "%",
+             "<b><font color=\"#41AB5D\" size=6>",
+             "With the Vaccine:<br>",
+             stat_treatment(), "%",
              "</b></font>", "<br>",
              "<font color=\"#000000\" size=2>",
-             "of the Vaccine group ",
+             "",
              suffix(),
              "</font>"
               )
