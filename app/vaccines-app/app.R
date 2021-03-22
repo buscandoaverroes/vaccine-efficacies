@@ -17,7 +17,9 @@ options(shiny.reactlog = TRUE)
 load("app-data.Rdata")
 
 # UI =====================================================================================
-ui <- fluidPage(
+ui <- navbarPage("App Title",
+  tabPanel("Page1", # PAGE1 ----------------------------------------------------------------------
+  fluidPage(
 
     # Application title
     titlePanel("Title"),
@@ -61,10 +63,52 @@ ui <- fluidPage(
     )),
 
     #tags$body("Adn this is :"), htmlOutput('text')
-) # end fluidpage
+)), # end fluidpage, tabpanel for page1
+
+tabPanel("Page2", # PAGE2 ----------------------------------------------------------------------
+  fluidPage(
+    
+    sliderInput("poprate", "Population Incidence",
+                min = 0, max = 1, value = 0.1, step = 0.01),
+    sliderInput("effrate", "Efficacy Rate",
+                min = 0, max = 1, value = 1, step = 0.01),
+    sliderInput('protectrate', "Chance you're protected", 
+                min = 0, max = 1, value = 0.01, step = 0.01),
+    
+    
+  )) # end tab panel, fluid page
+) # end navbarpage
+
+
 
 # SERVER =====================================================================================
-server <- function(input, output) {
+server <- function(input, output, session) {
+  
+  # page 2 data ---------------------------------------------------------------------
+  # f.efficacy   = 1 - (input$protectrate/input$poprate)
+  # f.population = (input$protectrate / (100 - input$effrate))
+  # f.vaccine     = 1- input$poprate*(100 - input$effrate)
+
+  
+  ## update efficacy rate
+  # observeEvent(input$poprate, { 
+  #   updateSliderInput(inputId = "effrate", value =  (input$protectrate / (1 - input$effrate))) })
+  # observeEvent(input$protectrate, { 
+  #   updateSliderInput(inputId = "effrate", value =  (input$protectrate / (1 - input$effrate))) })
+  
+  ## update protected rate
+  observeEvent(input$poprate, { 
+    updateSliderInput(inputId = "protectrate", value = 1- (input$poprate*(1 - input$effrate))) })
+  observeEvent(input$effrate, { 
+    updateSliderInput(inputId = "protectrate", value = 1- (input$poprate*(1 - input$effrate))) })
+  
+  ## update population rate
+  # observeEvent(input$protectrate, {
+  #   updateSliderInput(inputId = "poprate", value = 1 - (input$protectrate/input$poprate)) })
+  # observeEvent(input$effrate, {
+  #   updateSliderInput(inputId = "poprate", value = 1 - (input$protectrate/input$poprate)) })
+  
+  
 
   # key reactive values -------------------------------------------------------------------
   vaccine   <- reactive({ input$vaxname})
