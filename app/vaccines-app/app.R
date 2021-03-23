@@ -75,6 +75,8 @@ tabPanel("Page2", # PAGE2 ------------------------------------------------------
     sliderInput('protectrate', "Chance you're protected", 
                 min = 0, max = 1, value = 0.01, step = 0.01),
     
+    plotOutput("effplot")
+    
     
   )) # end tab panel, fluid page
 ) # end navbarpage
@@ -108,6 +110,27 @@ server <- function(input, output, session) {
   # observeEvent(input$effrate, {
   #   updateSliderInput(inputId = "poprate", value = 1 - (input$protectrate/input$poprate)) })
   
+  # for now, generate this data in-app
+  eff_data <- expand_grid(
+    pop    = seq(from = 0, to = 0.5, by = 0.1),
+    eff    = seq(from = 0, to = 1, by = 0.1),
+  ) %>% mutate(
+    p_safe   = 1-(pop*(1-eff))
+  )
+  
+  
+  # reactive data 
+  eff_pop <- reactive({input$poprate})
+  eff_eff <- reactive({input$effrate})
+  
+  eff_point <- reactive({
+    tibble(
+      pop = eff_pop(), 
+      eff = eff_eff(), 
+      p_safe = 1-(pop*(1-eff))
+    )
+  })
+    
   
 
   # key reactive values -------------------------------------------------------------------
@@ -186,6 +209,7 @@ server <- function(input, output, session) {
   
   # graphs ----------------------------------------------------------------------------------
   
+  # page1 graph 
   p1 <- reactive({ withProgress(message = "Building the Graph",
         ggplot(data = data(), aes(x, y)) + # use raster since high perferfmance and all same size
           geom_raster(aes(fill = outcome, alpha = outcome)) +
@@ -213,9 +237,23 @@ server <- function(input, output, session) {
   
   output$plotly <- renderPlot({p1()})
   
-}
 
 
+
+  # page2 graph 
+  p2 <- reactive({
+    ggplot(data = eff_data, aes(x = eff, y = pop, color = eff)) +
+      geom_contour_filled(aes(z = p_safe)) +
+      geom_vline(aes(xintercept = eff_eff()), linetype= "dotdash", alpha = 0.5) +
+      geom_hline(aes(yintercept = eff_pop()), linetype = "dotdash", alpha = 0.5) + 
+      geom_point(data = eff_point(), aes(x = eff, y = pop),
+                 size = 2, shape = 5, alpha=1, color = "blue", stroke = 2)
+    
+  })
+    
+  output$effplot <- renderPlot({p2()})
+
+} # end server ------------------------------------------------------------------------
 
 
 # Run the application 
