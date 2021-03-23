@@ -112,8 +112,8 @@ server <- function(input, output, session) {
   
   # for now, generate this data in-app
   eff_data <- expand_grid(
-    pop    = seq(from = 0, to = 0.5, by = 0.1),
-    eff    = seq(from = 0, to = 1, by = 0.1),
+    pop    = seq(from = 0, to = 0.25, by = 0.1),
+    eff    = seq(from = 0, to = 1, by = 0.01),
   ) %>% mutate(
     p_safe   = 1-(pop*(1-eff))
   )
