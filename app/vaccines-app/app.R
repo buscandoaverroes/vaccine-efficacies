@@ -68,14 +68,13 @@ ui <- navbarPage("App Title",
 tabPanel("Page2", # PAGE2 ----------------------------------------------------------------------
   fluidPage(
     
-    sliderInput("poprate", "COVID-19 rate in general population",
-                min = 0.01, max = 0.25, value = 0.1, step = 0.01),
+    sliderInput("poprate", "COVID-19 rate in population",
+                min = 0.001, max = 0.1, value = 0.03, step = 0.001),
     sliderInput("effrate", "Vaccine Efficacy Rate",
-                min = 0, max = 1, value = 0.8, step = 0.01),  tags$br(),
-    materialSwitch('clinicalpoints', "Show Clinical Data", value = FALSE),
-    
+                min = 0, max = 1, value = 0.8, step = 0.01),  
+
     tags$h3("Expected Chance of Covid Protection"),
-    plotlyOutput("pct_protected", height = '200px'),
+    plotlyOutput("pct_protected", height = '100px'),
     
     plotOutput("effplot")
     
@@ -114,7 +113,7 @@ server <- function(input, output, session) {
   
   # for now, generate this data in-app
   eff_data <- expand_grid(
-    pop    = seq(from = 0, to = 0.25, by = 0.1),
+    pop    = seq(from = 0, to = 0.1, by = 0.05),
     eff    = seq(from = 0, to = 1, by = 0.01),
   ) %>% mutate(
     p_safe   = 1-(pop*(1-eff))
@@ -260,8 +259,10 @@ server <- function(input, output, session) {
     ggplot(data = eff_data, aes(x = eff, y = pop, color = eff)) +
       geom_contour_filled(aes(z = p_safe)) +
       scale_fill_viridis_d(name = "Chance of Protection",
-                           labels = c("80-82%", "82-84%", "84-86%", "86-88%", "88-90%",
-                                      "90-92%", "92-94%", "94-96%", "96-98%", "98-100%")) +
+                           option = 'plasma', direction = 1,
+                           alpha = 0.8,
+                           labels = c("90-91%", "91-92%", "92-93%", "93-94%", "94-95%",
+                                      "95-96%", "96-97%", "97-98%", "98-99%", "99-100%")) +
       geom_vline(aes(xintercept = eff_eff()), linetype= "dotdash", alpha = 0.5) +
       geom_hline(aes(yintercept = eff_pop()), linetype = "dotdash", alpha = 0.5) + 
       geom_point(data = eff_point(), aes(x = eff, y = pop),
@@ -272,14 +273,14 @@ server <- function(input, output, session) {
       geom_hline(aes(yintercept = vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"]),
                  linetype = "solid", alpha = 0.3) + 
       geom_point(data = eff_clinical_data[eff_clinical_data$name =="Pfizer",], aes(x = eff, y = pop),
-                 size = 2, shape = 5, alpha=1, color = "purple", stroke = 2, show.legend = c('shape'=T)) +
+                 size = 2, shape = 20, alpha=1, color = "purple", stroke = 2) +
       # {Moderna data}
       geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]),
                  linetype= "dotted", alpha = 0.4) +
       geom_hline(aes(yintercept = vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"]),
                  linetype = "dotted", alpha = 0.4) + 
       geom_point(data = eff_clinical_data[eff_clinical_data$name =="Moderna",], aes(x = eff, y = pop),
-                 size = 2, shape = 5, alpha=1, color = "red", stroke = 2, show.legend = c('shape' = T)) +
+                 size = 2, shape = 20, alpha=1, color = "red", stroke = 2) +
       labs(x = "Vaccine Efficacy Rate",
            y = "COVID-19 Rate in general population") +
       theme_minimal()
@@ -295,8 +296,9 @@ server <- function(input, output, session) {
   threshold   <- reactive({ 1 - input$poprate})
   
   p3 <- reactive({
-    plot_ly(type = "indicator", mode = 'number+gauge', title = "",
+    plot_ly(type = "indicator", mode = 'number', title = "",
             value = protectrate(),
+            number = list(valueformat = '.2%'),
             gauge = list(
               bar = list(color = "#4292C6"),
               axis = list(
