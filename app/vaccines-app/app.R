@@ -7,17 +7,22 @@ library(shinydashboard)
 library(shinycssloaders)
 library(reactlog)
 library(plotly)
+library(bslib)
 
 reactlog_enable()
 
 options(shiny.reactlog = TRUE)
 
+theme <- bslib::bs_theme(
+  version = 4, bootswatch = "flatly",
+  spacer = '0.5rem'
+                         )
 
 # load data 
 load("app-data.Rdata")
 
 # UI =====================================================================================
-ui <- navbarPage("App Title",
+ui = navbarPage("App Title",
   tabPanel("Page1", # PAGE1 ----------------------------------------------------------------------
   fluidPage(
 
@@ -67,7 +72,8 @@ ui <- navbarPage("App Title",
 
 tabPanel("Page2", # PAGE2 ----------------------------------------------------------------------
   fluidPage(
-    wellPanel(
+    theme = theme,
+    
     fluidRow(align='center',
       actionBttn(inputId = 'reset_pfizer', label = "Pfizer data", size = 'sm',
                  style = 'fill', block = F, no_outline = T),
@@ -78,7 +84,7 @@ tabPanel("Page2", # PAGE2 ------------------------------------------------------
         wellPanel( align='center',
                    
         tags$h4(tags$b("Infection Rate")),         
-        sliderInput("poprate", "",
+        sliderInput("poprate", label = NULL,
                       width = '150px',
                       min = 0.001, max = 0.1, value = 0.03, step = 0.001),
           htmlOutput('right_poprate', width = 6),
@@ -86,27 +92,24 @@ tabPanel("Page2", # PAGE2 ------------------------------------------------------
     wellPanel( align='center',
       
       tags$h4(tags$b("Efficacy Rate")),
-      sliderInput("effrate", "",
+      sliderInput("effrate", label = NULL,
                   width = '150px',
                   min = 0, max = 1, value = 0.8, step = 0.01),
       htmlOutput('right_effrate', width = 6, )
-    ))), # end main input panel, end second element
+    )), # end main input panel, end second element
       
         
     verticalLayout(
       wellPanel(align='center',
           tags$h3(tags$b("Chance of Covid Protection")),
-          htmlOutput("center_protectrate")
-                ),
+          htmlOutput("center_protectrate"),
       #plotlyOutput("pct_protected", height = '100px'),
-      
+
       plotOutput("effplot")
-    )
+    ))
     
-    
-    
-  )) # end tab panel, fluid page
-) # end navbarpage
+    ) # end tab panel, fluid page
+)) # end navbarpage, taglist
 
 
 
@@ -409,4 +412,8 @@ server <- function(input, output, session) {
 
 
 # Run the application 
-shinyApp(ui = ui, server = server)
+
+
+run_with_themer(shinyApp(ui = ui, server = server))
+
+
