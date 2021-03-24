@@ -260,7 +260,7 @@ server <- function(input, output, session) {
       # "Covid Infection Rate:<br>",
       # "</b></font>",
       "<b><font color=\"#000000\" size=6>",
-      right_covid_per_10k(), " in 10,000",
+      right_covid_per_10k(), " in ", "10,000",
       "</b></font>"
     )
   })
@@ -334,15 +334,15 @@ server <- function(input, output, session) {
   p2 <- reactive({
     ggplot(data = eff_data, aes(x = eff, y = pop, color = eff)) +
       geom_contour_filled(aes(z = p_safe)) +
-      scale_fill_viridis_d(name = "Chance of Protection",
+      scale_fill_viridis_d(name = "Protection Chance",
                            option = 'plasma', direction = 1,
                            alpha = 0.8,
                            labels = c("90-91%", "91-92%", "92-93%", "93-94%", "94-95%",
                                       "95-96%", "96-97%", "97-98%", "98-99%", "99-100%")) +
       geom_vline(aes(xintercept = eff_eff()), linetype= "dotdash", alpha = 0.5) +
       geom_hline(aes(yintercept = eff_pop()), linetype = "dotdash", alpha = 0.5) + 
-      geom_point(data = eff_point(), aes(x = eff, y = pop),
-                 size = 2, shape = 5, alpha=1, color = "blue", stroke = 2) +
+      geom_point(data = eff_point(), aes(x = eff, y = pop), 
+                 size = 2, shape = 5, alpha=1, color = 'blue', stroke = 2) +
       # {Pfizer data}
       geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"]),
                  linetype= "solid", alpha = 0.3) +
@@ -358,8 +358,19 @@ server <- function(input, output, session) {
       geom_point(data = eff_clinical_data[eff_clinical_data$name =="Moderna",], aes(x = eff, y = pop),
                  size = 2, shape = 20, alpha=1, color = "red", stroke = 2) +
       labs(x = "Vaccine Efficacy Rate",
-           y = "COVID-19 Rate in general population") +
-      theme_minimal()
+           y = "% of Population with Covid") +
+      scale_x_continuous(labels = label_percent()) +
+      scale_y_continuous(labels = label_percent()) +
+      theme_minimal() +
+      theme(
+        legend.key.size = unit(8,'mm'),
+        legend.title = element_text(size=12, face = "bold"),
+        legend.text = element_text(size=10),
+        axis.title = element_text(size=15),
+        axis.text = element_text(size=12),
+        
+        
+      )
     
   })
     
