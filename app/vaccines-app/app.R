@@ -69,7 +69,7 @@ tabPanel("Page2", # PAGE2 ------------------------------------------------------
   fluidPage(
     
     sliderInput("poprate", "COVID-19 rate in general population",
-                min = 0, max = 0.2, value = 0.1, step = 0.01),
+                min = 0.01, max = 0.25, value = 0.1, step = 0.01),
     sliderInput("effrate", "Vaccine Efficacy Rate",
                 min = 0, max = 1, value = 0.8, step = 0.01),  tags$br(),
     
@@ -245,10 +245,16 @@ server <- function(input, output, session) {
   p2 <- reactive({
     ggplot(data = eff_data, aes(x = eff, y = pop, color = eff)) +
       geom_contour_filled(aes(z = p_safe)) +
+      scale_fill_viridis_d(name = "Chance of Protection",
+                           labels = c("80-82%", "82-84%", "84-86%", "86-88%", "88-90%",
+                                      "90-92%", "92-94%", "94-96%", "96-98%", "98-100%")) +
       geom_vline(aes(xintercept = eff_eff()), linetype= "dotdash", alpha = 0.5) +
       geom_hline(aes(yintercept = eff_pop()), linetype = "dotdash", alpha = 0.5) + 
       geom_point(data = eff_point(), aes(x = eff, y = pop),
-                 size = 2, shape = 5, alpha=1, color = "blue", stroke = 2)
+                 size = 2, shape = 5, alpha=1, color = "blue", stroke = 2) +
+      labs(x = "Vaccine Efficacy Rate",
+           y = "COVID-19 Rate in general population") +
+      theme_minimal()
     
   })
     
@@ -258,15 +264,22 @@ server <- function(input, output, session) {
   
   # page2 plotly percent protected indicator
   protectrate <- reactive({ 1- (input$poprate*(1 - input$effrate)) })
+  threshold   <- reactive({ 1 - input$poprate})
+  
   p3 <- reactive({
-    plot_ly(type = "indicator", mode = 'number+gauge', title = "Expected Chance of Protection",
+    plot_ly(type = "indicator", mode = 'number+gauge', title = "",
             value = protectrate(),
             gauge = list(
+              bar = list(color = "#4292C6"),
               axis = list(
                 range = c(0,1),
                 tickmode = 'array',
                 tickvals = c(0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1)
-                
+              ),
+              threshold = list(
+                thickness = 1,
+                line = list(width=4, color="#CB181D"),
+                value = threshold()
               )
             )
     )
