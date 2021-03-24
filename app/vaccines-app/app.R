@@ -67,7 +67,10 @@ ui <- navbarPage("App Title",
 
 tabPanel("Page2", # PAGE2 ----------------------------------------------------------------------
   fluidPage(
-    
+    actionBttn(inputId = 'reset_pfizer', label = "Pfizer data", size = 'xs',
+               style = 'fill', block = F, no_outline = T),
+    actionBttn(inputId = 'reset_moderna', label = "Moderna data", size = 'xs',
+               style = 'fill', block = F, no_outline = T),
     sliderInput("poprate", "COVID-19 rate in population",
                 min = 0.001, max = 0.1, value = 0.03, step = 0.001),
     sliderInput("effrate", "Vaccine Efficacy Rate",
@@ -110,6 +113,18 @@ server <- function(input, output, session) {
   #   updateSliderInput(inputId = "poprate", value = 1 - (input$protectrate/input$poprate)) })
   # observeEvent(input$effrate, {
   #   updateSliderInput(inputId = "poprate", value = 1 - (input$protectrate/input$poprate)) })
+  #   
+  
+  ## update sliders with clinical data presets 
+  ### pfizer 
+  observeEvent(input$reset_pfizer, {
+    updateSliderInput('poprate', session = session, value = vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"])
+    updateSliderInput('effrate', session = session, value = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"])
+  })
+  observeEvent(input$reset_moderna, {
+    updateSliderInput('poprate', session = session, value = vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"])
+    updateSliderInput('effrate', session = session,  value = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"])
+  })
   
   # for now, generate this data in-app
   eff_data <- expand_grid(
