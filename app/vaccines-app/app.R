@@ -124,6 +124,7 @@ server <- function(input, output, session) {
   eff_pop <- reactive({input$poprate})
   eff_eff <- reactive({input$effrate})
   
+  # for hypothetical point data
   eff_point <- reactive({
     tibble(
       pop = eff_pop(), 
@@ -131,6 +132,18 @@ server <- function(input, output, session) {
       p_safe = 1-(pop*(1-eff))
     )
   })
+  
+  # for actual clinical data
+  eff_clinical_data <- tibble(
+    name = c("Pfizer", "Moderna"),
+    pop  = c(vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"],
+             vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"]),
+    eff  = c(vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"],
+             vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]),
+    p_safe = 1-(pop*(1-eff))
+  )
+  
+  
     
   
 
@@ -252,6 +265,20 @@ server <- function(input, output, session) {
       geom_hline(aes(yintercept = eff_pop()), linetype = "dotdash", alpha = 0.5) + 
       geom_point(data = eff_point(), aes(x = eff, y = pop),
                  size = 2, shape = 5, alpha=1, color = "blue", stroke = 2) +
+      # {Pfizer data}
+      geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"]),
+                 linetype= "solid", alpha = 0.3) +
+      geom_hline(aes(yintercept = vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"]),
+                 linetype = "solid", alpha = 0.3) + 
+      geom_point(data = eff_clinical_data[eff_clinical_data$name =="Pfizer",], aes(x = eff, y = pop),
+                 size = 2, shape = 5, alpha=1, color = "purple", stroke = 2) +
+      # {Moderna data}
+       geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]),
+                  linetype= "dotted", alpha = 0.4) +
+      geom_hline(aes(yintercept = vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"]),
+                 linetype = "dotted", alpha = 0.4) + 
+      geom_point(data = eff_clinical_data[eff_clinical_data$name =="Moderna",], aes(x = eff, y = pop),
+                 size = 2, shape = 5, alpha=1, color = "red", stroke = 2) +
       labs(x = "Vaccine Efficacy Rate",
            y = "COVID-19 Rate in general population") +
       theme_minimal()
