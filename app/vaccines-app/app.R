@@ -72,6 +72,7 @@ tabPanel("Page2", # PAGE2 ------------------------------------------------------
                 min = 0.01, max = 0.25, value = 0.1, step = 0.01),
     sliderInput("effrate", "Vaccine Efficacy Rate",
                 min = 0, max = 1, value = 0.8, step = 0.01),  tags$br(),
+    materialSwitch('clinicalpoints', "Show Clinical Data", value = FALSE),
     
     tags$h3("Expected Chance of Covid Protection"),
     plotlyOutput("pct_protected", height = '200px'),
@@ -271,14 +272,14 @@ server <- function(input, output, session) {
       geom_hline(aes(yintercept = vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"]),
                  linetype = "solid", alpha = 0.3) + 
       geom_point(data = eff_clinical_data[eff_clinical_data$name =="Pfizer",], aes(x = eff, y = pop),
-                 size = 2, shape = 5, alpha=1, color = "purple", stroke = 2) +
+                 size = 2, shape = 5, alpha=1, color = "purple", stroke = 2, show.legend = c('shape'=T)) +
       # {Moderna data}
-       geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]),
-                  linetype= "dotted", alpha = 0.4) +
+      geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]),
+                 linetype= "dotted", alpha = 0.4) +
       geom_hline(aes(yintercept = vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"]),
                  linetype = "dotted", alpha = 0.4) + 
       geom_point(data = eff_clinical_data[eff_clinical_data$name =="Moderna",], aes(x = eff, y = pop),
-                 size = 2, shape = 5, alpha=1, color = "red", stroke = 2) +
+                 size = 2, shape = 5, alpha=1, color = "red", stroke = 2, show.legend = c('shape' = T)) +
       labs(x = "Vaccine Efficacy Rate",
            y = "COVID-19 Rate in general population") +
       theme_minimal()
