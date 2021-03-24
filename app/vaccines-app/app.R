@@ -77,7 +77,7 @@ tabPanel("Page2", # PAGE2 ------------------------------------------------------
     splitLayout( ## begin main input panel ----------------------------------------
         wellPanel( align='center',
                    
-        tags$h4("Population Infection Rate"),         
+        tags$h4(tags$b("Infection Rate")),         
         sliderInput("poprate", "",
                       width = '150px',
                       min = 0.001, max = 0.1, value = 0.03, step = 0.001),
@@ -85,7 +85,7 @@ tabPanel("Page2", # PAGE2 ------------------------------------------------------
     ),  # end first element of splitpanel
     wellPanel( align='center',
       
-      tags$h4("Vaccine Efficacy Rate"),
+      tags$h4(tags$b("Efficacy Rate")),
       sliderInput("effrate", "",
                   width = '150px',
                   min = 0, max = 1, value = 0.8, step = 0.01),
@@ -93,11 +93,16 @@ tabPanel("Page2", # PAGE2 ------------------------------------------------------
     ))), # end main input panel, end second element
       
         
-
-    tags$h3("Expected Chance of Covid Protection"),
-    plotlyOutput("pct_protected", height = '100px'),
+    verticalLayout(
+      wellPanel(align='center',
+          tags$h3(tags$b("Chance of Covid Protection")),
+          htmlOutput("center_protectrate")
+                ),
+      #plotlyOutput("pct_protected", height = '100px'),
+      
+      plotOutput("effplot")
+    )
     
-    plotOutput("effplot")
     
     
   )) # end tab panel, fluid page
@@ -211,6 +216,7 @@ server <- function(input, output, session) {
   
   right_covid_per_10k <- reactive({ input$poprate * 10000 })
   right_covid_efficacy<- reactive({ round(input$effrate*100, 2) })
+  protectrate         <- reactive({ round((1- (input$poprate*(1 - input$effrate)))*100,2)  })
   
   
   # output values ---------------------------------------------------------------------------
@@ -250,9 +256,9 @@ server <- function(input, output, session) {
   
   output$right_poprate <- renderText({
     paste0(
-      "<b><font color=\"#41AB5D\" size=2>",
-      "Covid Infection Rate:<br>",
-      "</b></font>",
+      # "<b><font color=\"#41AB5D\" size=2>",
+      # "Covid Infection Rate:<br>",
+      # "</b></font>",
       "<b><font color=\"#000000\" size=6>",
       right_covid_per_10k(), " in 10,000",
       "</b></font>"
@@ -261,11 +267,19 @@ server <- function(input, output, session) {
   
   output$right_effrate <- renderText({
     paste0(
-      "<b><font color=\"#41AB5D\" size=2>",
-      "Vaccine Effiacy:<br>",
-      "</b></font>",
+      # "<b><font color=\"#41AB5D\" size=2>",
+      # "Vaccine Effiacy:<br>",
+      # "</b></font>",
       "<b><font color=\"#000000\" size=6>",
       right_covid_efficacy(), "%",
+      "</b></font>"
+    )
+  })
+  
+  output$center_protectrate <- renderText({
+    paste0(
+      "<b><font color=\"#000000\" size=6>",
+      protectrate(), "%",
       "</b></font>"
     )
   })
@@ -354,30 +368,30 @@ server <- function(input, output, session) {
   
   
   # page2 plotly percent protected indicator
-  protectrate <- reactive({ 1- (input$poprate*(1 - input$effrate)) })
-  threshold   <- reactive({ 1 - input$poprate})
   
-  p3 <- reactive({
-    plot_ly(type = "indicator", mode = 'number', title = "",
-            value = protectrate(),
-            number = list(valueformat = '.2%'),
-            gauge = list(
-              bar = list(color = "#4292C6"),
-              axis = list(
-                range = c(0,1),
-                tickmode = 'array',
-                tickvals = c(0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1)
-              ),
-              threshold = list(
-                thickness = 1,
-                line = list(width=4, color="#CB181D"),
-                value = threshold()
-              )
-            )
-    )
-  })
-  
-  output$pct_protected <- renderPlotly({p3()})
+  # threshold   <- reactive({ 1 - input$poprate})
+  # 
+  # p3 <- reactive({
+  #   plot_ly(type = "indicator", mode = 'number', title = "",
+  #           value = protectrate(),
+  #           number = list(valueformat = '.2%'),
+  #           gauge = list(
+  #             bar = list(color = "#4292C6"),
+  #             axis = list(
+  #               range = c(0,1),
+  #               tickmode = 'array',
+  #               tickvals = c(0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1)
+  #             ),
+  #             threshold = list(
+  #               thickness = 1,
+  #               line = list(width=4, color="#CB181D"),
+  #               value = threshold()
+  #             )
+  #           )
+  #   )
+  # })
+  # 
+  # output$pct_protected <- renderPlotly({p3()})
   
 
 } # end server ------------------------------------------------------------------------
