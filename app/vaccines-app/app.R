@@ -67,14 +67,32 @@ ui <- navbarPage("App Title",
 
 tabPanel("Page2", # PAGE2 ----------------------------------------------------------------------
   fluidPage(
-      actionBttn(inputId = 'reset_pfizer', label = "Pfizer data", size = 'xs',
+    wellPanel(
+    fluidRow(align='center',
+      actionBttn(inputId = 'reset_pfizer', label = "Pfizer data", size = 'sm',
                  style = 'fill', block = F, no_outline = T),
-      actionBttn(inputId = 'reset_moderna', label = "Moderna data", size = 'xs',
-                 style = 'fill', block = F, no_outline = T),
-    sliderInput("poprate", "COVID-19 rate in population",
-                min = 0.001, max = 0.1, value = 0.03, step = 0.001),
-    sliderInput("effrate", "Vaccine Efficacy Rate",
-                min = 0, max = 1, value = 0.8, step = 0.01),  
+      actionBttn(inputId = 'reset_moderna', label = "Moderna data", size = 'sm',
+                 style = 'fill', block = F, no_outline = T)
+    ),
+    splitLayout( ## begin main input panel ----------------------------------------
+        wellPanel( align='center',
+                   
+        tags$h4("Population Infection Rate"),         
+        sliderInput("poprate", "",
+                      width = '150px',
+                      min = 0.001, max = 0.1, value = 0.03, step = 0.001),
+          htmlOutput('right_poprate', width = 6),
+    ),  # end first element of splitpanel
+    wellPanel( align='center',
+      
+      tags$h4("Vaccine Efficacy Rate"),
+      sliderInput("effrate", "",
+                  width = '150px',
+                  min = 0, max = 1, value = 0.8, step = 0.01),
+      htmlOutput('right_effrate', width = 6, )
+    ))), # end main input panel, end second element
+      
+        
 
     tags$h3("Expected Chance of Covid Protection"),
     plotlyOutput("pct_protected", height = '100px'),
@@ -160,6 +178,8 @@ server <- function(input, output, session) {
   )
   
   
+  
+  
     
   
 
@@ -187,6 +207,10 @@ server <- function(input, output, session) {
     input$indicator=="severe"~vax_data$treatment_severe_rate_pct[vax_data$short_name == as.character(input$vaxname)],
     input$indicator=="mortality"~vax_data$treatment_mortality_rate_pct[vax_data$short_name == as.character(input$vaxname)]
   )})
+  
+  
+  right_covid_per_10k <- reactive({ input$poprate * 10000 })
+  right_covid_efficacy<- reactive({ round(input$effrate*100, 2) })
   
   
   # output values ---------------------------------------------------------------------------
@@ -223,6 +247,28 @@ server <- function(input, output, session) {
              "</font>"
               )
     })
+  
+  output$right_poprate <- renderText({
+    paste0(
+      "<b><font color=\"#41AB5D\" size=2>",
+      "Covid Infection Rate:<br>",
+      "</b></font>",
+      "<b><font color=\"#000000\" size=6>",
+      right_covid_per_10k(), " in 10,000",
+      "</b></font>"
+    )
+  })
+  
+  output$right_effrate <- renderText({
+    paste0(
+      "<b><font color=\"#41AB5D\" size=2>",
+      "Vaccine Effiacy:<br>",
+      "</b></font>",
+      "<b><font color=\"#000000\" size=6>",
+      right_covid_efficacy(), "%",
+      "</b></font>"
+    )
+  })
   
   
   
