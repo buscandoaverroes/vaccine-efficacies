@@ -68,12 +68,13 @@ ui <- navbarPage("App Title",
 tabPanel("Page2", # PAGE2 ----------------------------------------------------------------------
   fluidPage(
     
-    sliderInput("poprate", "Population Incidence",
-                min = 0, max = 1, value = 0.1, step = 0.01),
-    sliderInput("effrate", "Efficacy Rate",
-                min = 0, max = 1, value = 1, step = 0.01),
-    sliderInput('protectrate', "Chance you're protected", 
-                min = 0, max = 1, value = 0.01, step = 0.01),
+    sliderInput("poprate", "COVID-19 rate in general population",
+                min = 0, max = 0.2, value = 0.1, step = 0.01),
+    sliderInput("effrate", "Vaccine Efficacy Rate",
+                min = 0, max = 1, value = 0.8, step = 0.01),  tags$br(),
+    
+    tags$h3("Expected Chance of Covid Protection"),
+    plotlyOutput("pct_protected", height = '200px'),
     
     plotOutput("effplot")
     
@@ -252,6 +253,27 @@ server <- function(input, output, session) {
   })
     
   output$effplot <- renderPlot({p2()})
+  
+  
+  
+  # page2 plotly percent protected indicator
+  protectrate <- reactive({ 1- (input$poprate*(1 - input$effrate)) })
+  p3 <- reactive({
+    plot_ly(type = "indicator", mode = 'number+gauge', title = "Expected Chance of Protection",
+            value = protectrate(),
+            gauge = list(
+              axis = list(
+                range = c(0,1),
+                tickmode = 'array',
+                tickvals = c(0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1)
+                
+              )
+            )
+    )
+  })
+  
+  output$pct_protected <- renderPlotly({p3()})
+  
 
 } # end server ------------------------------------------------------------------------
 
