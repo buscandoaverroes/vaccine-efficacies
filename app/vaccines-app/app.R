@@ -85,7 +85,7 @@ tabPanel("Page2", # PAGE2 ------------------------------------------------------
                    
         tags$h4(tags$b("Infection Rate")),         
         sliderInput("poprate", label = NULL,
-                      width = '150px',
+                      width = '150px', ticks = F,
                       min = 0.001, max = 0.1, value = 0.03, step = 0.001),
           htmlOutput('right_poprate', width = 6),
     ),  # end first element of splitpanel
@@ -93,7 +93,7 @@ tabPanel("Page2", # PAGE2 ------------------------------------------------------
       
       tags$h4(tags$b("Efficacy Rate")),
       sliderInput("effrate", label = NULL,
-                  width = '150px',
+                  width = '150px', ticks = F, 
                   min = 0, max = 1, value = 0.8, step = 0.01),
       htmlOutput('right_effrate', width = 6, )
     )), # end main input panel, end second element
@@ -101,7 +101,7 @@ tabPanel("Page2", # PAGE2 ------------------------------------------------------
         
     verticalLayout(
       wellPanel(align='center',
-                style= 'background: #FFF',
+                style= 'background: #D9F9E5',
                   
                 
           tags$h3(tags$b("Chance of Covid Protection")),
@@ -267,7 +267,7 @@ server <- function(input, output, session) {
       # "Covid Infection Rate:<br>",
       # "</b></font>",
       "<b><font color=\"#000000\" size=6>",
-      right_covid_per_10k(), " in ", "10,000",
+      right_covid_per_10k(), " per ", "10,000",
       "</b></font>"
     )
   })
@@ -285,7 +285,7 @@ server <- function(input, output, session) {
   
   output$center_protectrate <- renderText({
     paste0(
-      "<b><font color=\"#000000\" size=6>",
+      "<b><font color=\"#41AB5D\" size=8>",
       protectrate(), "%",
       "</b></font>"
     )
