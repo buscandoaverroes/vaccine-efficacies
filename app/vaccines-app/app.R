@@ -15,63 +15,89 @@ reactlog_enable()
 options(shiny.reactlog = TRUE)
 
 theme <- bslib::bs_theme(
-  version = 4, bootswatch = "flatly",
-  spacer = '0.5rem'
+  version = 4, bootswatch = "cosmo",
+  spacer = '1.5rem',
+  enable_rounded = TRUE,
+  primary = "#7C36B0"
                          )
 
 # load data 
 load("app-data.Rdata")
 
 # UI =====================================================================================
-ui = navbarPage("App Title",
+ui = navbarPage("Vaccines",
 
 # Application title
-titlePanel("COVID-19 Vaccines"),
+
                 
   tabPanel("Vaccine Efficacies", # PAGE: efficacies ----------------------------------------------------------------------
-           fluidPage(
-             theme = theme,
-             
-             fluidRow(align='center',
-                      actionBttn(inputId = 'reset_pfizer', label = "Pfizer data", size = 'sm',
-                                 style = 'fill', block = F, no_outline = T),
-                      actionBttn(inputId = 'reset_moderna', label = "Moderna data", size = 'sm',
-                                 style = 'fill', block = F, no_outline = T)
-             ),
-             splitLayout( ##  main input panels ----------------------------------------
-                          wellPanel( align='center',
-                                     
-                                     tags$h4(tags$b("Infection Rate")),         
-                                     sliderInput("poprate", label = NULL,
-                                                 width = '150px', ticks = F,
-                                                 min = 0.001, max = 0.1, value = 0.03, step = 0.001),
-                                     htmlOutput('right_poprate', width = 6),
-                          ),  # end first element of splitpanel
-                          wellPanel( align='center',
-                                     
-                                     tags$h4(tags$b("Efficacy Rate")),
-                                     sliderInput("effrate", label = NULL,
-                                                 width = '150px', ticks = F, 
-                                                 min = 0, max = 1, value = 0.8, step = 0.01),
-                                     htmlOutput('right_effrate', width = 6, )
-                          )), # end main input panel, end second element
-             
-             
-             verticalLayout( 
-               wellPanel(align='center', ## protection rate ----
-                         style= 'background: #D9F9E5',
-                         
-                         
-                         tags$h3(tags$b("Chance of Covid Protection")),
-                         htmlOutput("center_protectrate")
-               ), # end wellpanel
-               #plotlyOutput("pct_protected", height = '100px'),
-               
-               plotOutput("effplot") ## rainbow curve plot ----
-             )
-             
-           )), # end tab panel, fluid page              
-                
+     fluidPage(
+       theme = theme,
+       
+       #titlePanel("COVID-19 Vaccines"),
+       tags$h4(tags$b("The Efficacy Rate is not your chance of being protected")), 
+       tags$body("It's just math -- your chances of Covid protection depend on:"),
+       tags$li("the vaccine efficacy rate"), tags$li("the rate and which unvaccinated people contract the virus."),
+       tags$li("and other individual risk factors"),
+
+       tags$h4("Estimate your Chances"),
+       tags$body("Select a vaccine preset to explore the clinical trial data or use the sliders to adjust to a hypothetical scenario.
+                 Worried about variants? Lower the efficacy rate."),
+       
+       tags$h4("Keep in Mind"),
+       tags$body("These trial data are from different snapshots in time and place; they aren't perfectly comparable.
+                 Also the clinical data revealed slightly different efficacies based on demographic factors like age (see sources)."),
+       tags$body("Also, if you're vaccinated, you should still follow local and CDC guidelines on masking and social
+                 distancing to protect those still waiting for a vaccine."), br(), hr(),
+       
+       
+       wellPanel(align='center',
+                 style= 'background: #2c3e50',
+
+                actionBttn(inputId = 'reset_pfizer', label = "Pfizer data", size = 'sm',
+                          color = 'primary',  style = 'fill', block = F, no_outline = T),
+                actionBttn(inputId = 'reset_moderna', label = "Moderna data", size = 'sm',
+                           color = 'primary', style = 'fill', block = F, no_outline = T),
+                actionBttn(inputId = 'variantA', label = "Variant A", size = 'xs',
+                           color = 'danger',  style = 'fill', block = F, no_outline = T),
+                actionBttn(inputId = 'variantB', label = "Variant B", size = 'xs',
+                           color = 'danger', style = 'fill', block = F, no_outline = T)
+              
+       ),
+       splitLayout( ##  main input panels ----------------------------------------
+                    wellPanel( align='center',
+                               
+                               tags$h4(tags$b("Infection Rate")),         
+                               sliderInput("poprate", label = NULL,
+                                           width = '150px', ticks = F,
+                                           min = 0.001, max = 0.1, value = 0.03, step = 0.001),
+                               htmlOutput('right_poprate', width = 6),
+                    ),  # end first element of splitpanel
+                    wellPanel( align='center',
+                               
+                               tags$h4(tags$b("Efficacy Rate")),
+                               sliderInput("effrate", label = NULL,
+                                           width = '150px', ticks = F, 
+                                           min = 0, max = 1, value = 0.8, step = 0.01),
+                               htmlOutput('right_effrate', width = 6, )
+                    )), # end main input panel, end second element
+       
+       
+       verticalLayout( 
+         wellPanel(align='center', ## protection rate ----
+                   style= 'background: #D9F9E5',
+                   
+                   
+                   tags$h3(tags$b("Estimated Chance of Covid Protection")),
+                   htmlOutput("center_protectrate")
+         ), # end wellpanel
+         #plotlyOutput("pct_protected", height = '100px'),
+         
+         plotOutput("effplot") ## rainbow curve plot ----
+       )
+       
+     )), # end tab panel, fluid page              
+          
                 
                 
                 
@@ -348,13 +374,13 @@ server <- function(input, output, session) {
   ## rainbow curve graph ---- 
   p2 <- reactive({
     ggplot(data = eff_data, aes(x = eff, y = pop, color = eff)) +
-      geom_contour_filled(aes(z = p_safe)) +
-      scale_fill_manual(breaks = c(0.5, 0.9, 0.99)) +
-      # scale_fill_viridis_d(name = "Protection Chance",
-      #                      option = 'plasma', direction = 1,
-      #                      alpha = 0.8,
-      #                      labels = c("90-91%", "91-92%", "92-93%", "93-94%", "94-95%",
-      #                                 "95-96%", "96-97%", "97-98%", "98-99%", "99-100%")) +
+      geom_contour_filled(aes(z = p_safe), breaks = c(0, 0.9,
+                                                      0.95, 0.99, 0.995, 0.999,
+                                                      1)) +
+      scale_fill_viridis_d(name = "Protection",
+                           option = 'plasma', direction = 1,
+                           alpha = 1,
+                           labels = c("90 - 95%", "95 - 99%", "99 - 99.5%", "99.5 -99.9%", "over 99.9%")) +
       geom_vline(aes(xintercept = eff_eff()), linetype= "dotdash", alpha = 0.5) +
       geom_hline(aes(yintercept = eff_pop()), linetype = "dotdash", alpha = 0.5) + 
       geom_point(data = eff_point(), aes(x = eff, y = pop), 
@@ -373,15 +399,15 @@ server <- function(input, output, session) {
                  linetype = "dotted", alpha = 0.4) + 
       geom_point(data = eff_clinical_data[eff_clinical_data$name =="Moderna",], aes(x = eff, y = pop),
                  size = 2, shape = 20, alpha=1, color = "red", stroke = 2) +
-      labs(x = "Vaccine Efficacy Rate",
-           y = "% of Population with Covid") +
+      labs(x = "Vaccine Efficacy",
+           y = "Pct of Population with Covid") +
       scale_x_continuous(labels = label_percent()) +
       scale_y_continuous(labels = label_percent()) +
       theme_minimal() +
       theme(
         legend.key.size = unit(8,'mm'),
-        legend.title = element_text(size=12, face = "bold"),
-        legend.text = element_text(size=10),
+        legend.title = element_text(size=15, face = "bold"),
+        legend.text = element_text(size=13),
         axis.title = element_text(size=15),
         axis.text = element_text(size=12),
         
