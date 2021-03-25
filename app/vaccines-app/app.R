@@ -24,8 +24,11 @@ load("app-data.Rdata")
 
 # UI =====================================================================================
 ui = navbarPage("App Title",
+
+# Application title
+titlePanel("COVID-19 Vaccines"),
                 
-  tabPanel("Clinical Data", # PAGE2 ----------------------------------------------------------------------
+  tabPanel("Vaccine Efficacies", # PAGE: efficacies ----------------------------------------------------------------------
            fluidPage(
              theme = theme,
              
@@ -35,7 +38,7 @@ ui = navbarPage("App Title",
                       actionBttn(inputId = 'reset_moderna', label = "Moderna data", size = 'sm',
                                  style = 'fill', block = F, no_outline = T)
              ),
-             splitLayout( ## begin main input panel ----------------------------------------
+             splitLayout( ##  main input panels ----------------------------------------
                           wellPanel( align='center',
                                      
                                      tags$h4(tags$b("Infection Rate")),         
@@ -54,8 +57,8 @@ ui = navbarPage("App Title",
                           )), # end main input panel, end second element
              
              
-             verticalLayout(
-               wellPanel(align='center',
+             verticalLayout( 
+               wellPanel(align='center', ## protection rate ----
                          style= 'background: #D9F9E5',
                          
                          
@@ -64,7 +67,7 @@ ui = navbarPage("App Title",
                ), # end wellpanel
                #plotlyOutput("pct_protected", height = '100px'),
                
-               plotOutput("effplot")
+               plotOutput("effplot") ## rainbow curve plot ----
              )
              
            )), # end tab panel, fluid page              
@@ -72,15 +75,13 @@ ui = navbarPage("App Title",
                 
                 
                 
-  tabPanel("Vaccine Efficacies", # PAGE1 ----------------------------------------------------------------------
+  tabPanel("Clinical Data", # PAGE: clinical dat ----------------------------------------------------------------------
   fluidPage(
 
-    # Application title
-    titlePanel("Title"),
-    
+
     tags$body("a few sentences that will go here but idk what yet exactly."), tags$br(),
     
-    wellPanel( # input panel --------------------------------------------------
+    wellPanel( ## input panel --------------------------------------------------
       column(12, align='center',
              fluidRow(
              radioGroupButtons('vaxname', "Vaccine",
@@ -102,7 +103,7 @@ ui = navbarPage("App Title",
       )
     ),
     
-    fluidRow(column(12, align='center', # effectiveness value boxs -------------------------
+    fluidRow(column(12, align='center', ## effectiveness value boxs -------------------------
                     htmlOutput('oddsratio'))), tags$br(),
     fluidRow(column(6, align='center',
                     htmlOutput('placeboText'),           
@@ -112,7 +113,7 @@ ui = navbarPage("App Title",
             )),
     tags$br(),
     
-    fluidRow( # placebo/treatment ---------------------------------------------------------
+    fluidRow( ## placebo/treatment ---------------------------------------------------------
       column(12, align='center',
       withSpinner(plotOutput('plotly', height = '400px', width = '400px'), type = 1)
     )),
@@ -127,7 +128,7 @@ ui = navbarPage("App Title",
 # SERVER =====================================================================================
 server <- function(input, output, session) {
   
-  # page 2 data ---------------------------------------------------------------------
+  # efficacy data ---------------------------------------------------------------------
   # f.efficacy   = 1 - (input$protectrate/input$poprate)
   # f.population = (input$protectrate / (100 - input$effrate))
   # f.vaccine     = 1- input$poprate*(100 - input$effrate)
@@ -139,7 +140,7 @@ server <- function(input, output, session) {
   # observeEvent(input$protectrate, { 
   #   updateSliderInput(inputId = "effrate", value =  (input$protectrate / (1 - input$effrate))) })
   
-  ## update protected rate
+  ## update protected rate ----
   observeEvent(input$poprate, { 
     updateSliderInput(inputId = "protectrate", value = 1- (input$poprate*(1 - input$effrate))) })
   observeEvent(input$effrate, { 
@@ -152,7 +153,7 @@ server <- function(input, output, session) {
   #   updateSliderInput(inputId = "poprate", value = 1 - (input$protectrate/input$poprate)) })
   #   
   
-  ## update sliders with clinical data presets 
+  ## update sliders with clinical data presets ----
   observeEvent(input$reset_pfizer, {
     updateSliderInput('poprate', session = session, value = vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"])
     updateSliderInput('effrate', session = session, value = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"])
@@ -163,7 +164,7 @@ server <- function(input, output, session) {
   })
 
   
-  
+  ## eff data for plot ----
   # for now, generate this data in-app
   eff_data <- expand_grid(
     pop    = seq(from = 0, to = 0.1, by = 0.05),
@@ -233,7 +234,7 @@ server <- function(input, output, session) {
   protectrate         <- reactive({ round((1- (input$poprate*(1 - input$effrate)))*100,2)  })
   
   
-  # output values ---------------------------------------------------------------------------
+  # text output  ---------------------------------------------------------------------------
   output$oddsratio <- renderText({ # containers should go for each of these three?
     paste0("<b><font color=\"#737373\" size=5>","Efficacy",
            "</b></font>", "<br>",
@@ -313,7 +314,7 @@ server <- function(input, output, session) {
   
   # graphs ----------------------------------------------------------------------------------
   
-  # page1 graph 
+  ## placebo/vaccine graph ----
   p1 <- reactive({ withProgress(message = "Building the Graph",
         ggplot(data = data(), aes(x, y)) + # use raster since high perferfmance and all same size
           geom_raster(aes(fill = outcome, alpha = outcome)) +
@@ -344,7 +345,7 @@ server <- function(input, output, session) {
 
 
 
-  # page2 graph 
+  ## rainbow curve graph ---- 
   p2 <- reactive({
     ggplot(data = eff_data, aes(x = eff, y = pop, color = eff)) +
       geom_contour_filled(aes(z = p_safe)) +
