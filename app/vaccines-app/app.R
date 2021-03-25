@@ -1,6 +1,7 @@
 
 library(RColorBrewer)
 library(tidyverse)
+library(scales)
 library(shiny)
 library(shinyWidgets)
 library(shinydashboard)
@@ -23,7 +24,55 @@ load("app-data.Rdata")
 
 # UI =====================================================================================
 ui = navbarPage("App Title",
-  tabPanel("Page1", # PAGE1 ----------------------------------------------------------------------
+                
+  tabPanel("Clinical Data", # PAGE2 ----------------------------------------------------------------------
+           fluidPage(
+             theme = theme,
+             
+             fluidRow(align='center',
+                      actionBttn(inputId = 'reset_pfizer', label = "Pfizer data", size = 'sm',
+                                 style = 'fill', block = F, no_outline = T),
+                      actionBttn(inputId = 'reset_moderna', label = "Moderna data", size = 'sm',
+                                 style = 'fill', block = F, no_outline = T)
+             ),
+             splitLayout( ## begin main input panel ----------------------------------------
+                          wellPanel( align='center',
+                                     
+                                     tags$h4(tags$b("Infection Rate")),         
+                                     sliderInput("poprate", label = NULL,
+                                                 width = '150px', ticks = F,
+                                                 min = 0.001, max = 0.1, value = 0.03, step = 0.001),
+                                     htmlOutput('right_poprate', width = 6),
+                          ),  # end first element of splitpanel
+                          wellPanel( align='center',
+                                     
+                                     tags$h4(tags$b("Efficacy Rate")),
+                                     sliderInput("effrate", label = NULL,
+                                                 width = '150px', ticks = F, 
+                                                 min = 0, max = 1, value = 0.8, step = 0.01),
+                                     htmlOutput('right_effrate', width = 6, )
+                          )), # end main input panel, end second element
+             
+             
+             verticalLayout(
+               wellPanel(align='center',
+                         style= 'background: #D9F9E5',
+                         
+                         
+                         tags$h3(tags$b("Chance of Covid Protection")),
+                         htmlOutput("center_protectrate")
+               ), # end wellpanel
+               #plotlyOutput("pct_protected", height = '100px'),
+               
+               plotOutput("effplot")
+             )
+             
+           )), # end tab panel, fluid page              
+                
+                
+                
+                
+  tabPanel("Vaccine Efficacies", # PAGE1 ----------------------------------------------------------------------
   fluidPage(
 
     # Application title
@@ -35,15 +84,16 @@ ui = navbarPage("App Title",
       column(12, align='center',
              fluidRow(
              radioGroupButtons('vaxname', "Vaccine",
-                           choices = c("Pfizer", "Moderna", "J&J"), 
+                           choices = c("Pfizer", "Moderna"), 
                            #choiceValues = c("Pfizer-BioNTech", "Moderna","Johnson&Johnson"),
                            selected = "Pfizer", size = "lg", width = '300px',
                             justified = TRUE, individual = TRUE, direction = 'horizontal')),
              fluidRow(
                awesomeRadio('indicator', "Indicator",
-                            choices = c("Covid Infections" = 'covid',
-                                            "Severe Covid Infections" = 'severe',
-                                            "Deaths" = 'mortality'),
+                            choices = c("Covid Infections" = 'covid'
+                                            # "Severe Covid Infections" = 'severe',
+                                            # "Deaths" = 'mortality'
+                                        ),
                             selected = "covid", inline = TRUE)
              ), 
              
@@ -68,52 +118,9 @@ ui = navbarPage("App Title",
     )),
 
     #tags$body("Adn this is :"), htmlOutput('text')
-)), # end fluidpage, tabpanel for page1
+)) # end fluidpage, tabpanel for page1
 
-tabPanel("Page2", # PAGE2 ----------------------------------------------------------------------
-  fluidPage(
-    theme = theme,
-    
-    fluidRow(align='center',
-      actionBttn(inputId = 'reset_pfizer', label = "Pfizer data", size = 'sm',
-                 style = 'fill', block = F, no_outline = T),
-      actionBttn(inputId = 'reset_moderna', label = "Moderna data", size = 'sm',
-                 style = 'fill', block = F, no_outline = T)
-    ),
-    splitLayout( ## begin main input panel ----------------------------------------
-        wellPanel( align='center',
-                   
-        tags$h4(tags$b("Infection Rate")),         
-        sliderInput("poprate", label = NULL,
-                      width = '150px', ticks = F,
-                      min = 0.001, max = 0.1, value = 0.03, step = 0.001),
-          htmlOutput('right_poprate', width = 6),
-    ),  # end first element of splitpanel
-    wellPanel( align='center',
-      
-      tags$h4(tags$b("Efficacy Rate")),
-      sliderInput("effrate", label = NULL,
-                  width = '150px', ticks = F, 
-                  min = 0, max = 1, value = 0.8, step = 0.01),
-      htmlOutput('right_effrate', width = 6, )
-    )), # end main input panel, end second element
-      
-        
-    verticalLayout(
-      wellPanel(align='center',
-                style= 'background: #D9F9E5',
-                  
-                
-          tags$h3(tags$b("Chance of Covid Protection")),
-          htmlOutput("center_protectrate")
-          ), # end wellpanel
-      #plotlyOutput("pct_protected", height = '100px'),
-
-      plotOutput("effplot")
-    )
-    
-    ) # end tab panel, fluid page
-)) # end navbarpage, taglist
+) # end navbarpage, taglist
 
 
 
@@ -341,11 +348,12 @@ server <- function(input, output, session) {
   p2 <- reactive({
     ggplot(data = eff_data, aes(x = eff, y = pop, color = eff)) +
       geom_contour_filled(aes(z = p_safe)) +
-      scale_fill_viridis_d(name = "Protection Chance",
-                           option = 'plasma', direction = 1,
-                           alpha = 0.8,
-                           labels = c("90-91%", "91-92%", "92-93%", "93-94%", "94-95%",
-                                      "95-96%", "96-97%", "97-98%", "98-99%", "99-100%")) +
+      scale_fill_manual(breaks = c(0.5, 0.9, 0.99)) +
+      # scale_fill_viridis_d(name = "Protection Chance",
+      #                      option = 'plasma', direction = 1,
+      #                      alpha = 0.8,
+      #                      labels = c("90-91%", "91-92%", "92-93%", "93-94%", "94-95%",
+      #                                 "95-96%", "96-97%", "97-98%", "98-99%", "99-100%")) +
       geom_vline(aes(xintercept = eff_eff()), linetype= "dotdash", alpha = 0.5) +
       geom_hline(aes(yintercept = eff_pop()), linetype = "dotdash", alpha = 0.5) + 
       geom_point(data = eff_point(), aes(x = eff, y = pop), 
