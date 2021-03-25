@@ -101,8 +101,12 @@ tabPanel("Page2", # PAGE2 ------------------------------------------------------
         
     verticalLayout(
       wellPanel(align='center',
+                style= 'background: #FFF',
+                  
+                
           tags$h3(tags$b("Chance of Covid Protection")),
-          htmlOutput("center_protectrate")), # end wellpanel
+          htmlOutput("center_protectrate")
+          ), # end wellpanel
       #plotlyOutput("pct_protected", height = '100px'),
 
       plotOutput("effplot")
