@@ -332,7 +332,9 @@ server <- function(input, output, session) {
     )
   })
   
-  
+  output$math <- renderUI({
+    withMathJax(helpText("Some math here $$\\alpha+\\beta$$"))
+  })
   
   
   # data work -------------------------------------------------------------------------------
