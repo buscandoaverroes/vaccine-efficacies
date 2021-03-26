@@ -9,6 +9,7 @@ library(shinycssloaders)
 library(reactlog)
 library(plotly)
 library(bslib)
+library(mathjaxr)
 
 reactlog_enable()
 
@@ -84,7 +85,9 @@ ui = navbarPage("Vaccines",
        
        
        verticalLayout( 
-         wellPanel(align='center', 'background: #D9F9E5',
+         wellPanel(align='center',
+                   style='background: #D9F9E5',
+                   
                    tags$body("testing...")
                    ),
          wellPanel(align='center', ## protection rate ----
@@ -264,7 +267,8 @@ server <- function(input, output, session) {
   
   
   # text output  ---------------------------------------------------------------------------
-  output$oddsratio <- renderText({ # containers should go for each of these three?
+  ## clinical data ----
+  output$oddsratio <- renderText({ 
     paste0("<b><font color=\"#737373\" size=5>","Efficacy",
            "</b></font>", "<br>",
            "<b><font color=\"#737373\" size=6>",stat_eff(), "%",
@@ -297,7 +301,7 @@ server <- function(input, output, session) {
              "</font>"
               )
     })
-  
+  ## efficacies ----
   output$right_poprate <- renderText({
     paste0(
       # "<b><font color=\"#41AB5D\" size=2>",
@@ -327,6 +331,7 @@ server <- function(input, output, session) {
       "</b></font>"
     )
   })
+  
   
   
   
