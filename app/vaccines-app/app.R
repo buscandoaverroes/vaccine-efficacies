@@ -50,7 +50,7 @@ ui = navbarPage("Vaccines",
        tags$body("Also, if you're vaccinated, you should still follow local and CDC guidelines on masking and social
                  distancing to protect those still waiting for a vaccine."), br(), hr(),
        
-       
+       switchInput('showmath', 'Show Math', value=T, size = 'mini'),
        wellPanel(align='center',
                  style= 'background: #2c3e50',
 
@@ -84,6 +84,9 @@ ui = navbarPage("Vaccines",
        
        
        verticalLayout( 
+         wellPanel(align='center', 'background: #D9F9E5',
+                   tags$body("testing...")
+                   ),
          wellPanel(align='center', ## protection rate ----
                    style= 'background: #D9F9E5',
                    
