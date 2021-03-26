@@ -276,7 +276,7 @@ server <- function(input, output, session) {
   )})
   
   
-  right_covid_per_10k <- reactive({ input$poprate * 10000 })
+  right_covid_per_1k <- reactive({ input$poprate * 1000 })
   right_covid_efficacy<- reactive({ round(input$effrate*100, 2) })
   protectrate         <- reactive({ round((1- (input$poprate*(1 - input$effrate)))*100,2)  })
   
@@ -323,7 +323,7 @@ server <- function(input, output, session) {
       # "Covid Infection Rate:<br>",
       # "</b></font>",
       "<b><font color=\"#000000\" size=6>",
-      right_covid_per_10k(), " per ", "10,000",
+      right_covid_per_1k(), " per ", "1,000",
       "</b></font>"
     )
   })
