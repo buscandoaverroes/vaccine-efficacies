@@ -37,21 +37,21 @@ ui = navbarPage("Vaccines",
        
        #titlePanel("COVID-19 Vaccines"),
        tags$h4(tags$b("The Efficacy Rate is not your chance of being protected")), 
-       tags$body("It's just math -- your chances of Covid protection depend on:"),
-       tags$li("the vaccine efficacy rate"), tags$li("the rate and which unvaccinated people contract the virus."),
+       tags$body("It's just math! Your chances of Covid protection depend on:"),
+       tags$li("the vaccine efficacy rate"),
+       tags$li("how fast the virus spreads"),
        tags$li("and other individual risk factors"),
 
        tags$h4("Estimate your Chances"),
        tags$body("Select a vaccine preset to explore the clinical trial data or use the sliders to adjust to a hypothetical scenario.
                  Worried about variants? Lower the efficacy rate."),
        
-       tags$h4("Keep in Mind"),
-       tags$body("These trial data are from different snapshots in time and place; they aren't perfectly comparable.
-                 Also the clinical data revealed slightly different efficacies based on demographic factors like age (see sources)."),
-       tags$body("Also, if you're vaccinated, you should still follow local and CDC guidelines on masking and social
-                 distancing to protect those still waiting for a vaccine."), br(), hr(),
+     
+
        
-       switchInput('showmath', 'Show Math', value=T, size = 'mini'),
+       br(), hr(),
+       
+       materialSwitch('showmath', 'Show Math', value=F, right = T, inline = T),
        wellPanel(align='center',
                  style= 'background: #2c3e50',
 
@@ -91,7 +91,8 @@ ui = navbarPage("Vaccines",
           wellPanel(align='center',
                     style='background: #D9F9E5',
                     
-                    uiOutput('math')
+                    tags$ul(htmlOutput('math', container = tags$h4))
+                    # htmloutput same as renderui
           )
         ),
          wellPanel(align='center', ## protection rate ----
@@ -104,7 +105,21 @@ ui = navbarPage("Vaccines",
          #plotlyOutput("pct_protected", height = '100px'),
          
          plotOutput("effplot") ## rainbow curve plot ----
-       )
+       ),
+       
+       
+       tags$h4("Keep in Mind"),
+       tags$body("These trial data are from different snapshots in time and place; they aren't perfectly comparable.
+                 It's worth noting that the clinical studies revealed slightly different efficacies based on demographic factors like age (see sources)."),
+       tags$body("Also, if you're vaccinated, you should still follow local and CDC guidelines on masking and social
+                 distancing to protect those still waiting for a vaccine."), 
+       
+       tags$h4("Key Takeaways"),
+       tags$li("Your protection chances from Covid are much higher than the stated efficacy rate."),
+       tags$li("Vaccines work. All approved COVID-19 vaccines reduce the average person's chances of
+             contracting covid to near 0."),
+       tags$li("Any differences in efficacy rates between vaccines don't matter much in practicality -- it's 
+               more important simply to get vaccinated."),
        
      )), # end tab panel, fluid page              
           
@@ -165,29 +180,12 @@ ui = navbarPage("Vaccines",
 server <- function(input, output, session) {
   
   # efficacy data ---------------------------------------------------------------------
-  # f.efficacy   = 1 - (input$protectrate/input$poprate)
-  # f.population = (input$protectrate / (100 - input$effrate))
-  # f.vaccine     = 1- input$poprate*(100 - input$effrate)
 
-  
-  ## update efficacy rate
-  # observeEvent(input$poprate, { 
-  #   updateSliderInput(inputId = "effrate", value =  (input$protectrate / (1 - input$effrate))) })
-  # observeEvent(input$protectrate, { 
-  #   updateSliderInput(inputId = "effrate", value =  (input$protectrate / (1 - input$effrate))) })
-  
   ## update protected rate ----
   observeEvent(input$poprate, { 
     updateSliderInput(inputId = "protectrate", value = 1- (input$poprate*(1 - input$effrate))) })
   observeEvent(input$effrate, { 
     updateSliderInput(inputId = "protectrate", value = 1- (input$poprate*(1 - input$effrate))) })
-  
-  ## update population rate
-  # observeEvent(input$protectrate, {
-  #   updateSliderInput(inputId = "poprate", value = 1 - (input$protectrate/input$poprate)) })
-  # observeEvent(input$effrate, {
-  #   updateSliderInput(inputId = "poprate", value = 1 - (input$protectrate/input$poprate)) })
-  #   
   
   ## update sliders with clinical data presets ----
   observeEvent(input$reset_pfizer, {
@@ -198,7 +196,20 @@ server <- function(input, output, session) {
     updateSliderInput('poprate', session = session, value = vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"])
     updateSliderInput('effrate', session = session,  value = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"])
   })
-
+  
+  ## variant adjustments ----
+  ### Variant A: reduces efficacy by 0.15 (15%), increases population prevalence by 0.1 (10%)
+  observeEvent(input$variantA, {
+    updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.15))
+    updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.1))
+  })
+  ### Variant BA: reduces efficacy by 0.10 (15%), increases population prevalence by 0.4 (10%)
+  observeEvent(input$variantB, {
+    updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.1))
+    updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.4))
+  })
+  
+  
   
   ## eff data for plot ----
   # for now, generate this data in-app
@@ -336,8 +347,11 @@ server <- function(input, output, session) {
     )
   })
   math_eq <- reactive({
-    paste0(round(protectrate()/100,3), " = 1 - (",round(input$poprate,3),"*(1 - ",
+    paste0(
+      #"<b><font color=\"#000\" size=6", # can't use with renderUI??
+      round(protectrate()/100,4), " = 1 - (",round(input$poprate,3),"*(1 - ",
            round(input$effrate,3),"))"
+      #"</b></font>"
                  )
   })
   output$math <- renderUI({
@@ -398,7 +412,7 @@ server <- function(input, output, session) {
       scale_fill_viridis_d(name = "Protection",
                            option = 'plasma', direction = 1,
                            alpha = 0.9,
-                           labels = c("90 - 95%", "95 - 99%", "99 - 99.5%", "99.5 -99.9%", "over 99.9%")) +
+                           labels = c("90 - 95%", "95 - 99%", "99 - 99.5%", "99.5-99.9%", "over 99.9%")) +
       geom_vline(aes(xintercept = eff_eff()), linetype= "dotdash", alpha = 0.5) +
       geom_hline(aes(yintercept = eff_pop()), linetype = "dotdash", alpha = 0.5) + 
       geom_point(data = eff_point(), aes(x = eff, y = pop), 
@@ -437,33 +451,7 @@ server <- function(input, output, session) {
   output$effplot <- renderPlot({p2()})
   
   
-  
-  # page2 plotly percent protected indicator
-  
-  # threshold   <- reactive({ 1 - input$poprate})
-  # 
-  # p3 <- reactive({
-  #   plot_ly(type = "indicator", mode = 'number', title = "",
-  #           value = protectrate(),
-  #           number = list(valueformat = '.2%'),
-  #           gauge = list(
-  #             bar = list(color = "#4292C6"),
-  #             axis = list(
-  #               range = c(0,1),
-  #               tickmode = 'array',
-  #               tickvals = c(0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1)
-  #             ),
-  #             threshold = list(
-  #               thickness = 1,
-  #               line = list(width=4, color="#CB181D"),
-  #               value = threshold()
-  #             )
-  #           )
-  #   )
-  # })
-  # 
-  # output$pct_protected <- renderPlotly({p3()})
-  
+
 
 } # end server ------------------------------------------------------------------------
 
