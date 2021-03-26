@@ -9,7 +9,7 @@ library(shinycssloaders)
 library(reactlog)
 library(plotly)
 library(bslib)
-library(mathjaxr)
+#library(mathjaxr)
 
 reactlog_enable()
 
@@ -80,16 +80,20 @@ ui = navbarPage("Vaccines",
                                sliderInput("effrate", label = NULL,
                                            width = '150px', ticks = F, 
                                            min = 0, max = 1, value = 0.8, step = 0.01),
-                               htmlOutput('right_effrate', width = 6, )
+                               htmlOutput('right_effrate', width = 6 )
                     )), # end main input panel, end second element
        
        
-       verticalLayout( 
-         wellPanel(align='center',
-                   style='background: #D9F9E5',
-                   
-                   tags$body("testing...")
-                   ),
+       verticalLayout(  ## math ----
+        conditionalPanel(
+          condition = 'input.showmath',
+          
+          wellPanel(align='center',
+                    style='background: #D9F9E5',
+                    
+                    uiOutput('math')
+          )
+        ),
          wellPanel(align='center', ## protection rate ----
                    style= 'background: #D9F9E5',
                    
@@ -331,9 +335,13 @@ server <- function(input, output, session) {
       "</b></font>"
     )
   })
-  
+  math_eq <- reactive({
+    paste0(round(protectrate()/100,3), " = 1 - (",round(input$poprate,3),"*(1 - ",
+           round(input$effrate,3),"))"
+                 )
+  })
   output$math <- renderUI({
-    withMathJax(helpText("Some math here $$\\alpha+\\beta$$"))
+    withMathJax(helpText(math_eq()))
   })
   
   
@@ -389,7 +397,7 @@ server <- function(input, output, session) {
                                                       1)) +
       scale_fill_viridis_d(name = "Protection",
                            option = 'plasma', direction = 1,
-                           alpha = 1,
+                           alpha = 0.9,
                            labels = c("90 - 95%", "95 - 99%", "99 - 99.5%", "99.5 -99.9%", "over 99.9%")) +
       geom_vline(aes(xintercept = eff_eff()), linetype= "dotdash", alpha = 0.5) +
       geom_hline(aes(yintercept = eff_pop()), linetype = "dotdash", alpha = 0.5) + 
