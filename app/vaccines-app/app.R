@@ -13,7 +13,7 @@ library(bslib)
 
 reactlog_enable()
 
-options(shiny.reactlog = TRUE)
+#options(shiny.reactlog = TRUE)
 
 theme <- bslib::bs_theme(
   version = 4, bootswatch = "cosmo",
@@ -25,6 +25,11 @@ theme <- bslib::bs_theme(
 # load data 
 load("app-data.Rdata")
 
+# default input values 
+dflt_poprate = 0.03
+dflt_effrate = 0.8
+
+
 # UI =====================================================================================
 ui = navbarPage("Vaccines",
 
@@ -35,7 +40,6 @@ ui = navbarPage("Vaccines",
      fluidPage(
        theme = theme,
        
-       #titlePanel("COVID-19 Vaccines"),
        tags$h4(tags$b("The Efficacy Rate is not your chance of being protected")), 
        tags$body("It's just math! Your chances of Covid protection depend on:"),
        tags$li("the vaccine efficacy rate"),
@@ -59,11 +63,13 @@ ui = navbarPage("Vaccines",
                           color = 'primary',  style = 'fill', block = F, no_outline = T),
                 actionBttn(inputId = 'reset_moderna', label = "Moderna data", size = 'sm',
                            color = 'primary', style = 'fill', block = F, no_outline = T),
-                actionBttn(inputId = 'variantA', label = "Variant A", size = 'xs',
-                           color = 'danger',  style = 'fill', block = F, no_outline = T),
-                actionBttn(inputId = 'variantB', label = "Variant B", size = 'xs',
-                           color = 'danger', style = 'fill', block = F, no_outline = T)
-              
+                checkboxGroupButtons(
+                  'variants', label = NULL,
+                  choices = c("Variant A", "Variant B"),
+                  size = "sm", status = 'primary',
+                  direction = 'horizontal',
+                )
+           
        ),
        splitLayout( ##  main input panels ----------------------------------------
                     wellPanel( align='center',
@@ -107,26 +113,27 @@ ui = navbarPage("Vaccines",
          plotOutput("effplot") ## rainbow curve plot ----
        ),
        
-       
-       tags$h4("Keep in Mind"),
-       tags$body("These trial data are from different snapshots in time and place; they aren't perfectly comparable.
-                 It's worth noting that the clinical studies revealed slightly different efficacies based on demographic factors like age (see sources)."),
-       tags$body("Also, if you're vaccinated, you should still follow local and CDC guidelines on masking and social
-                 distancing to protect those still waiting for a vaccine."), 
-       
        tags$h4("Key Takeaways"),
        tags$li("Your protection chances from Covid are much higher than the stated efficacy rate."),
        tags$li("Vaccines work. All approved COVID-19 vaccines reduce the average person's chances of
              contracting covid to near 0."),
-       tags$li("Any differences in efficacy rates between vaccines don't matter much in practicality -- it's 
-               more important simply to get vaccinated."),
+       tags$li("Differences in efficacy rates between vaccines don't matter much in practicality -- it's 
+               more important just to get vaccinated."),
        
+       tags$h4("Keep in Mind"),
+       tags$body("The clinical trials occured in different places and stages of the pandemic, so 
+                 they aren't perfectly comparable.
+                 Also, these studies revealed slightly different efficacies based on demographic factors like age (see sources)."),
+       tags$body("Finally, if you're vaccinated, it's very important to continue following CDC guidelines on masking and social
+                 distancing to protect those still waiting for a vaccine.") 
+       
+
      )), # end tab panel, fluid page              
           
                 
                 
                 
-  tabPanel("Clinical Data", # PAGE: clinical dat ----------------------------------------------------------------------
+  tabPanel("Clinical Data", # PAGE: clinical data ----------------------------------------------------------------------
   fluidPage(
 
 
@@ -197,25 +204,43 @@ server <- function(input, output, session) {
     updateSliderInput('effrate', session = session,  value = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"])
   })
   
+  
+  usr_poprate <- reactive({input$poprate}) 
+  usr_effrate <- reactive({input$effrate})
+  
+  
   ## variant adjustments ----
   ### Variant A: reduces efficacy by 0.15 (15%), increases population prevalence by 0.1 (10%)
-  observeEvent(input$variantA, {
-    updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.15))
-    updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.1))
-  })
-  ### Variant BA: reduces efficacy by 0.10 (15%), increases population prevalence by 0.4 (10%)
-  observeEvent(input$variantB, {
-    updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.1))
-    updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.4))
+  ### Variant B: reduces efficacy by 0.10 (10%), increases population prevalence by 0.4 (40%)
+  observeEvent(input$variants, {
+    
+    if (input$variants == "Variant A") {
+      # store value?? this requires going "back" to reset to the previous number so we can do the calc from there.
+
+      updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.15))
+      updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.1))
+      #updateCheckboxGroupButtons('variants', session = session, disabledChoices = "Variant A")
+      
+    }
+    
+    if (input$variants == "Variant B") {
+      updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.1))
+      updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.4))
+      #updateCheckboxGroupButtons('variants', session = session, disabledChoices = "Variant B")
+      
+    }
+      
+
   })
   
+  #observeEvent()
   
   
   ## eff data for plot ----
   # for now, generate this data in-app
   eff_data <- expand_grid(
     pop    = seq(from = 0, to = 0.1, by = 0.05),
-    eff    = seq(from = 0, to = 1, by = 0.01),
+    eff    = seq(from = 0, to = 1, by = 0.01)
   ) %>% mutate(
     p_safe   = 1-(pop*(1-eff))
   )
@@ -441,7 +466,7 @@ server <- function(input, output, session) {
         legend.title = element_text(size=15, face = "bold"),
         legend.text = element_text(size=13),
         axis.title = element_text(size=15),
-        axis.text = element_text(size=12),
+        axis.text = element_text(size=12)
         
         
       )
@@ -449,7 +474,7 @@ server <- function(input, output, session) {
   })
     
   output$effplot <- renderPlot({p2()})
-  
+
   
 
 
