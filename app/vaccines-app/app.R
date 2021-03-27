@@ -54,8 +54,9 @@ ui = navbarPage("Vaccines",
 
        
        br(), hr(),
-       
-       materialSwitch('showmath', 'Show Math', value=F, right = T, inline = T),
+       tags$body("variants:"),textOutput('out'),
+       tags$body("beta:"), textOutput('out2'),
+       prettySwitch('showmath', 'Show Math', slim = T, inline = T, status = 'info'),
        wellPanel(align='center',
                  style= 'background: #2c3e50',
 
@@ -65,9 +66,9 @@ ui = navbarPage("Vaccines",
                            color = 'primary', style = 'fill', block = F, no_outline = T),
                 checkboxGroupButtons(
                   'variants', label = NULL,
-                  choices = c("Variant A", "Variant B"),
-                  size = "sm", status = 'primary',
-                  direction = 'horizontal',
+                  choices = c("Variant A", "Variant B"), 
+                   status = 'primary',
+                  size = "sm", direction = 'horizontal'
                 )
            
        ),
@@ -78,7 +79,7 @@ ui = navbarPage("Vaccines",
                                sliderInput("poprate", label = NULL,
                                            width = '150px', ticks = F,
                                            min = 0.001, max = 0.1, value = 0.03, step = 0.001),
-                               htmlOutput('right_poprate', width = 6),
+                               htmlOutput('right_poprate', width = 6)
                     ),  # end first element of splitpanel
                     wellPanel( align='center',
                                
@@ -89,7 +90,7 @@ ui = navbarPage("Vaccines",
                                htmlOutput('right_effrate', width = 6 )
                     )), # end main input panel, end second element
        
-       
+
        verticalLayout(  ## math ----
         conditionalPanel(
           condition = 'input.showmath',
@@ -154,7 +155,7 @@ ui = navbarPage("Vaccines",
                                             # "Deaths" = 'mortality'
                                         ),
                             selected = "covid", inline = TRUE)
-             ), 
+             ) 
              
             
 
@@ -164,17 +165,17 @@ ui = navbarPage("Vaccines",
     fluidRow(column(12, align='center', ## effectiveness value boxs -------------------------
                     htmlOutput('oddsratio'))), tags$br(),
     fluidRow(column(6, align='center',
-                    htmlOutput('placeboText'),           
+                    htmlOutput('placeboText')           
             ),
             column(6, align='center',
-                   htmlOutput('treatmentText'),           
+                   htmlOutput('treatmentText')          
             )),
     tags$br(),
     
     fluidRow( ## placebo/treatment ---------------------------------------------------------
       column(12, align='center',
       withSpinner(plotOutput('plotly', height = '400px', width = '400px'), type = 1)
-    )),
+    ))
 
     #tags$body("Adn this is :"), htmlOutput('text')
 )) # end fluidpage, tabpanel for page1
@@ -208,30 +209,61 @@ server <- function(input, output, session) {
   usr_poprate <- reactive({input$poprate}) 
   usr_effrate <- reactive({input$effrate})
   
+
   
   ## variant adjustments ----
   ### Variant A: reduces efficacy by 0.15 (15%), increases population prevalence by 0.1 (10%)
   ### Variant B: reduces efficacy by 0.10 (10%), increases population prevalence by 0.4 (40%)
+  ### beta ----
+  beta <- reactiveValues(e = 0, p = 0) # set scalar values initially to 0
+    
+    # 
+    # case_when(
+    #   is.null(input$variants)                ~ beta$a = 0 <-, # standard scenario
+    #   input$variants[1] == "Variant A"        ~ a = 0.15,          # A only
+    #   input$variants[1] == "Variant B"        ~ a = 0.1,           # B only 
+    #   input$variants[1] == "Variant A" & 
+    #     input$variants[2] == "Variant B"      ~ a = 0.5           # A and B (to math figure)
+    # )
+
+  
+  ### variant scalers ----
   observeEvent(input$variants, {
+    
+    # first determine scale factor based on combination of variant inputs
+    ## set scale factor, where first element will be for effrate, second for poprate
+    ##  beta[effrate, poprate]
+
+    
+    
+    
+    # then update input values based on scale factors
     
     if (input$variants == "Variant A") {
       # store value?? this requires going "back" to reset to the previous number so we can do the calc from there.
 
-      updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.15))
-      updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.1))
+      updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*beta$e))
+      updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*beta$p))
       #updateCheckboxGroupButtons('variants', session = session, disabledChoices = "Variant A")
       
     }
     
     if (input$variants == "Variant B") {
-      updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.1))
-      updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.4))
+      updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*beta$e))
+      updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*beta$p))
+      #updateCheckboxGroupButtons('variants', session = session, disabledChoices = "Variant B")
+      
+    }
+    
+    if (is.null(input$variants)) { # this is not update properly
+      updateSliderInput('effrate', session = session, value = 0)
+      updateSliderInput('poprate', session = session, value = 0)
       #updateCheckboxGroupButtons('variants', session = session, disabledChoices = "Variant B")
       
     }
       
 
-  })
+  }, ignoreInit = T)
   
   #observeEvent()
   
@@ -476,7 +508,8 @@ server <- function(input, output, session) {
   output$effplot <- renderPlot({p2()})
 
   
-
+  output$out <- renderPrint({input$variants})
+  output$out2 <- renderPrint({beta()})
 
 } # end server ------------------------------------------------------------------------
 
