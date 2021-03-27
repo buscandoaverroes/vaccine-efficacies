@@ -54,7 +54,7 @@ ui = navbarPage("Vaccines",
 
        
        br(), hr(),
-       tags$body("variants:"),textOutput('out'),
+       tags$body("input$variants:"),textOutput('out'),
        tags$body("beta:"), textOutput('out2'),
        prettySwitch('showmath', 'Show Math', slim = T, inline = T, status = 'info'),
        wellPanel(align='center',
@@ -63,13 +63,25 @@ ui = navbarPage("Vaccines",
                 actionBttn(inputId = 'reset_pfizer', label = "Pfizer data", size = 'sm',
                           color = 'primary',  style = 'fill', block = F, no_outline = T),
                 actionBttn(inputId = 'reset_moderna', label = "Moderna data", size = 'sm',
-                           color = 'primary', style = 'fill', block = F, no_outline = T),
-                checkboxGroupButtons(
-                  'variants', label = NULL,
-                  choices = c("Variant A", "Variant B"), 
-                   status = 'primary',
-                  size = "sm", direction = 'horizontal'
-                )
+                           color = 'primary', style = 'fill', block = F, no_outline = T)),
+       wellPanel(align='center',
+                 style= 'background: #2c3e50',
+                 actionBttn(inputId = 'variants_reset', label = "Reset", size = 'xs',
+                            color = 'default', style = 'fill', block = F, no_outline = T),
+                 actionBttn(inputId = 'variants_A', label = "VariantA", size = 'xs',
+                            color = 'default', style = 'fill', block = F, no_outline = T),
+                 actionBttn(inputId = 'variants_B', label = "VariantB", size = 'xs',
+                            color = 'default', style = 'fill', block = F, no_outline = T),
+                 actionBttn(inputId = 'variants_AB', label = "VariantsA+B", size = 'xs',
+                            color = 'default', style = 'fill', block = F, no_outline = T),
+         
+       
+                # awesomeRadio(
+                #   'variants', label = NULL,
+                #   choices = c("Variant A", "Variant B", "No Variants"), 
+                #    status = 'primary', inline = TRUE
+                #   #size = "sm", direction = 'horizontal'
+                # )
            
        ),
        splitLayout( ##  main input panels ----------------------------------------
@@ -215,17 +227,37 @@ server <- function(input, output, session) {
   ### Variant A: reduces efficacy by 0.15 (15%), increases population prevalence by 0.1 (10%)
   ### Variant B: reduces efficacy by 0.10 (10%), increases population prevalence by 0.4 (40%)
   ### beta ----
-  beta <- reactiveValues(e = 0, p = 0) # set scalar values initially to 0
+  #beta <- reactiveValues(e = 0, p = 0) # set scalar values initially to 0
     
-    # 
-    # case_when(
-    #   is.null(input$variants)                ~ beta$a = 0 <-, # standard scenario
-    #   input$variants[1] == "Variant A"        ~ a = 0.15,          # A only
-    #   input$variants[1] == "Variant B"        ~ a = 0.1,           # B only 
-    #   input$variants[1] == "Variant A" & 
-    #     input$variants[2] == "Variant B"      ~ a = 0.5           # A and B (to math figure)
-    # )
-
+  observeEvent(input$variants_reset, {
+    updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0))
+    updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0))
+  })
+  
+  observeEvent(input$variants_A, {
+    updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.15))
+    updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.10))
+  }, once = TRUE)
+  
+  observeEvent(input$variants_B, {
+    updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.10))
+    updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.40))
+  }, once = TRUE)
+  
+  observeEvent(input$variants_AB, {
+    updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.25))
+    updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.50))
+  }, once = TRUE)
+  
+  
+  # case_when(
+  #   is.null(input$variants)               ~ beta <- reactiveValues(e=0,p=0), # standard scenario
+  #   input$variants[1] == "Variant A"      ~ beta <- reactiveValues(e=.15,p=.10),          # A only
+  #   input$variants[1] == "Variant B"      ~ beta <- reactiveValues(e=10,p=.40),           # B only
+  #   input$variants[1] == "Variant A" &
+  #     input$variants[2] == "Variant B"    ~ beta <- reactiveValues(e=.25,p=.5)          # A and B (to math figure)
+  # )
+  # 
   
   ### variant scalers ----
   observeEvent(input$variants, {
@@ -235,20 +267,19 @@ server <- function(input, output, session) {
     ##  beta[effrate, poprate]
 
     
-    
-    
     # then update input values based on scale factors
     
-    if (input$variants == "Variant A") {
+    if (input$variants[1] == "Variant A") {
       # store value?? this requires going "back" to reset to the previous number so we can do the calc from there.
-
+      beta <- reactiveValues(e=.15,p=.10)
       updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*beta$e))
       updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*beta$p))
       #updateCheckboxGroupButtons('variants', session = session, disabledChoices = "Variant A")
       
     }
     
-    if (input$variants == "Variant B") {
+    if (input$variants[1] == "Variant B") {
+      beta <- reactiveValues(e=.10,p=.40)
       updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*beta$e))
       updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*beta$p))
       #updateCheckboxGroupButtons('variants', session = session, disabledChoices = "Variant B")
@@ -256,6 +287,8 @@ server <- function(input, output, session) {
     }
     
     if (is.null(input$variants)) { # this is not update properly
+      
+      beta <- reactiveValues(e=.25,p=.5) 
       updateSliderInput('effrate', session = session, value = 0)
       updateSliderInput('poprate', session = session, value = 0)
       #updateCheckboxGroupButtons('variants', session = session, disabledChoices = "Variant B")
@@ -263,7 +296,7 @@ server <- function(input, output, session) {
     }
       
 
-  }, ignoreInit = T)
+  }, ignoreInit = F)
   
   #observeEvent()
   
@@ -509,7 +542,7 @@ server <- function(input, output, session) {
 
   
   output$out <- renderPrint({input$variants})
-  output$out2 <- renderPrint({beta()})
+  #output$out2 <- renderPrint({beta$e})
 
 } # end server ------------------------------------------------------------------------
 
