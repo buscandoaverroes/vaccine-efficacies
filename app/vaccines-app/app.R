@@ -249,16 +249,7 @@ server <- function(input, output, session) {
     updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.50))
   }, once = TRUE)
   
-  
-  # case_when(
-  #   is.null(input$variants)               ~ beta <- reactiveValues(e=0,p=0), # standard scenario
-  #   input$variants[1] == "Variant A"      ~ beta <- reactiveValues(e=.15,p=.10),          # A only
-  #   input$variants[1] == "Variant B"      ~ beta <- reactiveValues(e=10,p=.40),           # B only
-  #   input$variants[1] == "Variant A" &
-  #     input$variants[2] == "Variant B"    ~ beta <- reactiveValues(e=.25,p=.5)          # A and B (to math figure)
-  # )
-  # 
-  
+ 
   ### variant scalers ----
   observeEvent(input$variants, {
     
@@ -506,7 +497,7 @@ server <- function(input, output, session) {
       geom_vline(aes(xintercept = eff_eff()), linetype= "dotdash", alpha = 0.5) +
       geom_hline(aes(yintercept = eff_pop()), linetype = "dotdash", alpha = 0.5) + 
       geom_point(data = eff_point(), aes(x = eff, y = pop), 
-                 size = 2, shape = 5, alpha=1, color = 'blue', stroke = 2) +
+                 size = 4, shape = 4, alpha=1, color = 'black', stroke = 4) +
       # {Pfizer data}
       geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"]),
                  linetype= "solid", alpha = 0.3) +
