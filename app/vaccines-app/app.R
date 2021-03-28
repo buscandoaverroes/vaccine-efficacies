@@ -54,8 +54,8 @@ ui = navbarPage("Vaccines",
 
        
        br(), hr(),
-       tags$body("input$variants:"),textOutput('out'),
-       tags$body("beta:"), textOutput('out2'),
+       tags$body("usr_data$e:"),textOutput('out'),
+       tags$body("usr_data$p:"), textOutput('out2'),
        prettySwitch('showmath', 'Show Math', slim = T, inline = T, status = 'info'),
        wellPanel(align='center',
                  style= 'background: #2c3e50',
@@ -63,27 +63,24 @@ ui = navbarPage("Vaccines",
                 actionBttn(inputId = 'reset_pfizer', label = "Pfizer data", size = 'sm',
                           color = 'primary',  style = 'fill', block = F, no_outline = T),
                 actionBttn(inputId = 'reset_moderna', label = "Moderna data", size = 'sm',
-                           color = 'primary', style = 'fill', block = F, no_outline = T)),
-       wellPanel(align='center',
-                 style= 'background: #2c3e50',
-                 actionBttn(inputId = 'variants_reset', label = "Reset", size = 'xs',
-                            color = 'default', style = 'fill', block = F, no_outline = T),
-                 actionBttn(inputId = 'variants_A', label = "VariantA", size = 'xs',
-                            color = 'default', style = 'fill', block = F, no_outline = T),
-                 actionBttn(inputId = 'variants_B', label = "VariantB", size = 'xs',
-                            color = 'default', style = 'fill', block = F, no_outline = T),
-                 actionBttn(inputId = 'variants_AB', label = "VariantsA+B", size = 'xs',
-                            color = 'default', style = 'fill', block = F, no_outline = T),
-         
-       
-                # awesomeRadio(
-                #   'variants', label = NULL,
-                #   choices = c("Variant A", "Variant B", "No Variants"), 
-                #    status = 'primary', inline = TRUE
-                #   #size = "sm", direction = 'horizontal'
-                # )
-           
-       ),
+                           color = 'primary', style = 'fill', block = F, no_outline = T),
+                radioGroupButtons(
+                  'variants', label = NULL,
+                  choices = c("Variant A", "Variant B", "No Variants"),
+                  status = 'primary',  selected = "No Variants",
+                  size = "sm", direction = 'horizontal', individual = FALSE
+                )),
+       # wellPanel(align='center',
+       #           style= 'background: #2c3e50',
+       #           actionBttn(inputId = 'variants_reset', label = "Reset", size = 'xs',
+       #                      color = 'default', style = 'fill', block = F, no_outline = T),
+       #           actionBttn(inputId = 'variants_A', label = "VariantA", size = 'xs',
+       #                      color = 'default', style = 'fill', block = F, no_outline = T),
+       #           actionBttn(inputId = 'variants_B', label = "VariantB", size = 'xs',
+       #                      color = 'default', style = 'fill', block = F, no_outline = T),
+       #           actionBttn(inputId = 'variants_AB', label = "VariantsA+B", size = 'xs',
+       #                      color = 'default', style = 'fill', block = F, no_outline = T)),
+
        splitLayout( ##  main input panels ----------------------------------------
                     wellPanel( align='center',
                                
@@ -141,56 +138,56 @@ ui = navbarPage("Vaccines",
                  distancing to protect those still waiting for a vaccine.") 
        
 
-     )), # end tab panel, fluid page              
+     )) # end tab panel, fluid page              
           
                 
                 
                 
-  tabPanel("Clinical Data", # PAGE: clinical data ----------------------------------------------------------------------
-  fluidPage(
-
-
-    tags$body("a few sentences that will go here but idk what yet exactly."), tags$br(),
-    
-    wellPanel( ## input panel --------------------------------------------------
-      column(12, align='center',
-             fluidRow(
-             radioGroupButtons('vaxname', "Vaccine",
-                           choices = c("Pfizer", "Moderna"), 
-                           #choiceValues = c("Pfizer-BioNTech", "Moderna","Johnson&Johnson"),
-                           selected = "Pfizer", size = "lg", width = '300px',
-                            justified = TRUE, individual = TRUE, direction = 'horizontal')),
-             fluidRow(
-               awesomeRadio('indicator', "Indicator",
-                            choices = c("Covid Infections" = 'covid'
-                                            # "Severe Covid Infections" = 'severe',
-                                            # "Deaths" = 'mortality'
-                                        ),
-                            selected = "covid", inline = TRUE)
-             ) 
-             
-            
-
-      )
-    ),
-    
-    fluidRow(column(12, align='center', ## effectiveness value boxs -------------------------
-                    htmlOutput('oddsratio'))), tags$br(),
-    fluidRow(column(6, align='center',
-                    htmlOutput('placeboText')           
-            ),
-            column(6, align='center',
-                   htmlOutput('treatmentText')          
-            )),
-    tags$br(),
-    
-    fluidRow( ## placebo/treatment ---------------------------------------------------------
-      column(12, align='center',
-      withSpinner(plotOutput('plotly', height = '400px', width = '400px'), type = 1)
-    ))
-
-    #tags$body("Adn this is :"), htmlOutput('text')
-)) # end fluidpage, tabpanel for page1
+#   tabPanel("Clinical Data", # PAGE: clinical data ----------------------------------------------------------------------
+#   fluidPage(
+# 
+# 
+#     tags$body("a few sentences that will go here but idk what yet exactly."), tags$br(),
+#     
+#     wellPanel( ## input panel --------------------------------------------------
+#       column(12, align='center',
+#              fluidRow(
+#              radioGroupButtons('vaxname', "Vaccine",
+#                            choices = c("Pfizer", "Moderna"), 
+#                            #choiceValues = c("Pfizer-BioNTech", "Moderna","Johnson&Johnson"),
+#                            selected = "Pfizer", size = "lg", width = '300px',
+#                             justified = TRUE, individual = TRUE, direction = 'horizontal')),
+#              fluidRow(
+#                awesomeRadio('indicator', "Indicator",
+#                             choices = c("Covid Infections" = 'covid'
+#                                             # "Severe Covid Infections" = 'severe',
+#                                             # "Deaths" = 'mortality'
+#                                         ),
+#                             selected = "covid", inline = TRUE)
+#              ) 
+#              
+#             
+# 
+#       )
+#     ),
+#     
+#     fluidRow(column(12, align='center', ## effectiveness value boxs -------------------------
+#                     htmlOutput('oddsratio'))), tags$br(),
+#     fluidRow(column(6, align='center',
+#                     htmlOutput('placeboText')           
+#             ),
+#             column(6, align='center',
+#                    htmlOutput('treatmentText')          
+#             )),
+#     tags$br(),
+#     
+#     fluidRow( ## placebo/treatment ---------------------------------------------------------
+#       column(12, align='center',
+#       withSpinner(plotOutput('plotly', height = '400px', width = '400px'), type = 1)
+#     ))
+# 
+#     #tags$body("Adn this is :"), htmlOutput('text')
+# )) # end fluidpage, tabpanel for page1
 
 ) # end navbarpage, taglist
 
@@ -201,6 +198,45 @@ server <- function(input, output, session) {
   
   # efficacy data ---------------------------------------------------------------------
 
+  ## tier1 user data ----
+  ## this value will only update when: the user manually changes the sliders OR presses a vaccine preset
+  
+  usr_data <- reactiveValues(e = dflt_effrate, p=dflt_poprate) # start by defining as the presets
+  
+  # these values are direct inputs
+  right_covid_per_1k <- reactive({ input$poprate * 1000 })
+  right_covid_efficacy<- reactive({ round(input$effrate*100, 2) })
+  
+  # these values are dependent on secondary/filtered inputs
+  protectrate         <- reactive({ round((1- (input$poprate*(1 - input$effrate)))*100,2)  })
+  
+  
+  # calculate the alternate values under different variant scenarios, using usr_data values
+  variants <- reactive({
+    reactiveValues(a_eff = usr_data$e - (usr_data$e*0.15),
+                   a_pop = usr_data$p + (usr_data$p*0.10),
+                   b_eff = usr_data$e - (usr_data$e*0.10),
+                   b_pop = usr_data$p + (usr_data$p*0.40))
+  })
+  
+  # use observeevent to update sliders/data based on selectd toggle
+  observeEvent(input$variants, {
+    if (input$variants[1] == "Variant A") {
+      updateSliderInput('poprate', session = session, value = variants()$a_pop)
+      updateSliderInput('effrate', session = session, value = variants()$a_eff)
+    }
+    if (input$variants[1] == "Variant B") {
+      updateSliderInput('poprate', session = session, value = variants()$b_pop)
+      updateSliderInput('effrate', session = session, value = variants()$b_eff)
+    }
+    if (input$variants[1] == "No Variants") {
+      updateSliderInput('poprate', session = session, value = usr_data$p)
+      updateSliderInput('effrate', session = session, value = usr_data$e)
+    }
+    
+  })
+
+  
   ## update protected rate ----
   observeEvent(input$poprate, { 
     updateSliderInput(inputId = "protectrate", value = 1- (input$poprate*(1 - input$effrate))) })
@@ -209,85 +245,97 @@ server <- function(input, output, session) {
   
   ## update sliders with clinical data presets ----
   observeEvent(input$reset_pfizer, {
+    # update sliders
     updateSliderInput('poprate', session = session, value = vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"])
     updateSliderInput('effrate', session = session, value = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"])
-  })
+    # update usr_data
+    usr_data$e = vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"]
+    usr_data$p = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"]
+    })
   observeEvent(input$reset_moderna, {
+    # update sliders
     updateSliderInput('poprate', session = session, value = vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"])
     updateSliderInput('effrate', session = session,  value = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"])
+    # update usr_data
+    usr_data$e = vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"]
+    usr_data$p = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]
   })
   
-  
-  usr_poprate <- reactive({input$poprate}) 
-  usr_effrate <- reactive({input$effrate})
-  
 
   
-  ## variant adjustments ----
-  ### Variant A: reduces efficacy by 0.15 (15%), increases population prevalence by 0.1 (10%)
-  ### Variant B: reduces efficacy by 0.10 (10%), increases population prevalence by 0.4 (40%)
-  ### beta ----
-  #beta <- reactiveValues(e = 0, p = 0) # set scalar values initially to 0
-    
-  observeEvent(input$variants_reset, {
-    updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0))
-    updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0))
-  })
+  # ## variant adjustments ----
+  # ### Variant A: reduces efficacy by 0.15 (15%), increases population prevalence by 0.1 (10%)
+  # ### Variant B: reduces efficacy by 0.10 (10%), increases population prevalence by 0.4 (40%)
+  # Note that the button action will simply show/select the calculation, but all calculations are 
+  # done at all times (perhaps not the most efficient, but small calculations here).
   
-  observeEvent(input$variants_A, {
-    updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.15))
-    updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.10))
-  }, once = TRUE)
   
-  observeEvent(input$variants_B, {
-    updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.10))
-    updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.40))
-  }, once = TRUE)
   
-  observeEvent(input$variants_AB, {
-    updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.25))
-    updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.50))
-  }, once = TRUE)
   
- 
-  ### variant scalers ----
-  observeEvent(input$variants, {
-    
-    # first determine scale factor based on combination of variant inputs
-    ## set scale factor, where first element will be for effrate, second for poprate
-    ##  beta[effrate, poprate]
-
-    
-    # then update input values based on scale factors
-    
-    if (input$variants[1] == "Variant A") {
-      # store value?? this requires going "back" to reset to the previous number so we can do the calc from there.
-      beta <- reactiveValues(e=.15,p=.10)
-      updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*beta$e))
-      updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*beta$p))
-      #updateCheckboxGroupButtons('variants', session = session, disabledChoices = "Variant A")
-      
-    }
-    
-    if (input$variants[1] == "Variant B") {
-      beta <- reactiveValues(e=.10,p=.40)
-      updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*beta$e))
-      updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*beta$p))
-      #updateCheckboxGroupButtons('variants', session = session, disabledChoices = "Variant B")
-      
-    }
-    
-    if (is.null(input$variants)) { # this is not update properly
-      
-      beta <- reactiveValues(e=.25,p=.5) 
-      updateSliderInput('effrate', session = session, value = 0)
-      updateSliderInput('poprate', session = session, value = 0)
-      #updateCheckboxGroupButtons('variants', session = session, disabledChoices = "Variant B")
-      
-    }
-      
-
-  }, ignoreInit = F)
+  
+  
+  # ### beta ----
+  # #beta <- reactiveValues(e = 0, p = 0) # set scalar values initially to 0
+  #
+  # observeEvent(input$variants_reset, {
+  #   updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0))
+  #   updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0))
+  # })
+  # 
+  # observeEvent(input$variants_A, {
+  #   updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.15))
+  #   updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.10))
+  # }, once = TRUE)
+  # 
+  # observeEvent(input$variants_B, {
+  #   updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.10))
+  #   updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.40))
+  # }, once = TRUE)
+  # 
+  # observeEvent(input$variants_AB, {
+  #   updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*0.25))
+  #   updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*0.50))
+  # }, once = TRUE)
+  # 
+  # 
+  # ### variant scalers ----
+  # observeEvent(input$variants, {
+  #   
+  #   # first determine scale factor based on combination of variant inputs
+  #   ## set scale factor, where first element will be for effrate, second for poprate
+  #   ##  beta[effrate, poprate]
+  # 
+  #   
+  #   # then update input values based on scale factors
+  #   
+  #   if (input$variants[1] == "Variant A") {
+  #     # store value?? this requires going "back" to reset to the previous number so we can do the calc from there.
+  #     beta <- reactiveValues(e=.15,p=.10)
+  #     updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*beta$e))
+  #     updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*beta$p))
+  #     #updateCheckboxGroupButtons('variants', session = session, disabledChoices = "Variant A")
+  #     
+  #   }
+  #   
+  #   if (input$variants[1] == "Variant B") {
+  #     beta <- reactiveValues(e=.10,p=.40)
+  #     updateSliderInput('effrate', session = session, value = input$effrate - (input$effrate*beta$e))
+  #     updateSliderInput('poprate', session = session, value = input$poprate + (input$poprate*beta$p))
+  #     #updateCheckboxGroupButtons('variants', session = session, disabledChoices = "Variant B")
+  #     
+  #   }
+  #   
+  #   if (is.null(input$variants)) { # this is not update properly
+  #     
+  #     beta <- reactiveValues(e=.25,p=.5) 
+  #     updateSliderInput('effrate', session = session, value = 0)
+  #     updateSliderInput('poprate', session = session, value = 0)
+  #     #updateCheckboxGroupButtons('variants', session = session, disabledChoices = "Variant B")
+  #     
+  #   }
+  #     
+  # 
+  # }, ignoreInit = F)
   
   #observeEvent()
   
@@ -332,71 +380,67 @@ server <- function(input, output, session) {
   
 
   # key reactive values -------------------------------------------------------------------
-  vaccine   <- reactive({ input$vaxname})
-  indicator <- reactive({ input$indicator})
-  suffix    <- reactive({ case_when(
-      input$indicator == "covid" ~ paste0("tested positive","<br>","for COVID-19"),
-      input$indicator == "severe"~ paste0("experienced","<br>", "severe COVID symptoms"),
-      input$indicator == "mortality"~ paste0("died after","<br>", "COVID symptoms"))
-  })
-  
-  stat_eff  <- reactive({ case_when(
-    input$indicator=="covid" ~ vax_data$stated_efficacy_pct[vax_data$short_name == as.character(input$vaxname)],
-    input$indicator=="severe"~vax_data$severe_efficacy_pct[vax_data$short_name == as.character(input$vaxname)],
-    input$indicator=="mortality"~vax_data$mortality_efficacy_pct[vax_data$short_name == as.character(input$vaxname)]
-  )})
-  stat_placebo  <- reactive({ case_when(
-    input$indicator=="covid" ~ vax_data$placebo_covid_rate_pct[vax_data$short_name == as.character(input$vaxname)],
-    input$indicator=="severe"~vax_data$placebo_severe_rate_pct[vax_data$short_name == as.character(input$vaxname)],
-    input$indicator=="mortality"~vax_data$placebo_mortality_rate_pct[vax_data$short_name == as.character(input$vaxname)]
-  )})
-  stat_treatment  <- reactive({ case_when(
-    input$indicator=="covid" ~ vax_data$treatment_covid_rate_pct[vax_data$short_name == as.character(input$vaxname)],
-    input$indicator=="severe"~vax_data$treatment_severe_rate_pct[vax_data$short_name == as.character(input$vaxname)],
-    input$indicator=="mortality"~vax_data$treatment_mortality_rate_pct[vax_data$short_name == as.character(input$vaxname)]
-  )})
-  
-  
-  right_covid_per_1k <- reactive({ input$poprate * 1000 })
-  right_covid_efficacy<- reactive({ round(input$effrate*100, 2) })
-  protectrate         <- reactive({ round((1- (input$poprate*(1 - input$effrate)))*100,2)  })
+  # vaccine   <- reactive({ input$vaxname})
+  # indicator <- reactive({ input$indicator})
+  # suffix    <- reactive({ case_when(
+  #     input$indicator == "covid" ~ paste0("tested positive","<br>","for COVID-19"),
+  #     input$indicator == "severe"~ paste0("experienced","<br>", "severe COVID symptoms"),
+  #     input$indicator == "mortality"~ paste0("died after","<br>", "COVID symptoms"))
+  # })
+  # 
+  # stat_eff  <- reactive({ case_when(
+  #   input$indicator=="covid" ~ vax_data$stated_efficacy_pct[vax_data$short_name == as.character(input$vaxname)],
+  #   input$indicator=="severe"~vax_data$severe_efficacy_pct[vax_data$short_name == as.character(input$vaxname)],
+  #   input$indicator=="mortality"~vax_data$mortality_efficacy_pct[vax_data$short_name == as.character(input$vaxname)]
+  # )})
+  # stat_placebo  <- reactive({ case_when(
+  #   input$indicator=="covid" ~ vax_data$placebo_covid_rate_pct[vax_data$short_name == as.character(input$vaxname)],
+  #   input$indicator=="severe"~vax_data$placebo_severe_rate_pct[vax_data$short_name == as.character(input$vaxname)],
+  #   input$indicator=="mortality"~vax_data$placebo_mortality_rate_pct[vax_data$short_name == as.character(input$vaxname)]
+  # )})
+  # stat_treatment  <- reactive({ case_when(
+  #   input$indicator=="covid" ~ vax_data$treatment_covid_rate_pct[vax_data$short_name == as.character(input$vaxname)],
+  #   input$indicator=="severe"~vax_data$treatment_severe_rate_pct[vax_data$short_name == as.character(input$vaxname)],
+  #   input$indicator=="mortality"~vax_data$treatment_mortality_rate_pct[vax_data$short_name == as.character(input$vaxname)]
+  # )})
   
   
+
   # text output  ---------------------------------------------------------------------------
   ## clinical data ----
-  output$oddsratio <- renderText({ 
-    paste0("<b><font color=\"#737373\" size=5>","Efficacy",
-           "</b></font>", "<br>",
-           "<b><font color=\"#737373\" size=6>",stat_eff(), "%",
-           "</b></font>", "<br>"
-    )
-    })
-  
-  output$placeboText <- renderText({ 
-    paste0(
-           "<b><font color=\"#CB181D\" size=6>",
-           "Without the Vaccine:<br>",
-           stat_placebo(), "%",
-          "</b></font>", "<br>",
-          "<font color=\"#000000\" size=2>",
-          "",
-          suffix(),
-          "</font>"
-          )
-    })
-  
-  output$treatmentText <- renderText({ 
-      paste0(
-             "<b><font color=\"#41AB5D\" size=6>",
-             "With the Vaccine:<br>",
-             stat_treatment(), "%",
-             "</b></font>", "<br>",
-             "<font color=\"#000000\" size=2>",
-             "",
-             suffix(),
-             "</font>"
-              )
-    })
+  # output$oddsratio <- renderText({ 
+  #   paste0("<b><font color=\"#737373\" size=5>","Efficacy",
+  #          "</b></font>", "<br>",
+  #          "<b><font color=\"#737373\" size=6>",stat_eff(), "%",
+  #          "</b></font>", "<br>"
+  #   )
+  #   })
+  # 
+  # output$placeboText <- renderText({ 
+  #   paste0(
+  #          "<b><font color=\"#CB181D\" size=6>",
+  #          "Without the Vaccine:<br>",
+  #          stat_placebo(), "%",
+  #         "</b></font>", "<br>",
+  #         "<font color=\"#000000\" size=2>",
+  #         "",
+  #         suffix(),
+  #         "</font>"
+  #         )
+  #   })
+  # 
+  # output$treatmentText <- renderText({ 
+  #     paste0(
+  #            "<b><font color=\"#41AB5D\" size=6>",
+  #            "With the Vaccine:<br>",
+  #            stat_treatment(), "%",
+  #            "</b></font>", "<br>",
+  #            "<font color=\"#000000\" size=2>",
+  #            "",
+  #            suffix(),
+  #            "</font>"
+  #             )
+  #   })
   ## efficacies ----
   output$right_poprate <- renderText({
     paste0(
@@ -532,8 +576,8 @@ server <- function(input, output, session) {
   output$effplot <- renderPlot({p2()})
 
   
-  output$out <- renderPrint({input$variants})
-  #output$out2 <- renderPrint({beta$e})
+  output$out <- renderPrint({usr_data$e})
+  output$out2 <- renderPrint({usr_data$p})
 
 } # end server ------------------------------------------------------------------------
 
