@@ -46,9 +46,9 @@ ui = navbarPage("Vaccines",
        tags$li("how fast the virus spreads"),
        tags$li("and other individual risk factors"),
 
-       tags$h4("Estimate your Chances"),
-       tags$body("Select a vaccine preset to explore the clinical trial data or use the sliders to adjust to a hypothetical scenario.
-                 Worried about variants? Lower the efficacy rate."),
+       tags$h4("Estimate Your Chances"),
+       tags$body("Select a vaccine preset to explore the clinical trial data or adjust
+                 the buttons and sliders to explore a hypothetical scenario."),
        
      
 
@@ -68,20 +68,10 @@ ui = navbarPage("Vaccines",
                   status = 'primary',  selected = "No Variants",
                   size = "sm", direction = 'horizontal', individual = FALSE
                 )),
-       # wellPanel(align='center',
-       #           style= 'background: #2c3e50',
-       #           actionBttn(inputId = 'variants_reset', label = "Reset", size = 'xs',
-       #                      color = 'default', style = 'fill', block = F, no_outline = T),
-       #           actionBttn(inputId = 'variants_A', label = "VariantA", size = 'xs',
-       #                      color = 'default', style = 'fill', block = F, no_outline = T),
-       #           actionBttn(inputId = 'variants_B', label = "VariantB", size = 'xs',
-       #                      color = 'default', style = 'fill', block = F, no_outline = T),
-       #           actionBttn(inputId = 'variants_AB', label = "VariantsA+B", size = 'xs',
-       #                      color = 'default', style = 'fill', block = F, no_outline = T)),
 
        splitLayout( ##  main input panels ----------------------------------------
-                    wellPanel( align='center',
-                               
+                    wellPanel( align='center', 
+
                                tags$h4(tags$b("Infection Rate")),         
                                sliderInput("poprate", label = NULL,
                                            width = '150px', ticks = F,
@@ -89,7 +79,7 @@ ui = navbarPage("Vaccines",
                                htmlOutput('right_poprate', width = 6)
                     ),  # end first element of splitpanel
                     wellPanel( align='center',
-                               
+
                                tags$h4(tags$b("Efficacy Rate")),
                                sliderInput("effrate", label = NULL,
                                            width = '150px', ticks = F, 
@@ -116,8 +106,7 @@ ui = navbarPage("Vaccines",
                    tags$h3(tags$b("Estimated Chance of Covid Protection")),
                    htmlOutput("center_protectrate")
          ), # end wellpanel
-         #plotlyOutput("pct_protected", height = '100px'),
-         
+
          plotOutput("effplot") ## rainbow curve plot ----
        ),
        
@@ -382,12 +371,29 @@ server <- function(input, output, session) {
   })
   math_eq <- reactive({
     paste0(
-      round(protectrate()/100,4), " = 1 - (",round(poprate_B(),3),"*(1 - ",
+      protectrate(), " = 1 - (",round(poprate_B(),3),"*(1 - ",
            round(effrate_B(),3),"))"
                  )
   })
   output$math <- renderUI({
     withMathJax(helpText(math_eq()))
+  })
+  
+  # html styles ----
+  style_infectionrate <- reactive({
+    case_when(
+      input$variants[1] == "No Variants" ~ paste0(""),
+      input$variants[1] == "Variant A"   ~ paste0('background: #FEE6CE'),
+      input$variants[1] == "Variant B"   ~ paste0('background: #FDAE6B'),
+    )
+  })
+  
+  style_efficacyrate <- reactive({
+    case_when(
+      input$variants[1] == "No Variants" ~ paste0(""),
+      input$variants[1] == "Variant A"   ~ paste0('background: #FDD0A2'),
+      input$variants[1] == "Variant B"   ~ paste0('background: #FEE6CE'),
+    )
   })
   
   
