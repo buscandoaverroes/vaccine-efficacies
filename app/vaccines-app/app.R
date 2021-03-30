@@ -149,52 +149,7 @@ ui = navbarPage("Vaccines",
           
                 
                 
-                
-#   tabPanel("Clinical Data", # PAGE: clinical data ----------------------------------------------------------------------
-#   fluidPage(
-# 
-# 
-#     tags$body("a few sentences that will go here but idk what yet exactly."), tags$br(),
-#     
-#     wellPanel( ## input panel --------------------------------------------------
-#       column(12, align='center',
-#              fluidRow(
-#              radioGroupButtons('vaxname', "Vaccine",
-#                            choices = c("Pfizer", "Moderna"), 
-#                            #choiceValues = c("Pfizer-BioNTech", "Moderna","Johnson&Johnson"),
-#                            selected = "Pfizer", size = "lg", width = '300px',
-#                             justified = TRUE, individual = TRUE, direction = 'horizontal')),
-#              fluidRow(
-#                awesomeRadio('indicator', "Indicator",
-#                             choices = c("Covid Infections" = 'covid'
-#                                             # "Severe Covid Infections" = 'severe',
-#                                             # "Deaths" = 'mortality'
-#                                         ),
-#                             selected = "covid", inline = TRUE)
-#              ) 
-#              
-#             
-# 
-#       )
-#     ),
-#     
-#     fluidRow(column(12, align='center', ## effectiveness value boxs -------------------------
-#                     htmlOutput('oddsratio'))), tags$br(),
-#     fluidRow(column(6, align='center',
-#                     htmlOutput('placeboText')           
-#             ),
-#             column(6, align='center',
-#                    htmlOutput('treatmentText')          
-#             )),
-#     tags$br(),
-#     
-#     fluidRow( ## placebo/treatment ---------------------------------------------------------
-#       column(12, align='center',
-#       withSpinner(plotOutput('plotly', height = '400px', width = '400px'), type = 1)
-#     ))
-# 
-#     #tags$body("Adn this is :"), htmlOutput('text')
-# )) # end fluidpage, tabpanel for page1
+
 
 ) # end navbarpage, taglist
 
@@ -315,68 +270,12 @@ server <- function(input, output, session) {
     
   
 
-  # page2 -------------------------------------------------------------------
-  # vaccine   <- reactive({ input$vaxname})
-  # indicator <- reactive({ input$indicator})
-  # suffix    <- reactive({ case_when(
-  #     input$indicator == "covid" ~ paste0("tested positive","<br>","for COVID-19"),
-  #     input$indicator == "severe"~ paste0("experienced","<br>", "severe COVID symptoms"),
-  #     input$indicator == "mortality"~ paste0("died after","<br>", "COVID symptoms"))
-  # })
-  # 
-  # stat_eff  <- reactive({ case_when(
-  #   input$indicator=="covid" ~ vax_data$stated_efficacy_pct[vax_data$short_name == as.character(input$vaxname)],
-  #   input$indicator=="severe"~vax_data$severe_efficacy_pct[vax_data$short_name == as.character(input$vaxname)],
-  #   input$indicator=="mortality"~vax_data$mortality_efficacy_pct[vax_data$short_name == as.character(input$vaxname)]
-  # )})
-  # stat_placebo  <- reactive({ case_when(
-  #   input$indicator=="covid" ~ vax_data$placebo_covid_rate_pct[vax_data$short_name == as.character(input$vaxname)],
-  #   input$indicator=="severe"~vax_data$placebo_severe_rate_pct[vax_data$short_name == as.character(input$vaxname)],
-  #   input$indicator=="mortality"~vax_data$placebo_mortality_rate_pct[vax_data$short_name == as.character(input$vaxname)]
-  # )})
-  # stat_treatment  <- reactive({ case_when(
-  #   input$indicator=="covid" ~ vax_data$treatment_covid_rate_pct[vax_data$short_name == as.character(input$vaxname)],
-  #   input$indicator=="severe"~vax_data$treatment_severe_rate_pct[vax_data$short_name == as.character(input$vaxname)],
-  #   input$indicator=="mortality"~vax_data$treatment_mortality_rate_pct[vax_data$short_name == as.character(input$vaxname)]
-  # )})
+
   
   
 
   # text output  ---------------------------------------------------------------------------
-  ## clinical data ----
-  # output$oddsratio <- renderText({ 
-  #   paste0("<b><font color=\"#737373\" size=5>","Efficacy",
-  #          "</b></font>", "<br>",
-  #          "<b><font color=\"#737373\" size=6>",stat_eff(), "%",
-  #          "</b></font>", "<br>"
-  #   )
-  #   })
-  # 
-  # output$placeboText <- renderText({ 
-  #   paste0(
-  #          "<b><font color=\"#CB181D\" size=6>",
-  #          "Without the Vaccine:<br>",
-  #          stat_placebo(), "%",
-  #         "</b></font>", "<br>",
-  #         "<font color=\"#000000\" size=2>",
-  #         "",
-  #         suffix(),
-  #         "</font>"
-  #         )
-  #   })
-  # 
-  # output$treatmentText <- renderText({ 
-  #     paste0(
-  #            "<b><font color=\"#41AB5D\" size=6>",
-  #            "With the Vaccine:<br>",
-  #            stat_treatment(), "%",
-  #            "</b></font>", "<br>",
-  #            "<font color=\"#000000\" size=2>",
-  #            "",
-  #            suffix(),
-  #            "</font>"
-  #             )
-  #   })
+
   ## efficacies ----
   output$right_poprate <- renderText({
     paste0(
