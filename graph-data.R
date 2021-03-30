@@ -3,6 +3,8 @@
 
 library(RColorBrewer)
 library(plotly)
+library(scales)
+library(gghighlight)
 
 
 # import data
@@ -107,17 +109,83 @@ moderna_sim_data <- gen_sim_data("Moderna", 100)
 
 sim_data <- rbind(pfizer_sim_data, moderna_sim_data)
 
-# Generate plotly objects  ===========================================================
 
-# to be deteremined...will have to write a function
-# 
-# 
+
+# clinical trial outcome data ================================================================
+## outcome data ------------------------------------------------------------------------------
+
+# tilt long from vax_data
+vax_data_long <-
+  select(vax_data, short_name,
+               ends_with("n_covid_pos"),
+               ends_with("covid_rate"),
+               ends_with("covid_rate_pct"),
+               ends_with("rate10k")
+          ) %>%
+  pivot_longer(
+    cols = c(ends_with("n_covid_pos"),
+             ends_with("covid_rate"),
+             ends_with("covid_rate_pct"),
+             ends_with("rate10k")),
+    names_to = "indicator",
+    values_to = "value")  %>%
+  separate(indicator, into = c("arm", "indicator"), sep = '_', extra = 'merge') %>%
+  mutate(arm = stringr::str_to_title(arm)) %>% # convert to title case
+  #pivot_wider( id_cols = c("short_name", "arm"), names_from = "indicator", values_from = "value") %>%
+  filter(indicator == "covid_rate10k" | indicator == "severe_rate10k") #  
+
+## Generate plotly objects  --------------------------------------------------------------
+
+ui_outcome_plot <- function(name, ymax) {
+
+  p <-   
+  vax_data_long %>%
+    filter(short_name == as.character(name)) %>%
+    ggplot(., aes(arm, value)) +
+    geom_col(aes(fill = indicator), position = 'dodge', width = 0.8) +
+    scale_fill_viridis_d(
+      aesthetics = "fill",
+      option = "viridis",
+      labels = c("Covid",
+                 "Severe Covid")
+    ) +
+    scale_x_discrete(labels=c("Placebo", "Vaccine")) +
+    scale_y_continuous(limits = c(0,ymax)) +
+    labs(y = "Rate per 10k", x = NULL, fill = NULL) +
+    theme_minimal() + 
+    theme(
+      axis.title.x = NULL,
+      axis.title.y = element_text(size=10, margin = margin(t=0,r=8,b=0,l=0), face = 'bold'),
+      axis.text.x = element_text(size=10, face = 'bold'),
+      axis.text.y = element_text(size=10),
+      legend.title = NULL,
+      legend.text = element_text(size=10),
+      legend.key.size = unit(4,"mm"),
+      panel.grid = element_blank(),
+    ) +
+    gghighlight(value >= 0) + 
+    geom_label(aes(label = value),
+               position = position_dodge2(0.8), # this width matces colwidth above
+               vjust = -0.2,
+               label.size = 0.25,
+               fill = "#525252", color = 'white', alpha = 0.4)
+  
+  
+  p
+}
+
+
+### plotly function call ----
+ui_plot_pfizer <- ui_outcome_plot("Pfizer", 150)
+ui_plot_moderna <- ui_outcome_plot("Moderna", 150)
+
 
 save(
   vax_data, 
   sim_data,
   Pfizer_plaCov,Pfizer_plaSev,Pfizer_plaMort,Pfizer_treCov,Pfizer_treSev,Pfizer_treMort,
   Moderna_plaCov,Moderna_plaSev,Moderna_plaMort,Moderna_treCov, Moderna_treSev,Moderna_treMort,
+  ui_plot_moderna, ui_plot_pfizer,
   file = file.path(data, "app-data.Rdata")
 )
 
@@ -127,5 +195,6 @@ save(
   sim_data,
   Pfizer_plaCov,Pfizer_plaSev,Pfizer_plaMort,Pfizer_treCov,Pfizer_treSev,Pfizer_treMort,
   Moderna_plaCov,Moderna_plaSev,Moderna_plaMort,Moderna_treCov, Moderna_treSev,Moderna_treMort,
+  ui_plot_moderna, ui_plot_pfizer,
   file = file.path(app, "app-data.Rdata")
 )
