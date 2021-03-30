@@ -127,7 +127,7 @@ ui = navbarPage("Vaccines",
                    htmlOutput("center_protectrate")
          ), # end wellpanel
 
-         plotOutput("effplot") ## rainbow curve plot ----
+         plotOutput("effplot", ) ## rainbow curve plot ----
        ),
        
        tags$h4("Key Takeaways"),
@@ -257,6 +257,7 @@ server <- function(input, output, session) {
   # for actual clinical data
   eff_clinical_data <- tibble(
     name = c("Pfizer", "Moderna"),
+    var1 = 1,
     pop  = c(vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"],
              vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"]),
     eff  = c(vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"],
@@ -381,7 +382,8 @@ server <- function(input, output, session) {
       scale_fill_viridis_d(name = "Protection",
                            option = 'plasma', direction = 1,
                            alpha = 0.9,
-                           labels = c("90 - 95%", "95 - 99%", "99 - 99.5%", "99.5-99.9%", "over 99.9%")) +
+                           labels = c("90 - 95%", "95 - 99%", "99 - 99.5%", "99.5-99.9%", "over 99.9%"),
+                           aesthetics = "fill") +
       geom_vline(aes(xintercept = effrate_B()), linetype= "dotdash", alpha = 0.5) +
       geom_hline(aes(yintercept = poprate_B()), linetype = "dotdash", alpha = 0.5) + 
       geom_point(data = eff_point(), aes(x = eff, y = pop), 
@@ -391,28 +393,32 @@ server <- function(input, output, session) {
                  linetype= "solid", alpha = 0.3) +
       geom_hline(aes(yintercept = vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"]),
                  linetype = "solid", alpha = 0.3) + 
-      geom_point(data = eff_clinical_data[eff_clinical_data$name =="Pfizer",], aes(x = eff, y = pop),
-                 size = 2, shape = 20, alpha=1, color = "purple", stroke = 2) +
+      # geom_point(data = eff_clinical_data[eff_clinical_data$name =="Pfizer",], aes(x = eff, y = pop),
+      #            size = 2, shape = 20, alpha=1, color = "purple", stroke = 2) +
       # {Moderna data}
       geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]),
                  linetype= "dotted", alpha = 0.4) +
       geom_hline(aes(yintercept = vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"]),
                  linetype = "dotted", alpha = 0.4) + 
-      geom_point(data = eff_clinical_data[eff_clinical_data$name =="Moderna",], aes(x = eff, y = pop),
-                 size = 2, shape = 20, alpha=1, color = "red", stroke = 2) +
+      # {{point}}
+      geom_point(data = eff_clinical_data,
+                 aes(x = eff, y = pop, colour = name),
+                 size = 2, shape = 20, alpha=1, stroke = 2) + 
+      scale_color_brewer(palette = "Set1", aesthetics = "colour",
+                         name = "Vaccine") +
+      guides(color=guide_legend(override.aes = list(fill=NA, stroke=NA))) +
       labs(x = "Vaccine Efficacy",
            y = "Pct of Population with Covid") +
       scale_x_continuous(labels = label_percent()) +
       scale_y_continuous(labels = label_percent()) +
-      geom_label(aes(label = ))
       theme_minimal() +
       theme(
         legend.key.size = unit(8,'mm'),
+        legend.key = element_rect(linetype = 'solid', fill = 'white', color = "#525252", size = 0.5),
         legend.title = element_text(size=15, face = "bold"),
         legend.text = element_text(size=13),
         axis.title = element_text(size=15),
         axis.text = element_text(size=12)
-        
         
       )
     
