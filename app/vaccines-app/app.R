@@ -54,36 +54,56 @@ ui = navbarPage("Vaccines",
 
        
        br(), hr(),
+       textOutput('see'),
        prettySwitch('showmath', 'Show Math', slim = T, inline = T, status = 'info'),
        wellPanel(align='center',
                  style= 'background: #2c3e50',
+                 
+                 radioGroupButtons(
+                   'presets', label = NULL,
+                   choices = c("Explore Own", "Pfizer", "Moderna"),
+                   status = 'primary',  selected = "Explore Own",
+                   size = "lg", direction = 'horizontal', individual = T
+                 ),
 
-                actionBttn(inputId = 'reset_pfizer', label = "Pfizer data", size = 'sm',
-                          color = 'primary',  style = 'fill', block = F, no_outline = T),
-                actionBttn(inputId = 'reset_moderna', label = "Moderna data", size = 'sm',
-                           color = 'primary', style = 'fill', block = F, no_outline = T),
                 radioGroupButtons(
-                  'variants', label = NULL,
+                  'variants', label = NULL, disabled = FALSE,
                   choices = c("Variant A", "Variant B", "No Variants"),
                   status = 'primary',  selected = "No Variants",
                   size = "sm", direction = 'horizontal', individual = FALSE
                 )),
 
+       conditionalPanel( ## ui clinical data plot -----------------------------------
+              condition = 'input.presets != "Explore Own"', # this needs to be chaned over to radio (3 button)
+              
+            wellPanel( 
+                  align='center',
+                  style= 'background: #2c3e50',
+                  
+         uiOutput('uiclinical', height = '150px')
+         
+       )),
+       
+
        splitLayout( ##  main input panels ----------------------------------------
                     wellPanel( align='center', 
 
-                               tags$h4(tags$b("Infection Rate")),         
-                               sliderInput("poprate", label = NULL,
-                                           width = '150px', ticks = F,
-                                           min = 0.001, max = 0.1, value = 0.03, step = 0.001),
+                               tags$h4(tags$b("Infection Rate")),
+                               
+                 conditionalPanel(    condition = 'input.presets == "Explore Own"',
+                   sliderInput("poprate", label = NULL,
+                                           width = '120px', ticks = F,
+                                           min = 0.001, max = 0.1, value = 0.03, step = 0.001)),
                                htmlOutput('right_poprate', width = 6)
                     ),  # end first element of splitpanel
                     wellPanel( align='center',
 
                                tags$h4(tags$b("Efficacy Rate")),
+                               
+                  conditionalPanel(    condition = 'input.presets == "Explore Own"',
                                sliderInput("effrate", label = NULL,
                                            width = '150px', ticks = F, 
-                                           min = 0, max = 1, value = 0.8, step = 0.01),
+                                           min = 0, max = 1, value = 0.8, step = 0.01)),
                                htmlOutput('right_effrate', width = 6 )
                     )), # end main input panel, end second element
        
@@ -225,27 +245,39 @@ server <- function(input, output, session) {
   
   
   # account for vaccine buttons, update step A?
-  observeEvent(input$reset_pfizer, { # ok this won't update....
-    updateSliderInput('poprate', session = session,
-                      value = vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"])
-    updateSliderInput('effrate', session = session,
-                      value = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"])
-    updateRadioGroupButtons('variants', session = session,
-                            selected = "No Variants"
-    )
-  }, label = "update pfizer")
+  # establish ui_plot as reactive object
   
-  observeEvent(input$reset_moderna, {
-    updateSliderInput('poprate', session = session,
-                      value = vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"])
-    updateSliderInput('effrate', session = session,
-                      value = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"])
-    updateRadioGroupButtons('variants', session = session,
-                            selected = "No Variants"
-                              )
-  }, label = 'update moderna')
+  observeEvent(input$presets, { 
+    if (input$presets[1] == "Explore Own") {
+      # enable/disable rest of inputs 
+      updateRadioGroupButtons('variants', session = session,
+                              disabledChoices = NULL, selected = "No Variants")
+    }
+    if (input$presets[1] == "Pfizer") {
+      # set variants to 'no variants', disable....
+      updateRadioGroupButtons('variants', session = session,
+                              disabledChoices = c("Variant A", "Variant B"), selected = "No Variants")
+
+      updateSliderInput('poprate', session = session,
+                        value = vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"])
+      updateSliderInput('effrate', session = session,
+                        value = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"])
+      
+    }
+    if (input$presets[1] == "Moderna") {
+      updateSliderInput('poprate', session = session,
+                        value = vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"])
+      updateSliderInput('effrate', session = session,
+                        value = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"])
+      updateRadioGroupButtons('variants', session = session,
+                              disabledChoices = c("Variant A", "Variant B"), selected = "No Variants")
+      
+    }
+    
+    
+  }, label = "update from vaccine presets")
   
-  
+
   
   ## eff data for plot ----
   # for now, generate this data in-app
@@ -384,7 +416,7 @@ server <- function(input, output, session) {
     case_when(
       input$variants[1] == "No Variants" ~ paste0(""),
       input$variants[1] == "Variant A"   ~ paste0('background: #FEE6CE'),
-      input$variants[1] == "Variant B"   ~ paste0('background: #FDAE6B'),
+      input$variants[1] == "Variant B"   ~ paste0('background: #FDAE6B')
     )
   })
   
@@ -392,7 +424,7 @@ server <- function(input, output, session) {
     case_when(
       input$variants[1] == "No Variants" ~ paste0(""),
       input$variants[1] == "Variant A"   ~ paste0('background: #FDD0A2'),
-      input$variants[1] == "Variant B"   ~ paste0('background: #FEE6CE'),
+      input$variants[1] == "Variant B"   ~ paste0('background: #FEE6CE')
     )
   })
   
@@ -473,6 +505,7 @@ server <- function(input, output, session) {
            y = "Pct of Population with Covid") +
       scale_x_continuous(labels = label_percent()) +
       scale_y_continuous(labels = label_percent()) +
+      geom_label(aes(label = ))
       theme_minimal() +
       theme(
         legend.key.size = unit(8,'mm'),
@@ -488,7 +521,21 @@ server <- function(input, output, session) {
     
   output$effplot <- renderPlot({p2()})
 
+  
+  
+  
+  ## ui clinical data bar ------------------------------------------------------------
+  
+    # note that the graphs were already generated in outside of the app, we are just selecting
+  ui_plot <- reactive({
+    if (input$presets[1] == "Moderna") {ui_plot_moderna}
+    if (input$presets[1] == "Pfizer") {ui_plot_pfizer}
+    else NULL
+})
 
+  output$uiclinical <- renderUI({ui_plot()})
+
+ output$see <- renderPrint({input$presets})
 
 } # end server ------------------------------------------------------------------------
 

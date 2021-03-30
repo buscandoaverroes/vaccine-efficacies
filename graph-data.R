@@ -136,7 +136,7 @@ vax_data_long <-
 
 ## Generate plotly objects  --------------------------------------------------------------
 
-ui_outcome_plot <- function(name, ymax) {
+ui_outcome_plot <- function(name, ymax, bgcolor) {
 
   p <-   
   vax_data_long %>%
@@ -162,6 +162,9 @@ ui_outcome_plot <- function(name, ymax) {
       legend.text = element_text(size=10),
       legend.key.size = unit(4,"mm"),
       panel.grid = element_blank(),
+      panel.background = element_blank(),
+      plot.background = element_blank(),
+      panel.border = element_blank()
     ) +
     gghighlight(value >= 0) + 
     geom_label(aes(label = value),
