@@ -131,7 +131,6 @@ vax_data_long <-
     values_to = "value")  %>%
   separate(indicator, into = c("arm", "indicator"), sep = '_', extra = 'merge') %>%
   mutate(arm = stringr::str_to_title(arm)) %>% # convert to title case
-  #pivot_wider( id_cols = c("short_name", "arm"), names_from = "indicator", values_from = "value") %>%
   filter(indicator == "covid_rate10k" | indicator == "severe_rate10k") #  
 
 ## Generate plotly objects  --------------------------------------------------------------
@@ -145,9 +144,11 @@ ui_outcome_plot <- function(name, ymax, bgcolor) {
     geom_col(aes(fill = indicator), position = 'dodge', width = 0.8) +
     scale_fill_viridis_d(
       aesthetics = "fill",
-      option = "viridis",
+      begin = 0.4,
+      option = "plasma", direction = 1,
       labels = c("Covid",
-                 "Severe Covid")
+                 "Severe Covid"
+                 )
     ) +
     scale_x_discrete(labels=c("Placebo", "Vaccine")) +
     scale_y_continuous(limits = c(0,ymax)) +
@@ -155,16 +156,22 @@ ui_outcome_plot <- function(name, ymax, bgcolor) {
     theme_minimal() + 
     theme(
       axis.title.x = NULL,
-      axis.title.y = element_text(size=10, margin = margin(t=0,r=8,b=0,l=0), face = 'bold'),
-      axis.text.x = element_text(size=10, face = 'bold'),
-      axis.text.y = element_text(size=10),
+      axis.title.y = element_text(size=14, margin = margin(t=0,r=8,b=0,l=0),
+                                  face = 'bold', color = 'white'),
+      axis.text.x = element_text(size=16, face = 'bold', color = 'white'),
+      axis.text.y = element_text(size=10, color = 'white'),
+      axis.line = element_blank(),
       legend.title = NULL,
-      legend.text = element_text(size=10),
-      legend.key.size = unit(4,"mm"),
+      legend.text = element_text(size=12, colour = 'white'),
+      legend.key.size = unit(5,"mm"),
+      legend.position = 'top',
+      legend.direction = 'horizontal',
+      legend.justification = "center",
+      legend.spacing.x = unit(4, 'mm'),
       panel.grid = element_blank(),
-      panel.background = element_blank(),
-      plot.background = element_blank(),
-      panel.border = element_blank()
+      panel.background = element_rect(fill = "#2c3e50", color = NA),
+      plot.background = element_rect(fill = "#2c3e50", color = NA),
+      panel.border = element_rect(fill = NA, linetype = 'dashed', size = 0)
     ) +
     gghighlight(value >= 0) + 
     geom_label(aes(label = value),
@@ -201,3 +208,5 @@ save(
   ui_plot_moderna, ui_plot_pfizer,
   file = file.path(app, "app-data.Rdata")
 )
+
+#ui_plot_moderna

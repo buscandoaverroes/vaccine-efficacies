@@ -75,11 +75,11 @@ ui = navbarPage("Vaccines",
        conditionalPanel( ## ui clinical data plot -----------------------------------
               condition = 'input.presets != "Explore Own"', # this needs to be chaned over to radio (3 button)
               
-            #wellPanel( 
+            
                   align='center',
                   style= 'background: #2c3e50',
                   
-         plotOutput('uiclinical', height = '120px')
+              plotOutput('uiclinical', height = '150px')
          
        )),
        
@@ -88,7 +88,7 @@ ui = navbarPage("Vaccines",
                     wellPanel( align='center', 
 
                                tags$h4(tags$b("Infection Rate")),
-                               
+
                  conditionalPanel(    condition = 'input.presets == "Explore Own"',
                    sliderInput("poprate", label = NULL,
                                            width = '120px', ticks = F,
@@ -125,10 +125,12 @@ ui = navbarPage("Vaccines",
                    tags$h3(tags$b("Estimated Chance of Covid Protection")),
                    htmlOutput("center_protectrate")
          ), # end wellpanel
-
-         plotOutput("effplot") ## rainbow curve plot ----
+        wellPanel( align = 'center',
+                   style = 'background: #FFF',
+         plotOutput("effplot")) ## rainbow curve plot ----
        ),
        
+       ## After plot text ----
        tags$h4("Key Takeaways"),
        tags$li("Your protection chances from Covid are much higher than the stated efficacy rate."),
        tags$li("Vaccines work. All approved COVID-19 vaccines reduce the average person's chances of
@@ -380,7 +382,8 @@ server <- function(input, output, session) {
                                                       1)) +
       scale_fill_viridis_d(name = "Protection",
                            option = 'plasma', direction = 1,
-                           alpha = 0.9,
+                           begin = 0.2, end = 0.95,
+                           alpha = 1,
                            labels = c("90 - 95%", "95 - 99%", "99 - 99.5%", "99.5-99.9%", "over 99.9%"),
                            aesthetics = "fill") +
       geom_vline(aes(xintercept = effrate_B()), linetype= "dotdash", alpha = 0.5) +
@@ -392,8 +395,6 @@ server <- function(input, output, session) {
                  linetype= "solid", alpha = 0.3) +
       geom_hline(aes(yintercept = vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"]),
                  linetype = "solid", alpha = 0.3) + 
-      # geom_point(data = eff_clinical_data[eff_clinical_data$name =="Pfizer",], aes(x = eff, y = pop),
-      #            size = 2, shape = 20, alpha=1, color = "purple", stroke = 2) +
       # {Moderna data}
       geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]),
                  linetype= "dotted", alpha = 0.4) +
@@ -455,6 +456,9 @@ server <- function(input, output, session) {
 # Run the application 
 
 
-shinyApp(ui = ui, server = server, options = list("launch.browswer" = TRUE))
+#bslib::run_with_themer(
+  shinyApp(ui = ui, server = server, options = list("launch.browswer" = TRUE))
+ 
+# )
 
 
