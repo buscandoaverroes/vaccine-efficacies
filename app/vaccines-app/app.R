@@ -131,7 +131,7 @@ ui = navbarPage("Vaccines",
         wellPanel( align = 'center',
                    style = 'background: #FFF',
          plotOutput("effplot", click = "plot_click")), ## rainbow curve plot ----
-        textOutput('see')
+        #textOutput('see')
        ),
        
        ## After plot text ----
@@ -523,7 +523,7 @@ server <- function(input, output, session) {
 
 
   output$uiclinical <-  renderPlot({ui_plot()})
-  output$see <- renderPrint({str(origin$src)})
+  #output$see <- renderPrint({str(origin$src)})
 
     
 
