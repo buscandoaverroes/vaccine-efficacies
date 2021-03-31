@@ -89,21 +89,24 @@ ui = navbarPage("Vaccines",
 
                                tags$h4(tags$b("Infection Rate")),
 
-                 conditionalPanel(    condition = 'input.presets == "Explore Own"',
+                 conditionalPanel(  
+                   condition = 'input.presets == "Explore Own"',
+                   
                    sliderInput("poprate", label = NULL,
                                            width = '120px', ticks = F,
                                            min = 0.001, max = 0.1, value = 0.03, step = 0.001)),
                                htmlOutput('right_poprate', width = 6)
                     ),  # end first element of splitpanel
-                    wellPanel( align='center',
-
-                               tags$h4(tags$b("Efficacy Rate")),
-                               
-                  conditionalPanel(    condition = 'input.presets == "Explore Own"',
-                               sliderInput("effrate", label = NULL,
-                                           width = '150px', ticks = F, 
-                                           min = 0, max = 1, value = 0.8, step = 0.01)),
-                               htmlOutput('right_effrate', width = 6 )
+                    
+                 wellPanel( align='center',
+                  tags$h4(tags$b("Efficacy Rate")),
+                  conditionalPanel(    
+                    condition = 'input.presets == "Explore Own"',
+                    
+                   sliderInput("effrate", label = NULL,
+                               width = '150px', ticks = F, 
+                               min = 0, max = 1, value = 0.8, step = 0.01)),
+                   htmlOutput('right_effrate', width = 6 )
                     )), # end main input panel, end second element
        
 
@@ -127,7 +130,7 @@ ui = navbarPage("Vaccines",
          ), # end wellpanel
         wellPanel( align = 'center',
                    style = 'background: #FFF',
-         plotOutput("effplot", click = clickOpts(id = "plot_click"))), ## rainbow curve plot ----
+         plotOutput("effplot", click = "plot_click")), ## rainbow curve plot ----
         textOutput('see')
        ),
        
@@ -161,12 +164,68 @@ ui = navbarPage("Vaccines",
 server <- function(input, output, session) {
   
   # input chain ---------------------------------------------------------------------
+  
+  ## step0: data origin ----
+  origin <- reactiveValues(src = NULL) # start with null data source
+  observeEvent(input$plot_click, { origin$src <- "plot"}, label = "origin plot" )
+  observeEvent(input$effrate,    { origin$src <- "user"}, label = "origin effrate")
+  observeEvent(input$poprate,    { origin$src <- "user"}, label = "origin poprate")
+
   ## step1: user input ----
-  effrate_A <- reactive({input$effrate})
-  poprate_A <- reactive({input$poprate})
+  
+  ### save click values ----
+  ### (idk why plot input auto-nullifies after ~0.5 seconds...)
+  
+  
+  ### define reactive values 
+  click <- reactiveValues(x = NULL, y = NULL) 
+  
+  ### update with non-null plot click
+  observeEvent(input$plot_click, {
+    
+    click$x <- input$plot_click$x
+    click$y <- input$plot_click$y
+    
+  }, ignoreNULL = TRUE, label = 'preseve last plot click') 
+  
+  
+  ## calculate values based on origin source above 
+  effrate_A <- reactive({
+    if (origin$src == "user") {
+      input$effrate
+    } 
+    else {
+      click$x
+    }
+  })
+  
+  
+  poprate_A <- reactive({
+    if (origin$src == "user") {
+      input$poprate
+    } 
+    else {
+      click$y
+    }
+  })
+
+      #   if (is.null(input$plot_click)) {
+  #     input$effrate
+  #   }
+  #   else {
+  #     input$plot_click$x
+  #   }
+  #   })
+  # poprate_A <- reactive({
+  #   if (is.null(input$plot_click)) {
+  #     input$poprate 
+  #   }
+  #   else {
+  #     input$plot_click$y
+  #   }
+  #   })
   
   ## step2: multiplier ----
-  scaler <- reactiveValues(e = 0, p = 0)
   scaler_e <- reactive({
     case_when(
       input$variants[1] == "Variant A"   ~ 0.15,
@@ -186,8 +245,25 @@ server <- function(input, output, session) {
 
   
   ## step3: calculate new values with scalars ----
-  effrate_B <- reactive({effrate_A() - (effrate_A()*scaler_e() )})
-  poprate_B <- reactive({poprate_A() + (poprate_A()*scaler_p() )})
+  effrate_B <- reactive({
+    #if (is.null(input$plot_click)) {
+      effrate_A() - (effrate_A()*scaler_e() )
+    # }
+    # else {
+    #   input$plot_click$x
+    # }
+   })
+  
+  poprate_B <- reactive({ 
+   # if (is.null(input$plot_click)) {
+      poprate_A() + (poprate_A()*scaler_p() )
+    # } 
+    # else {
+    #   input$plot_click$y
+    # }
+    })
+  
+  
   
   ## step4: take these B values into the equations. ----
   protectrate <- reactive({
@@ -386,6 +462,7 @@ server <- function(input, output, session) {
                            alpha = 1,
                            labels = c("90 - 95%", "95 - 99%", "99 - 99.5%", "99.5-99.9%", "over 99.9%"),
                            aesthetics = "fill") +
+      # [user point stuff]
       geom_vline(aes(xintercept = effrate_B()), linetype= "dotdash", alpha = 0.5) +
       geom_hline(aes(yintercept = poprate_B()), linetype = "dotdash", alpha = 0.5) + 
       geom_point(data = eff_point(), aes(x = eff, y = pop), 
@@ -446,7 +523,7 @@ server <- function(input, output, session) {
 
 
   output$uiclinical <-  renderPlot({ui_plot()})
-  output$see <- renderPrint({str(input$plot_click)})
+  output$see <- renderPrint({str(origin$src)})
 
     
 
