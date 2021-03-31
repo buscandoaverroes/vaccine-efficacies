@@ -168,6 +168,8 @@ ui_outcome_plot <- function(name, ymax, bgcolor) {
       legend.direction = 'horizontal',
       legend.justification = "center",
       legend.spacing.x = unit(4, 'mm'),
+      legend.box.margin = margin(t=0,r=0,b=0,l=0),
+      legend.box.spacing = unit(0, 'mm'),
       panel.grid = element_blank(),
       panel.background = element_rect(fill = "#2c3e50", color = NA),
       plot.background = element_rect(fill = "#2c3e50", color = NA),
@@ -186,8 +188,8 @@ ui_outcome_plot <- function(name, ymax, bgcolor) {
 
 
 ### ggplot function call ----
-ui_plot_pfizer <- ui_outcome_plot("Pfizer", 150)
-ui_plot_moderna <- ui_outcome_plot("Moderna", 150)
+ui_plot_pfizer <- ui_outcome_plot("Pfizer", 180)
+ui_plot_moderna <- ui_outcome_plot("Moderna", 180)
 
 
 save(
@@ -209,4 +211,4 @@ save(
   file = file.path(app, "app-data.Rdata")
 )
 
-#ui_plot_moderna
+ui_plot_moderna
