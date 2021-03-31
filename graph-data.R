@@ -178,7 +178,7 @@ ui_outcome_plot <- function(name, ymax, bgcolor) {
 }
 
 
-### plotly function call ----
+### ggplot function call ----
 ui_plot_pfizer <- ui_outcome_plot("Pfizer", 150)
 ui_plot_moderna <- ui_outcome_plot("Moderna", 150)
 

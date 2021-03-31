@@ -80,7 +80,7 @@ ui = navbarPage("Vaccines",
                   align='center',
                   style= 'background: #2c3e50',
                   
-         uiOutput('uiclinical', height = '150px')
+         plotOutput('uiclinical', height = '150px')
          
        )),
        
@@ -127,7 +127,7 @@ ui = navbarPage("Vaccines",
                    htmlOutput("center_protectrate")
          ), # end wellpanel
 
-         plotOutput("effplot", ) ## rainbow curve plot ----
+         plotOutput("effplot") ## rainbow curve plot ----
        ),
        
        tags$h4("Key Takeaways"),
@@ -432,15 +432,26 @@ server <- function(input, output, session) {
   ## ui clinical data bar ------------------------------------------------------------
   
     # note that the graphs were already generated in outside of the app, we are just selecting
-  ui_plot <- reactive({
+  ui_plot <- eventReactive(input$presets[1], {
+    
+    # reactiveValuesToList( 
+    #   case_when(
+    #     input$presets[1] == "Moderna" ~ ui_plot_moderna,
+    #     input$presets[1] == "Pfizer" ~ ui_plot_pfizer
+    #     #is.null(input$presets) ~ NULL)
+    #   ))
+    # 
     if (input$presets[1] == "Moderna") {ui_plot_moderna}
-    if (input$presets[1] == "Pfizer") {ui_plot_pfizer}
+    if (input$presets[1] == "Pfizer") {ui_plot_moderna}
     else NULL
 })
 
-  output$uiclinical <- renderUI({ui_plot()})
 
- output$see <- renderPrint({input$presets})
+  output$uiclinical <-  renderPlot({ui_plot()})
+
+    
+
+ output$see <- renderPrint({  ui_plot()$data})
 
 } # end server ------------------------------------------------------------------------
 
