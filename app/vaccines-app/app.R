@@ -127,7 +127,8 @@ ui = navbarPage("Vaccines",
          ), # end wellpanel
         wellPanel( align = 'center',
                    style = 'background: #FFF',
-         plotOutput("effplot")) ## rainbow curve plot ----
+         plotOutput("effplot", click = clickOpts(id = "plot_click"))), ## rainbow curve plot ----
+        plotOutput('see')
        ),
        
        ## After plot text ----
@@ -160,11 +161,11 @@ ui = navbarPage("Vaccines",
 server <- function(input, output, session) {
   
   # input chain ---------------------------------------------------------------------
-  # step1: user input
+  ## step1: user input ----
   effrate_A <- reactive({input$effrate})
   poprate_A <- reactive({input$poprate})
   
-  # step2: multiplier
+  ## step2: multiplier ----
   scaler <- reactiveValues(e = 0, p = 0)
   scaler_e <- reactive({
     case_when(
@@ -184,25 +185,24 @@ server <- function(input, output, session) {
     
 
   
-  # step3: calculate new values with scalars 
+  ## step3: calculate new values with scalars ----
   effrate_B <- reactive({effrate_A() - (effrate_A()*scaler_e() )})
   poprate_B <- reactive({poprate_A() + (poprate_A()*scaler_p() )})
   
-  # step4: take these B values into the equations. 
+  ## step4: take these B values into the equations. ----
   protectrate <- reactive({
     1 - ( poprate_B() * ( 1 - effrate_B() ))
   })
 
-  # step5: calculate user-friendly values 
+  ## step5: calculate user-friendly values ----
   ## poprate per 1k 
   poprate_B_per1k <- reactive({ round(poprate_B() * 1000) })
   effrate_B_pct   <- reactive({ round(effrate_B()*100, 2)})
   protectrate_pct <- reactive({ round(protectrate()*100,2) })
   
   
-  # account for vaccine buttons, update step A?
-  # establish ui_plot as reactive object
-  
+  # vaccine buttons ----
+
   observeEvent(input$presets, { 
     if (input$presets[1] == "Explore Own") {
       # enable/disable rest of inputs 
@@ -235,8 +235,8 @@ server <- function(input, output, session) {
   
 
   
-  ## eff data for plot ----
-  # for now, generate this data in-app
+  # eff data for plot ----
+  #### for now, generate this data in-app
   eff_data <- expand_grid(
     pop    = seq(from = 0, to = 0.1, by = 0.05),
     eff    = seq(from = 0, to = 1, by = 0.01)
