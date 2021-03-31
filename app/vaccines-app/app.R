@@ -54,7 +54,6 @@ ui = navbarPage("Vaccines",
 
        
        br(), hr(),
-       textOutput('see'),
        prettySwitch('showmath', 'Show Math', slim = T, inline = T, status = 'info'),
        wellPanel(align='center',
                  style= 'background: #2c3e50',
@@ -71,16 +70,16 @@ ui = navbarPage("Vaccines",
                   choices = c("Variant A", "Variant B", "No Variants"),
                   status = 'primary',  selected = "No Variants",
                   size = "sm", direction = 'horizontal', individual = FALSE
-                )),
+                ),
 
        conditionalPanel( ## ui clinical data plot -----------------------------------
               condition = 'input.presets != "Explore Own"', # this needs to be chaned over to radio (3 button)
               
-            wellPanel( 
+            #wellPanel( 
                   align='center',
                   style= 'background: #2c3e50',
                   
-         plotOutput('uiclinical', height = '150px')
+         plotOutput('uiclinical', height = '120px')
          
        )),
        
@@ -430,20 +429,18 @@ server <- function(input, output, session) {
   
   
   ## ui clinical data bar ------------------------------------------------------------
-  
+
     # note that the graphs were already generated in outside of the app, we are just selecting
-  ui_plot <- eventReactive(input$presets[1], {
-    
-    # reactiveValuesToList( 
-    #   case_when(
-    #     input$presets[1] == "Moderna" ~ ui_plot_moderna,
-    #     input$presets[1] == "Pfizer" ~ ui_plot_pfizer
-    #     #is.null(input$presets) ~ NULL)
-    #   ))
-    # 
-    if (input$presets[1] == "Moderna") {ui_plot_moderna}
-    if (input$presets[1] == "Pfizer") {ui_plot_moderna}
-    else NULL
+  ui_plot <- eventReactive(input$presets, {
+    if (input$presets[1] == "Moderna") {
+      ui_plot_moderna
+      }
+    else if (input$presets[1] == "Pfizer") {
+      ui_plot_pfizer
+      }
+    else {
+      NULL
+    }
 })
 
 
@@ -451,7 +448,6 @@ server <- function(input, output, session) {
 
     
 
- output$see <- renderPrint({  ui_plot()$data})
 
 } # end server ------------------------------------------------------------------------
 
