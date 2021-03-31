@@ -446,6 +446,7 @@ server <- function(input, output, session) {
 
 
   output$uiclinical <-  renderPlot({ui_plot()})
+  output$see <- renderPlot({str(input$plot_click)})
 
     
 
