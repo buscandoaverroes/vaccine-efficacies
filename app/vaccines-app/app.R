@@ -9,6 +9,7 @@ library(shinycssloaders)
 library(reactlog)
 library(plotly)
 library(bslib)
+#library(mathjaxr)
 
 reactlog_enable()
 
@@ -129,8 +130,7 @@ ui = navbarPage("Vaccines",
          ), # end wellpanel
         wellPanel( align = 'center',
                    style = 'background: #FFF',
-         plotOutput("effplot", click = "plot_click")), ## rainbow curve plot ----
-        #textOutput('see')
+         plotOutput("effplot", click = "plot_click")) ## rainbow curve plot ----
        ),
        
        ## After plot text ----
@@ -149,27 +149,23 @@ ui = navbarPage("Vaccines",
                  distancing to protect those still waiting for a vaccine.") 
        
 
-     )) # end tab panel, fluid page              
+     )), # end tab panel, fluid page              
           
- 
+         
 
 
-
-
-
-tabPanel("Vaccine Efficacies", # PAGE2: About ----------------------------------------------------------------------
+       
+tabPanel("About", # PAGE2: efficacies ----------------------------------------------------------------------
          fluidPage(
-           theme = theme, 
+           theme = theme,  
            
+           HTML(markdown::markdownToHTML(file = 'about.md', fragment.only = TRUE))
            
-      markdown::markdownToHTML(file = 'about.md')
-           
-           
-     )) # end fluidpage, tabPanel (page2)
-                
+         )) # end page2 tabpanel, fluidpage
 
 
 ) # end navbarpage, taglist
+
 
 
 
@@ -222,22 +218,7 @@ server <- function(input, output, session) {
     }
   })
 
-      #   if (is.null(input$plot_click)) {
-  #     input$effrate
-  #   }
-  #   else {
-  #     input$plot_click$x
-  #   }
-  #   })
-  # poprate_A <- reactive({
-  #   if (is.null(input$plot_click)) {
-  #     input$poprate 
-  #   }
-  #   else {
-  #     input$plot_click$y
-  #   }
-  #   })
-  
+
   ## step2: multiplier ----
   scaler_e <- reactive({
     case_when(
@@ -258,23 +239,9 @@ server <- function(input, output, session) {
 
   
   ## step3: calculate new values with scalars ----
-  effrate_B <- reactive({
-    #if (is.null(input$plot_click)) {
-      effrate_A() - (effrate_A()*scaler_e() )
-    # }
-    # else {
-    #   input$plot_click$x
-    # }
-   })
+  effrate_B <- reactive({  effrate_A() - (effrate_A()*scaler_e()) })
   
-  poprate_B <- reactive({ 
-   # if (is.null(input$plot_click)) {
-      poprate_A() + (poprate_A()*scaler_p() )
-    # } 
-    # else {
-    #   input$plot_click$y
-    # }
-    })
+  poprate_B <- reactive({ poprate_A() + (poprate_A()*scaler_p()) })
   
   
   
@@ -282,6 +249,7 @@ server <- function(input, output, session) {
   protectrate <- reactive({
     1 - ( poprate_B() * ( 1 - effrate_B() ))
   })
+  
 
   ## step5: calculate user-friendly values ----
   ## poprate per 1k 
@@ -536,7 +504,6 @@ server <- function(input, output, session) {
 
 
   output$uiclinical <-  renderPlot({ui_plot()})
-  #output$see <- renderPrint({str(origin$src)})
 
     
 
