@@ -9,7 +9,6 @@ library(shinycssloaders)
 library(reactlog)
 library(plotly)
 library(bslib)
-#library(mathjaxr)
 
 reactlog_enable()
 
@@ -36,7 +35,7 @@ ui = navbarPage("Vaccines",
 # Application title
 
                 
-  tabPanel("Vaccine Efficacies", # PAGE: efficacies ----------------------------------------------------------------------
+  tabPanel("Vaccine Efficacies", # PAGE1: efficacies ----------------------------------------------------------------------
      fluidPage(
        theme = theme,
        
@@ -152,7 +151,21 @@ ui = navbarPage("Vaccines",
 
      )) # end tab panel, fluid page              
           
-                
+ 
+
+
+
+
+
+tabPanel("Vaccine Efficacies", # PAGE2: About ----------------------------------------------------------------------
+         fluidPage(
+           theme = theme, 
+           
+           
+      markdown::markdownToHTML(file = 'about.md')
+           
+           
+     )) # end fluidpage, tabPanel (page2)
                 
 
 
