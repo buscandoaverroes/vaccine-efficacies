@@ -92,9 +92,9 @@ ui = navbarPage("Vaccines",
                  conditionalPanel(  
                    condition = 'input.presets == "Explore Own"',
                    
-                   sliderInput("poprate", label = NULL,
+                   sliderInput("poprate", label = 'in person-years',
                                            width = '120px', ticks = F,
-                                           min = 0.001, max = 0.1, value = 0.03, step = 0.001)),
+                                           min = 1, max = 100, value = 3, step = 1)),
                                htmlOutput('right_poprate', width = 6)
                     ),  # end first element of splitpanel
                     
@@ -103,7 +103,7 @@ ui = navbarPage("Vaccines",
                   conditionalPanel(    
                     condition = 'input.presets == "Explore Own"',
                     
-                   sliderInput("effrate", label = NULL,
+                   sliderInput("effrate", label = "Risk Reduction Factor",
                                width = '150px', ticks = F, 
                                min = 0, max = 1, value = 0.8, step = 0.01)),
                    htmlOutput('right_effrate', width = 6 )
@@ -251,14 +251,14 @@ server <- function(input, output, session) {
   
   
   ## step4: take these B values into the equations. ----
-  protectrate <- reactive({
-    1 - ( poprate_B() * ( 1 - effrate_B() ))
+  protectrate <- reactive({ 
+    1 - ( poprate_B()/1000 * ( 1 - effrate_B() ))
   })
   
 
   ## step5: calculate user-friendly values ----
   ## poprate per 1k 
-  poprate_B_per1k <- reactive({ round(poprate_B() * 1000) })
+  poprate_B_per1k <- reactive({ round(poprate_B())})
   effrate_B_pct   <- reactive({ round(effrate_B()*100, 2)})
   protectrate_pct <- reactive({ round(protectrate()*100,2) })
   
@@ -277,14 +277,14 @@ server <- function(input, output, session) {
                               disabledChoices = c("Variant A", "Variant B"), selected = "No Variants")
 
       updateSliderInput('poprate', session = session,
-                        value = vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"])
+                        value = vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"])
       updateSliderInput('effrate', session = session,
                         value = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"])
       
     }
     if (input$presets[1] == "Moderna") {
       updateSliderInput('poprate', session = session,
-                        value = vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"])
+                        value = vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"])
       updateSliderInput('effrate', session = session,
                         value = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"])
       updateRadioGroupButtons('variants', session = session,
@@ -321,13 +321,13 @@ server <- function(input, output, session) {
   eff_clinical_data <- tibble(
     name = c("Pfizer", "Moderna"),
     var1 = 1,
-    pop  = c(vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"],
-             vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"]),
+    pop  = c(vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"],
+             vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"]),
     eff  = c(vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"],
              vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]),
-    p_safe = 1-(pop*(1-eff))
+    p_safe = 1-((pop/1000)*(1-eff))
   )
-  
+
   
   
   
@@ -392,49 +392,8 @@ server <- function(input, output, session) {
   })
   
   
-  # data work -------------------------------------------------------------------------------
-
-  data <- reactive({ withProgress(message = "Fetching the Data",
-    sim_data %>%
-      filter(vax_name == input$vaxname)) 
-  })
-  
-    
-  
-  
   
   # graphs ----------------------------------------------------------------------------------
-  
-  ## placebo/vaccine graph ----
-  p1 <- reactive({ withProgress(message = "Building the Graph",
-        ggplot(data = data(), aes(x, y)) + # use raster since high perferfmance and all same size
-          geom_raster(aes(fill = outcome, alpha = outcome)) +
-          scale_fill_manual(values = c(
-            "COVID Negative" = brewer.pal(9, "Blues")[2],
-            "COVID Positive" = brewer.pal(9, "Purples")[6],
-            "Severe COVID"   = brewer.pal(9, "Set1")[1]),
-            name = NULL,
-            labels = c("COVID Negative" = "No COVID",
-                       "COVID Positive" = "COVID",
-                       "Severe COVID"   = "Severe COVID")
-          ) +
-          scale_alpha_manual(values = c(0.4, 1.0, 1.0), guide = NULL) +
-          facet_grid(cols = vars(arm)) +
-          theme_void() +
-          theme(legend.position = 'top',
-                legend.key.size = unit(5,'mm'),
-                legend.spacing.x = unit(5,'mm'),
-                legend.justification = 'center',
-                legend.margin = margin(2,0,0,0),
-                panel.spacing.x = unit(0,'mm'),
-                plot.margin = margin(0,0,0,0))
-  )
-  })
-  
-  output$plotly <- renderPlot({p1()})
-  
-
-
 
   ## rainbow curve graph ---- 
   p2 <- reactive({
@@ -456,12 +415,12 @@ server <- function(input, output, session) {
       # {Pfizer data}
       geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"]),
                  linetype= "solid", alpha = 0.3) +
-      geom_hline(aes(yintercept = vax_data$placebo_covid_rate[vax_data$short_name %in% "Pfizer"]),
+      geom_hline(aes(yintercept = vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"]),
                  linetype = "solid", alpha = 0.3) + 
       # {Moderna data}
       geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]),
                  linetype= "dotted", alpha = 0.4) +
-      geom_hline(aes(yintercept = vax_data$placebo_covid_rate[vax_data$short_name %in% "Moderna"]),
+      geom_hline(aes(yintercept = vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"]),
                  linetype = "dotted", alpha = 0.4) + 
       # {{point}}
       geom_point(data = eff_clinical_data,
@@ -473,9 +432,9 @@ server <- function(input, output, session) {
                                   override.aes = list(fill=NA, stroke=NA))) +
       guides(fill = guide_legend(title.position = 'top')) +
       labs(x = "Vaccine Efficacy",
-           y = "Pct of Population with Covid") +
+           y = "Population Infection Rate (1000 person-years)") +
       scale_x_continuous(labels = label_percent()) +
-      scale_y_continuous(labels = label_percent()) +
+      scale_y_continuous() +
       theme_minimal() +
       theme(
         legend.key.size = unit(8,'mm'),
