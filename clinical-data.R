@@ -61,7 +61,7 @@ vax_data <- vax_data %>%
 
 vax_data <- vax_data %>%
   mutate(
-    covid_efficacy = (1 - (treatment_covid_incidence/placebo_covid_incidence))
+    covid_efficacy = (1 - (treatment_covid_incidence/placebo_covid_incidence)) # this is the main outcome variable
     # severe_efficacy= (1 - (treatment_severe_rate/placebo_severe_rate)),
     # mortality_efficacy= (1 - (treatment_mortality_rate/placebo_mortality_rate))
   )
@@ -73,6 +73,15 @@ vax_data <- vax_data %>%
 assertthat::assert_that(
   sum((abs(vax_data$stated_efficacy - vax_data$covid_efficacy) >= 0.001) == TRUE, na.rm = TRUE) == 0
   )
+
+
+## rate per 10,000: Taking many assumptions into account, particularly the uniformity of the
+## clinical rates in 'outside-trial' conditions, how many people per 10,000 could hypotethically
+## be expected to develop symptons: [variable_rate] * 10,000. 
+    # note, this is a less suitable measure than covid_incidence because covid_incidence takes 
+    # into account person-years, but the rate is still useful for raw descriptive statisitics.
+vax_data <- vax_data %>%
+  mutate(across(ends_with("_rate"), ~ round((10000 * .x)), .names = "{.col}10k")) 
 
 
 ### create percent variables 

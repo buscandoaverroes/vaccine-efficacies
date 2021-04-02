@@ -20,13 +20,15 @@ vax_data_long <-
                ends_with("n_covid_pos"),
                ends_with("covid_rate"),
                ends_with("covid_rate_pct"),
-               ends_with("rate10k")
+               ends_with("rate10k"), 
+               ends_with("incidence")
           ) %>%
   pivot_longer(
     cols = c(ends_with("n_covid_pos"),
              ends_with("covid_rate"),
              ends_with("covid_rate_pct"),
-             ends_with("rate10k")),
+             ends_with("rate10k"), 
+             ends_with("incidence")),
     names_to = "indicator",
     values_to = "value")  %>%
   separate(indicator, into = c("arm", "indicator"), sep = '_', extra = 'merge') %>%
@@ -94,9 +96,6 @@ ui_plot_moderna <- ui_outcome_plot("Moderna", 180)
 
 save(
   vax_data, 
-  sim_data,
-  Pfizer_plaCov,Pfizer_plaSev,Pfizer_plaMort,Pfizer_treCov,Pfizer_treSev,Pfizer_treMort,
-  Moderna_plaCov,Moderna_plaSev,Moderna_plaMort,Moderna_treCov, Moderna_treSev,Moderna_treMort,
   ui_plot_moderna, ui_plot_pfizer,
   file = file.path(data, "app-data.Rdata")
 )
@@ -104,11 +103,8 @@ save(
 ### save a copy to the app directory
 save(
   vax_data, 
-  sim_data,
-  Pfizer_plaCov,Pfizer_plaSev,Pfizer_plaMort,Pfizer_treCov,Pfizer_treSev,Pfizer_treMort,
-  Moderna_plaCov,Moderna_plaSev,Moderna_plaMort,Moderna_treCov, Moderna_treSev,Moderna_treMort,
   ui_plot_moderna, ui_plot_pfizer,
   file = file.path(app, "app-data.Rdata")
 )
 
-#ui_plot_moderna
+ui_plot_moderna
