@@ -50,6 +50,13 @@ vax_data <- vax_data %>%
     mortality_efficacy= (1 - (treatment_mortality_rate/placebo_mortality_rate))
   )
 
+## check that the calculated efficacy is virtually the same as the stated efficacy 
+##  here, we are saying that there is no case where the difference 
+##  between the stated and calculated efficacy rates
+##  is greater than 0.1 percent-points or 0.001
+assertthat::assert_that(
+  sum((abs(vax_data$stated_efficacy - vax_data$covid_efficacy) >= 0.001) == TRUE, na.rm = TRUE) == 0
+  )
 
 ## rate per 10,000: Taking many assumptions into account, particularly the uniformity of the
 ## clinical rates in 'outside-trial' conditions, how many people per 10,000 could hypotethically

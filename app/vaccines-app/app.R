@@ -159,7 +159,12 @@ tabPanel("About", # PAGE2: efficacies ------------------------------------------
          fluidPage(
            theme = theme,  
            
-           HTML(markdown::markdownToHTML(file = 'about.md', fragment.only = TRUE))
+           withMathJax(),
+           
+           HTML(markdown::markdownToHTML(file = 'about.md',
+                                         fragment.only = TRUE,
+                                         options = c('latex_math') ### also won't work...
+                                         ))
            
          )) # end page2 tabpanel, fluidpage
 
@@ -464,7 +469,9 @@ server <- function(input, output, session) {
                  size = 2, shape = 20, alpha=1, stroke = 2) + 
       scale_color_brewer(palette = "Set1", aesthetics = "colour",
                          name = "Vaccine") +
-      guides(color=guide_legend(override.aes = list(fill=NA, stroke=NA))) +
+      guides(color = guide_legend(title.position = 'top',
+                                  override.aes = list(fill=NA, stroke=NA))) +
+      guides(fill = guide_legend(title.position = 'top')) +
       labs(x = "Vaccine Efficacy",
            y = "Pct of Population with Covid") +
       scale_x_continuous(labels = label_percent()) +
@@ -472,12 +479,19 @@ server <- function(input, output, session) {
       theme_minimal() +
       theme(
         legend.key.size = unit(8,'mm'),
+        legend.margin = margin(t=0,r=0,b=0,l=0),
+        legend.position = 'right',
+        legend.spacing.x = unit(2,'mm'),
+        legend.spacing.y = unit(1,'mm'),
+        legend.direction = 'vertical',
         legend.key = element_rect(linetype = 'solid', fill = 'white', color = "#525252", size = 0.5),
         legend.title = element_text(size=15, face = "bold"),
         legend.text = element_text(size=13),
+        axis.ticks.length = unit(0,'mm'),
+        plot.margin = margin(t=0,r=0,b=0,l=0),
+        panel.grid = element_blank(), # how to reduce space between grid/axis labels and plot area?
         axis.title = element_text(size=15),
-        axis.text = element_text(size=12)
-        
+        axis.text = element_text(size=12,margin = margin(t=0,r=0,b=0,l=0)) # is inside another element??
       )
     
   })
