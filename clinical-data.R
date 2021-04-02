@@ -74,14 +74,6 @@ assertthat::assert_that(
   sum((abs(vax_data$stated_efficacy - vax_data$covid_efficacy) >= 0.001) == TRUE, na.rm = TRUE) == 0
   )
 
-## rate per 10,000: Taking many assumptions into account, particularly the uniformity of the
-## clinical rates in 'outside-trial' conditions, how many people per 10,000 could hypotethically
-## be expected to develop symptons: [variable_rate] * 10,000
-
-vax_data <- vax_data %>%
-  mutate(across(ends_with("_rate"), ~ round((10000 * .x)), .names = "{.col}10k")) 
-  
-
 
 ### create percent variables 
 vax_data <- vax_data %>%
