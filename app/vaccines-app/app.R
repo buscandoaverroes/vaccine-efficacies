@@ -87,25 +87,30 @@ ui = navbarPage("Vaccines",
        splitLayout( ##  main input panels ----------------------------------------
                     wellPanel( align='center', 
 
-                               tags$h4(tags$b("Infection Rate")),
+                               tags$h4(tags$b("Covid Infections")),
+                               tags$body(("unvaccinated population")),
 
                  conditionalPanel(  
                    condition = 'input.presets == "Explore Own"',
                    
-                   sliderInput("poprate", label = 'in person-years',
-                                           width = '120px', ticks = F,
-                                           min = 1, max = 100, value = 3, step = 1)),
+                   sliderInput("poprate", 
+                               label = NULL,
+                                           width = '100%', ticks = F,
+                                           min = 1, max = 100, value = dflt_poprate, step = 1)),
                                htmlOutput('right_poprate', width = 6)
                     ),  # end first element of splitpanel
                     
                  wellPanel( align='center',
                   tags$h4(tags$b("Efficacy Rate")),
+                  tags$body(("Risk reduction factor")),
+                  
                   conditionalPanel(    
                     condition = 'input.presets == "Explore Own"',
                     
-                   sliderInput("effrate", label = "Risk Reduction Factor",
-                               width = '150px', ticks = F, 
-                               min = 0, max = 1, value = 0.8, step = 0.01)),
+                   sliderInput("effrate",
+                               label = NULL,
+                               width = '100%', ticks = F, 
+                               min = 0, max = 1, value = dflt_effrate, step = 0.01)),
                    htmlOutput('right_effrate', width = 6 )
                     )), # end main input panel, end second element
        
@@ -199,6 +204,10 @@ server <- function(input, output, session) {
     
     click$x <- input$plot_click$x
     click$y <- input$plot_click$y
+    
+    # also resets presets to explore own to avoid confusion with clinical data 
+    updateRadioGroupButtons(session = session, inputId = 'presets',
+                            selected = "Explore Own" )
     
   }, ignoreNULL = TRUE, label = 'preseve last plot click') 
   
@@ -366,12 +375,12 @@ server <- function(input, output, session) {
   })
   math_eq <- reactive({
     paste0(
-      protectrate(), " = 1 - (",round(poprate_B(),3),"*(1 - ",
+      round(protectrate(), 4), " = 1 - (", "\\frac{", poprate_B(), "}{1000}","*(1 - ",
            round(effrate_B(),3),"))"
                  )
   })
   output$math <- renderUI({
-    withMathJax(helpText(math_eq()))
+    withMathJax(helpText('$$\\frac{1}{2}$$')) # math_eq()
   })
   
   # html styles ----
