@@ -37,6 +37,22 @@ vax_data <- vax_data %>%
     treatment_mortality_rate = (treatment_n_mortality / treatment_n_participants)
   )
 
+## incidence of covid in person years: this is the figure that will go into the efficacy rate 
+## as both mRna vaccine papers use this figure as the basis for calculating vaccine efficacy rates. some
+## papers have this already calculated, so if that is the case, then I will just take that raw value.
+vax_data <- vax_data %>%
+  mutate(
+    placebo_covid_incidence = case_when(
+      !is.na(vax_data$placebo_surv_time_pyrs) ~  (1000*(placebo_n_covid_pos / placebo_surv_time_pyrs)),
+      TRUE                           ~ placebo_covid_incidence
+    ),
+    treatment_covid_incidence = case_when(
+      !is.na(vax_data$treatment_surv_time_pyrs) ~  (1000*(treatment_n_covid_pos / treatment_surv_time_pyrs)),
+      TRUE                           ~ treatment_covid_incidence
+    )
+  )
+
+
 
 ## efficacy: here [x variable] efficacy is the "effect" of the vaccine between the placebo and ----
 # control groups, which is measured by comparing the [treatment/placebo] rates between the
