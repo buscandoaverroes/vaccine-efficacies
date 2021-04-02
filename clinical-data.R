@@ -61,9 +61,9 @@ vax_data <- vax_data %>%
 
 vax_data <- vax_data %>%
   mutate(
-    covid_efficacy = (1 - (treatment_covid_rate/placebo_covid_rate)),
-    severe_efficacy= (1 - (treatment_severe_rate/placebo_severe_rate)),
-    mortality_efficacy= (1 - (treatment_mortality_rate/placebo_mortality_rate))
+    covid_efficacy = (1 - (treatment_covid_incidence/placebo_covid_incidence))
+    # severe_efficacy= (1 - (treatment_severe_rate/placebo_severe_rate)),
+    # mortality_efficacy= (1 - (treatment_mortality_rate/placebo_mortality_rate))
   )
 
 ## check that the calculated efficacy is virtually the same as the stated efficacy 
