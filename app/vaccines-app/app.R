@@ -26,7 +26,7 @@ theme <- bslib::bs_theme(
 load("app-data.Rdata")
 
 # default input values 
-dflt_poprate = 0.03
+dflt_poprate = 30
 dflt_effrate = 0.8
 
 
@@ -300,8 +300,8 @@ server <- function(input, output, session) {
   # eff data for plot ----
   #### for now, generate this data in-app
   eff_data <- expand_grid(
-    pop    = seq(from = 0, to = 100, by = 1),
-    eff    = seq(from = 0, to = 1, by = 0.01)
+    pop    = seq(from = 0, to = 200, by = 1),
+    eff    = seq(from = 0, to = 1, by = 0.1)
   ) %>% mutate(
     p_safe   = 1-((pop/1000)*(1-eff))
   )
@@ -398,14 +398,14 @@ server <- function(input, output, session) {
   ## rainbow curve graph ---- 
   p2 <- reactive({
     ggplot(data = eff_data, aes(x = eff, y = pop, color = eff)) +
-      geom_contour_filled(aes(z = p_safe), breaks = c(0, 0.9,
-                                                      0.95, 0.99, 0.995, 0.999,
+      geom_contour_filled(aes(z = p_safe), breaks = c(0.8,
+                                                      0.90, 0.95, 0.99, 0.995,
                                                       1)) +
       scale_fill_viridis_d(name = "Protection",
                            option = 'plasma', direction = 1,
-                           begin = 0.2, end = 0.95,
+                           begin = 0.2, end = 0.90,
                            alpha = 1,
-                           labels = c("90 - 95%", "95 - 99%", "99 - 99.5%", "99.5-99.9%", "over 99.9%"),
+                           labels = c("80 - 90%", "90 - 95%", "95 - 99%", "99- 99.5%", "over 99.5%"),
                            aesthetics = "fill") +
       # [user point stuff]
       geom_vline(aes(xintercept = effrate_B()), linetype= "dotdash", alpha = 0.5) +
@@ -432,7 +432,7 @@ server <- function(input, output, session) {
                                   override.aes = list(fill=NA, stroke=NA))) +
       guides(fill = guide_legend(title.position = 'top')) +
       labs(x = "Vaccine Efficacy",
-           y = "Population Infection Rate (1000 person-years)") +
+           y = "Covid Cases per 1000") +
       scale_x_continuous(labels = label_percent()) +
       scale_y_continuous() +
       theme_minimal() +
