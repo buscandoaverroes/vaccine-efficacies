@@ -11,17 +11,6 @@ library(gghighlight)
 vax_data <- readRDS(file.path(data, "vax_data.rda"))
 
 
-
-
-# Generate simulated clinical data ===========================================================
-pfizer_sim_data  <- gen_sim_data("Pfizer", 100)
-moderna_sim_data <- gen_sim_data("Moderna", 100)
-
-
-sim_data <- rbind(pfizer_sim_data, moderna_sim_data)
-
-
-
 # clinical trial outcome data ================================================================
 ## outcome data ------------------------------------------------------------------------------
 
