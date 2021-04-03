@@ -45,26 +45,10 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      fluidPage( title = "Covid-19 Vaccine Data Explorer",
                 
                 
-       tags$h1("Covid-19 Vaccine Calculator"),
-       tags$body("Estimate your chances of protection and explore clinical data."), tags$br(),
-       tags$h4("The Calculator"),
-       tags$body("As Covid-19 vaccination efforts continue around the globe, 
-                 many questions remain about what vaccination means for
-                 those inocculated in practicality (WaPost, 02/01). Also, discrepencies in efficacy
-                 rates of available vaccines could shape individual preferences or even broader
-                 trender in public uptake. However,"),
-       #        tags$link("https://www.washingtonpost.com/health/2021/02/01/vaccinated-people-precautions/"),
-         
-       tags$blockquote("Your chance of protection is not the efficacy rate"), 
-       tags$body("It's just math! Your chances of Covid protection depend on:"),
-       tags$li("the vaccine efficacy rate"),
-       tags$li("how fast the virus spreads"),
-       tags$li("and other individual risk factors"),
-
-       tags$h4("Estimate Your Chances"),
-       tags$body("Select a vaccine preset to explore the clinical trial data or adjust
-                 the buttons and sliders to explore a hypothetical scenario."),
-       
+                HTML(markdown::markdownToHTML(file = 'page1-intro.md',
+                                              fragment.only = TRUE
+                                              
+                )),
      
 
        
@@ -153,19 +137,10 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        ),
        
        ## After plot text ----
-       tags$h4("Key Takeaways"),
-       tags$li("Your protection chances from Covid are much higher than the stated efficacy rate."),
-       tags$li("Vaccines work. All approved COVID-19 vaccines reduce the average person's chances of
-             contracting covid to near 0."),
-       tags$li("Differences in efficacy rates between vaccines don't matter much in practicality -- it's 
-               more important just to get vaccinated."),
-       
-       tags$h4("Keep in Mind"),
-       tags$body("The clinical trials occured in different places and stages of the pandemic, so 
-                 they aren't perfectly comparable.
-                 Also, these studies revealed slightly different efficacies based on demographic factors like age (see sources)."),
-       tags$body("Finally, if you're vaccinated, it's very important to continue following CDC guidelines on masking and social
-                 distancing to protect those still waiting for a vaccine.") 
+       HTML(markdown::markdownToHTML(file = 'page1-end.md',
+                                     fragment.only = TRUE
+                                     
+       ))
        
 
      )), # end tab panel, fluid page              
@@ -182,7 +157,7 @@ tabPanel("About", # PAGE2: about -----------------------------------------------
            
            HTML(markdown::markdownToHTML(file = 'about.md',
                                          fragment.only = TRUE,
-                                         options = c('latex_math') ### also won't work...
+                                         options = c('latex_math')
                                          ))
            
          )) # end page2 tabpanel, fluidpage
