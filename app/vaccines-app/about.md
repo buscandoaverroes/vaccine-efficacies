@@ -14,15 +14,15 @@ A bit about key terms and methodology is below in [Notes on the Data] and [Can I
 
 ## Inspiration
 
-Our professor's strategy proved quite fortuitous. It was all a game of mental Jiu-Jitsu. Read 20 pages of theoretical math, code it, stay up all night, and then, we show up to class:
+Our professor's strategy of mental Jiu-Jitsu proved quite fortuitous:. Read 20 pages of theoretical math, code it, stay up all night, and then:
 
 "Tell me the units".
 
-"HUuUuUh?" None of us ever remembered the single most important word in the whole paper. His point was simple: we, as future storytellers of data and empirics, will invariably tell our story to people -- and no matter how conceptual or math-y our methodology gets, we need a firm grasp on what our final results mean in practicality. Always know what the units mean.
+"HUuUuUh?" we forgot the single most important word in the whole paper. His point was simple: we, as future storytellers of data and empirics, will invariably tell our story to people -- and no matter how conceptual or math-y our methodology gets, we need a firm grasp on what our final results mean in practicality. Always know what the units mean.
 
 Fast forward to December 2020, and numbers start popping up on the news: 95, 94, then later, 66. People start noticing differences, and of course we want the best quality medicine available, and of course discussions ensue of vaccine equity, as they should.
 
-But I noticed that one very essential line was missing: the unit. The reported figures are not the "final figures" or the chances of protection as is reasonable to assume -- these figures are the "hazard ratios" and I figured that getting it right was
+But I noticed that one very essential line was missing: the unit.
 
 ## Data Sources
 
