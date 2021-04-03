@@ -31,16 +31,31 @@ dflt_effrate = 0.8
 
 
 # UI =====================================================================================
-ui = navbarPage("Vaccines",
+ui = navbarPage(title = NULL, 
+                position = "fixed-top",
+                collapsible = TRUE,
+                theme = theme,
+                header = list(tags$br(), tags$br(), tags$br()),
 
 # Application title
 
                 
-  tabPanel("Vaccine Efficacies", # PAGE1: efficacies ----------------------------------------------------------------------
-     fluidPage(
-       theme = theme,
-       
-       tags$h4(tags$b("The Efficacy Rate is not your chance of being protected")), 
+  
+tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------------------------------------------
+     fluidPage( title = "Covid-19 Vaccine Data Explorer",
+                
+                
+       tags$h1("Covid-19 Vaccine Calculator"),
+       tags$body("Estimate your chances of protection and explore clinical data."), tags$br(),
+       tags$h4("The Calculator"),
+       tags$body("As Covid-19 vaccination efforts continue around the globe, 
+                 many questions remain about what vaccination means for
+                 those inocculated in practicality (WaPost, 02/01). Also, discrepencies in efficacy
+                 rates of available vaccines could shape individual preferences or even broader
+                 trender in public uptake. However,"),
+       #        tags$link("https://www.washingtonpost.com/health/2021/02/01/vaccinated-people-precautions/"),
+         
+       tags$blockquote("Your chance of protection is not the efficacy rate"), 
        tags$body("It's just math! Your chances of Covid protection depend on:"),
        tags$li("the vaccine efficacy rate"),
        tags$li("how fast the virus spreads"),
@@ -88,7 +103,7 @@ ui = navbarPage("Vaccines",
                     wellPanel( align='center', 
 
                                tags$h4(tags$b("Covid Infections")),
-                               tags$body(("unvaccinated population")),
+                               tags$body(("in unvaccinated population")),
 
                  conditionalPanel(  
                    condition = 'input.presets == "Explore Own"',
@@ -120,17 +135,16 @@ ui = navbarPage("Vaccines",
           condition = 'input.showmath',
           
           wellPanel(align='center',
-                    style='background: #D9F9E5',
+                    style='background: #F6F1FB',
                     
-                    tags$ul(htmlOutput('math', container = tags$h4))
-                    # htmloutput same as renderui
+                    htmlOutput('math', container = tags$b)
           )
         ),
          wellPanel(align='center', ## protection rate ----
                    style= 'background: #D9F9E5',
                    
                    
-                   tags$h3(tags$b("Estimated Chance of Covid Protection")),
+                   tags$h3(tags$b("Estimated Chance of Protection")),
                    htmlOutput("center_protectrate")
          ), # end wellpanel
         wellPanel( align = 'center',
@@ -160,10 +174,10 @@ ui = navbarPage("Vaccines",
 
 
        
-tabPanel("About", # PAGE2: efficacies ----------------------------------------------------------------------
-         fluidPage(
-           theme = theme,  
-           
+tabPanel("About", # PAGE2: about ----------------------------------------------------------------------
+         fluidPage( title = "About Covid-19 Vaccine Data Explorer",
+          tags$br(),
+          
            withMathJax(),
            
            HTML(markdown::markdownToHTML(file = 'about.md',
@@ -374,13 +388,13 @@ server <- function(input, output, session) {
     )
   })
   math_eq <- reactive({
-    paste0(
-      round(protectrate(), 4), " = 1 - (", "\\frac{", poprate_B(), "}{1000}","*(1 - ",
-           round(effrate_B(),3),"))"
+    paste0( "$$", 
+      round(protectrate(), 4), " = 1 - (", "\\frac{", round(poprate_B()), "}{1000}","*(1 - ",
+           round(effrate_B(),3),"))", '$$'
                  )
   })
   output$math <- renderUI({
-    withMathJax(helpText('$$\\frac{1}{2}$$')) # math_eq()
+    withMathJax(helpText(math_eq()))
   })
   
   # html styles ----
@@ -412,7 +426,7 @@ server <- function(input, output, session) {
                                                       1)) +
       scale_fill_viridis_d(name = "Protection",
                            option = 'plasma', direction = 1,
-                           begin = 0.2, end = 0.90,
+                           begin = 0.28, end = 0.90,
                            alpha = 1,
                            labels = c("80 - 90%", "90 - 95%", "95 - 99%", "99- 99.5%", "over 99.5%"),
                            aesthetics = "fill") +
@@ -441,7 +455,7 @@ server <- function(input, output, session) {
                                   override.aes = list(fill=NA, stroke=NA))) +
       guides(fill = guide_legend(title.position = 'top')) +
       labs(x = "Vaccine Efficacy",
-           y = "Covid Cases per 1000") +
+           y = "Covid Cases per 1,000") +
       scale_x_continuous(labels = label_percent()) +
       scale_y_continuous() +
       theme_minimal() +
@@ -498,7 +512,6 @@ server <- function(input, output, session) {
 
 #bslib::run_with_themer(
   shinyApp(ui = ui, server = server, options = list("launch.browswer" = TRUE))
- 
-# )
+#)
 
 
