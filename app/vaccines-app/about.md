@@ -36,11 +36,13 @@ Yes -- please do. I designed the app to be entirely open-source so that every st
 
 ## Calculations
 
-**Population Infection Rate:** The rate at which unvaccinated people test positive for COVID-19, on average. This is determined from data in each clinical trial's placebo group: $\frac{\text{No. Covid Positives in Placebo Group}}{\text{No. Placebo Participants}}$. This figure excludes those who tested positive for Covid before receiving placebo or treatment and both mRNA vaccines studies used serologic or PCR-based tests to measure for COVID-19 [@baden2021; @polack2020].
+**Person-years** `population infection rate` and `treatment infection rate` are both recorded in "1000 person-years." This is admittedly not a natural way to think about rates, but it resolves a standardization problem described below in [Time]. Think about it this way: 1000 person-years is the equivalent to the total collective covid "risk" of 1000 people going about their daily lives for a year. If your general population has an infection rate of, say, `40` in `thousand person-years` , then on average 40 people for every 1,000 got infected with covid over a single year.
 
-**Treatment Infection Rate:** The rate at which people with the vaccine people test positive for COVID-19, on average. This is determined from data in each clinical trial's placebo group: $\frac{\text{No. Covid Positives in Vaccine Group}}{\text{No. Vaccine Participants}}$ . This figure excludes those who tested positive for Covid before receiving placebo or treatment and both mRNA vaccines studies used serologic or PCR-based tests to measure for COVID-19 [@baden2021; @polack2020].
+**Population Infection Rate:** The rate at which unvaccinated people test positive for COVID-19, on average, in `1000 person-years`. Person-year data are reported in the clinical papers The population infection rate is conceptually defined as: $\frac{\text{No. Covid Positives in Placebo Group}}{\text{Surveillance Period}}$ @polack2020. This figure excludes those who tested positive for Covid before receiving placebo or treatment and both mRNA vaccines studies used serologic or PCR-based tests to measure for COVID-19 [@baden2021; @polack2020].
 
-**Efficacy Rate:** A multiplication factor that reduces your chances of getting the virus, also known as the hazard-ratio. The efficacy calculation I use rate is $1 - \frac{\text{Treatment Infection Rate}}{\text{Population Infection Rate}}$. @polack2020 use a slightly different calculation method and arrive at the virtually the same numbers (slight discrepancies are found 4 digits after the decimal). See [Time] for more on why this is. My code includes automated checks to ensure that the numbers you see are within `0.001` of the stated efficacy rate for all papers.
+**Treatment Infection Rate:** The rate at which people with the vaccine people test positive for COVID-19, on average, in `1000 person-years`. Person-year data are reported in the clinical papers The population infection rate is conceptually defined as: $\frac{\text{No. Covid Positives in Vaccine Group}}{\text{No. Surveillance Period}}$ . This figure excludes those who tested positive for Covid before receiving placebo or treatment and both mRNA vaccines studies used serologic or PCR-based tests to measure for COVID-19 [@baden2021; @polack2020].
+
+**Efficacy Rate:** A multiplication factor that reduces your chances of getting the virus, also known as the hazard-ratio. The efficacy calculation I use rate is $1 - \frac{\text{Treatment Infection Rate}}{\text{Population Infection Rate}}$, following that of @polack2020. My code includes automated checks to ensure that the numbers you see are within `0.001` of the stated efficacy rate for all papers.
 
 **Chance of Protection:** is the probability that an average participant in the vaccine group did not test positive for COVID-19. If `chance of protection` is created through hypothetical data, it is the simply $(\text{population infection rate})*(\text{efficacy rate})$.
 
@@ -50,21 +52,7 @@ The two calculation methods are equivalent -- but in hypothetical data, since we
 
 ### Time
 
-Each clinical trial conducted vaccines studies over fixed periods of time -- so we should interpret the data under these time constraints for optimal validity. For example, the Pfizer trial timeline was about []. It would be correct to say something like:
-
-> The Pfizer data show that, during the latter part of 2020, the average infection rate was about [] over the period of [] in the places where participants were.
-
-The time aspect is paramount because one's chances of infection do not stay the same over time.
-
--   There could be an outbreak in your area, thereby increasing your chances.
-
--   New strains could appear that evade standard protections (i.e. single masks).
-
--   In theory, if one remained unvaccinated for long enough (say like 1,000 years), your chances of contracting the virus would likely increase simply because the sheer number of contacts with other people brings about many more chances at spread.
-
-To help account for this, some of the papers ([][]) have introduced a standardized way to account for rates over the short intervals of time, called 1000-person-years. But not all papers have done this and I find this somewhat difficult to interpret anyway.
-
-In lieu trying to standardize everyone's data, I decided to simply report the raw numbers and present the time issue as a caveat for readers to be aware of.
+Explanation forthcoming.
 
 ### Cross-Study Comparability
 
