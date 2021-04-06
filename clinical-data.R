@@ -37,6 +37,22 @@ vax_data <- vax_data %>%
     treatment_mortality_rate = (treatment_n_mortality / treatment_n_participants)
   )
 
+## incidence of covid in person years: this is the figure that will go into the efficacy rate 
+## as both mRna vaccine papers use this figure as the basis for calculating vaccine efficacy rates. some
+## papers have this already calculated, so if that is the case, then I will just take that raw value.
+vax_data <- vax_data %>%
+  mutate(
+    placebo_covid_incidence = case_when(
+      !is.na(vax_data$placebo_surv_time_pyrs) ~  (1000*(placebo_n_covid_pos / placebo_surv_time_pyrs)),
+      TRUE                           ~ placebo_covid_incidence
+    ),
+    treatment_covid_incidence = case_when(
+      !is.na(vax_data$treatment_surv_time_pyrs) ~  (1000*(treatment_n_covid_pos / treatment_surv_time_pyrs)),
+      TRUE                           ~ treatment_covid_incidence
+    )
+  )
+
+
 
 ## efficacy: here [x variable] efficacy is the "effect" of the vaccine between the placebo and ----
 # control groups, which is measured by comparing the [treatment/placebo] rates between the
@@ -45,19 +61,27 @@ vax_data <- vax_data %>%
 
 vax_data <- vax_data %>%
   mutate(
-    covid_efficacy = (1 - (treatment_covid_rate/placebo_covid_rate)),
-    severe_efficacy= (1 - (treatment_severe_rate/placebo_severe_rate)),
-    mortality_efficacy= (1 - (treatment_mortality_rate/placebo_mortality_rate))
+    covid_efficacy = (1 - (treatment_covid_incidence/placebo_covid_incidence)) # this is the main outcome variable
+    # severe_efficacy= (1 - (treatment_severe_rate/placebo_severe_rate)),
+    # mortality_efficacy= (1 - (treatment_mortality_rate/placebo_mortality_rate))
+  )
+
+## check that the calculated efficacy is virtually the same as the stated efficacy 
+##  here, we are saying that there is no case where the difference 
+##  between the stated and calculated efficacy rates
+##  is greater than 0.1 percent-points or 0.001
+assertthat::assert_that(
+  sum((abs(vax_data$stated_efficacy - vax_data$covid_efficacy) >= 0.001) == TRUE, na.rm = TRUE) == 0
   )
 
 
 ## rate per 10,000: Taking many assumptions into account, particularly the uniformity of the
 ## clinical rates in 'outside-trial' conditions, how many people per 10,000 could hypotethically
-## be expected to develop symptons: [variable_rate] * 10,000
-
+## be expected to develop symptons: [variable_rate] * 10,000. 
+    # note, this is a less suitable measure than covid_incidence because covid_incidence takes 
+    # into account person-years, but the rate is still useful for raw descriptive statisitics.
 vax_data <- vax_data %>%
   mutate(across(ends_with("_rate"), ~ round((10000 * .x)), .names = "{.col}10k")) 
-  
 
 
 ### create percent variables 
