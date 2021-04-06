@@ -1,4 +1,3 @@
-
 library(RColorBrewer)
 library(tidyverse)
 library(scales)
@@ -9,11 +8,8 @@ library(shinycssloaders)
 library(reactlog)
 library(plotly)
 library(bslib)
-#library(mathjaxr)
 
 reactlog_enable()
-
-#options(shiny.reactlog = TRUE)
 
 theme <- bslib::bs_theme(
   version = 4, bootswatch = "cosmo",
@@ -63,16 +59,20 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    status = 'primary',  selected = "Explore Own",
                    size = "lg", direction = 'horizontal', individual = T
                  ),
-
-                radioGroupButtons(
-                  'variants', label = NULL, disabled = FALSE,
-                  choices = c("Variant A", "Variant B", "No Variants"),
-                  status = 'primary',  selected = "No Variants",
-                  size = "sm", direction = 'horizontal', individual = FALSE
-                ),
+                 
+            conditionalPanel(
+              condition = 'input.presets == "Explore Own"',
+              
+              radioGroupButtons(
+                'variants', label = NULL, disabled = FALSE,
+                choices = c("Variant A", "Variant B", "No Variants"),
+                status = 'primary',  selected = "No Variants",
+                size = "sm", direction = 'horizontal', individual = FALSE
+              )
+            ),
 
        conditionalPanel( ## ui clinical data plot -----------------------------------
-              condition = 'input.presets != "Explore Own"', # this needs to be chaned over to radio (3 button)
+              condition = 'input.presets != "Explore Own"',
               
             
                   align='center',
@@ -265,15 +265,13 @@ server <- function(input, output, session) {
   # vaccine buttons ----
 
   observeEvent(input$presets, { 
-    if (input$presets[1] == "Explore Own") {
-      # enable/disable rest of inputs 
-      updateRadioGroupButtons('variants', session = session,
-                              disabledChoices = NULL, selected = "No Variants")
-    }
+    # if (input$presets[1] == "Explore Own") {
+    #  
+    # }
     if (input$presets[1] == "Pfizer") {
       # set variants to 'no variants', disable....
-      updateRadioGroupButtons('variants', session = session,
-                              disabledChoices = c("Variant A", "Variant B"), selected = "No Variants")
+      # updateRadioGroupButtons('variants', session = session,
+      #                         disabledChoices = c("Variant A", "Variant B"), selected = "No Variants")
 
       updateSliderInput('poprate', session = session,
                         value = vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"])
@@ -286,9 +284,6 @@ server <- function(input, output, session) {
                         value = vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"])
       updateSliderInput('effrate', session = session,
                         value = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"])
-      updateRadioGroupButtons('variants', session = session,
-                              disabledChoices = c("Variant A", "Variant B"), selected = "No Variants")
-      
     }
     
     

@@ -104,7 +104,5 @@ save(
 save(
   vax_data, 
   ui_plot_moderna, ui_plot_pfizer,
-  file = file.path(app, "app-data.Rdata")
+  file = file.path(app, "data/app-data.Rdata")
 )
-
-ui_plot_moderna
