@@ -28,9 +28,17 @@ But I noticed that one very essential line was missing: the unit.
 
 All of the data come directly from each of the relevant COVID-19 Vaccine Clinical Studies published via the National Institute of Health and the New England journal of medicine. As of the time of app production, these studies were published as open-access articles. Individual publication citation details are below.
 
+## License and Citing
+
+I make a distinction between my creative work and the clinical trial data that I present in this project.
+
+The information presented and cited from clinical papers was accessed via the "PMC Open Access Subset" at the time of publishing, so if you plan to use or cite anything related to the papers I recommend going directly to the source.
+
+If you want to use or refer to anything I've done, i.e. code or methodology, basically you can, as long as you keep it open source. Refer to the [the repository](https://github.com/buscandoaverroes/vaccine-efficacies) for more.
+
 ## Can I look at your code?
 
-Yes -- please do. I designed the app to be entirely open-source so that every step and calculation is transparent. I encourage those who are learning, curious, or even slightly skeptical to consult [the repository](https://github.com/buscandoaverroes/vaccine-efficacies).
+Yes, please do. I designed the app to be entirely open-source so that every step and calculation is transparent. I encourage those who are learning, curious, or even slightly skeptical to consult [the repository](https://github.com/buscandoaverroes/vaccine-efficacies).
 
 # Notes on the Data
 

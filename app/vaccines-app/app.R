@@ -17,13 +17,13 @@ reactlog_enable()
 
 theme <- bslib::bs_theme(
   version = 4, bootswatch = "cosmo",
-  spacer = '1.5rem',
+  spacer = '1rem',
   enable_rounded = TRUE,
   primary = "#7C36B0"
                          )
 
 # load data 
-load("app-data.Rdata")
+load("data/app-data.Rdata")
 
 # default input values 
 dflt_poprate = 30
@@ -45,7 +45,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      fluidPage( title = "Covid-19 Vaccine Data Explorer",
                 
                 
-                HTML(markdown::markdownToHTML(file = 'page1-intro.md',
+                HTML(markdown::markdownToHTML(file = 'md/page1-intro.md',
                                               fragment.only = TRUE
                                               
                 )),
@@ -86,8 +86,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        splitLayout( ##  main input panels ----------------------------------------
                     wellPanel( align='center', 
 
-                               tags$h4(tags$b("Covid Infections")),
-                               tags$body(("in unvaccinated population")),
+                               tags$h5(tags$b("Covid Infections")),
+                               tags$body(("in population")),
 
                  conditionalPanel(  
                    condition = 'input.presets == "Explore Own"',
@@ -95,13 +95,13 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    sliderInput("poprate", 
                                label = NULL,
                                            width = '100%', ticks = F,
-                                           min = 1, max = 100, value = dflt_poprate, step = 1)),
+                                           min = 1, max = 200, value = dflt_poprate, step = 1)),
                                htmlOutput('right_poprate', width = 6)
                     ),  # end first element of splitpanel
                     
                  wellPanel( align='center',
-                  tags$h4(tags$b("Efficacy Rate")),
-                  tags$body(("Risk reduction factor")),
+                  tags$h5(tags$b("Efficacy Rate")),
+                  tags$body(("Risk reduction")),
                   
                   conditionalPanel(    
                     condition = 'input.presets == "Explore Own"',
@@ -133,11 +133,12 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
          ), # end wellpanel
         wellPanel( align = 'center',
                    style = 'background: #FFF',
-         plotOutput("effplot", click = "plot_click")) ## rainbow curve plot ----
+         plotOutput("effplot", click = "plot_click")), ## rainbow curve plot ----
+        tags$source("Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)")
        ),
        
        ## After plot text ----
-       HTML(markdown::markdownToHTML(file = 'page1-end.md',
+       HTML(markdown::markdownToHTML(file = 'md/page1-end.md',
                                      fragment.only = TRUE
                                      
        ))
@@ -155,7 +156,7 @@ tabPanel("About", # PAGE2: about -----------------------------------------------
           
            withMathJax(),
            
-           HTML(markdown::markdownToHTML(file = 'about.md',
+           HTML(markdown::markdownToHTML(file = 'md/about.md',
                                          fragment.only = TRUE,
                                          options = c('latex_math')
                                          ))
@@ -341,7 +342,7 @@ server <- function(input, output, session) {
   ## efficacies ----
   output$right_poprate <- renderText({
     paste0(
-      "<b><font color=\"#000000\" size=6>",
+      "<b><font color=\"#000000\" size=5>",
       poprate_B_per1k(), " per ", "1,000",
       "</b></font>"
     )
@@ -349,7 +350,7 @@ server <- function(input, output, session) {
   
   output$right_effrate <- renderText({
     paste0(
-      "<b><font color=\"#000000\" size=6>",
+      "<b><font color=\"#000000\" size=5>",
       effrate_B_pct(), "%",
       "</b></font>"
     )
