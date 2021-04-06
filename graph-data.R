@@ -35,24 +35,24 @@ vax_data_long <-
   mutate(arm = stringr::str_to_title(arm)) %>% # convert to title case
   filter(indicator == "covid_rate10k" | indicator == "severe_rate10k") #  
 
-## Generate plotly objects  --------------------------------------------------------------
+## Generate ggplot objects  --------------------------------------------------------------
 
 ui_outcome_plot <- function(name, ymax, bgcolor) {
 
   p <-   
   vax_data_long %>%
     filter(short_name == as.character(name)) %>%
-    ggplot(., aes(arm, value)) +
-    geom_col(aes(fill = indicator), position = 'dodge', width = 0.8) +
+    ggplot(., aes(indicator, value)) +
+    geom_col(aes(fill = arm), position = 'dodge', width = 0.8) +
     scale_fill_viridis_d(
       aesthetics = "fill",
       begin = 0.4,
       option = "plasma", direction = 1,
-      labels = c("Covid",
-                 "Severe Covid"
+      labels = c("No Vaccine",
+                 "Vaccine"
                  )
     ) +
-    scale_x_discrete(labels=c("Placebo", "Vaccine")) +
+    scale_x_discrete(labels=c("Covid", "Severe Covid")) +
     scale_y_continuous(limits = c(0,ymax)) +
     labs(y = "Rate per 10k", x = NULL, fill = NULL) +
     theme_minimal() + 
