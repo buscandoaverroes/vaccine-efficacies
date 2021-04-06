@@ -94,15 +94,28 @@ ui_plot_pfizer <- ui_outcome_plot("Pfizer", 180)
 ui_plot_moderna <- ui_outcome_plot("Moderna", 180)
 
 
+
+# generate data for rainbow plot ----
+eff_data <- expand_grid(
+  pop    = seq(from = 0, to = 200, by = 1),
+  eff    = seq(from = 0, to = 1, by = 0.1)
+) %>% mutate(
+  p_safe   = 1-((pop/1000)*(1-eff))
+)
+
+
+
+
+# export ----
 save(
-  vax_data, 
+  vax_data, eff_data,
   ui_plot_moderna, ui_plot_pfizer,
   file = file.path(data, "app-data.Rdata")
 )
 
 ### save a copy to the app directory
 save(
-  vax_data, 
+  vax_data, eff_data, 
   ui_plot_moderna, ui_plot_pfizer,
   file = file.path(app, "data/app-data.Rdata")
 )

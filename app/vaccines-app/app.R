@@ -292,16 +292,6 @@ server <- function(input, output, session) {
 
   
   # eff data for plot ----
-  #### for now, generate this data in-app
-  eff_data <- expand_grid(
-    pop    = seq(from = 0, to = 200, by = 1),
-    eff    = seq(from = 0, to = 1, by = 0.1)
-  ) %>% mutate(
-    p_safe   = 1-((pop/1000)*(1-eff))
-  )
-  
-
-  
   # for hypothetical point data
   eff_point <- reactive({
     tibble(
