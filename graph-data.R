@@ -1,85 +1,110 @@
 # graph-data.R
-# generates teh coordinate data for plotting
+# generates the plots for app
 
 library(RColorBrewer)
 library(plotly)
+library(scales)
+library(gghighlight)
+
 
 # import data
 vax_data <- readRDS(file.path(data, "vax_data.rda"))
 
-# generate data ============================================================
 
-gen_sim_data <- function(name, max) {
-  
-  ## Coordinate data 
-  sim_data <- 
-    expand_grid(x = 1:max, y = 1:max)  # create all cominations of 100 ^2, or 10,000 obs
+# clinical trial outcome data ================================================================
+## outcome data ------------------------------------------------------------------------------
 
-  sim_data <-
-    sim_data %>%
-    mutate(r = runif(length(sim_data$x), min = 0, max = max)) %>% # make 10,000 random obs
-    arrange(r)
+# tilt long from vax_data
+vax_data_long <-
+  select(vax_data, short_name,
+               ends_with("n_covid_pos"),
+               ends_with("covid_rate"),
+               ends_with("covid_rate_pct"),
+               ends_with("rate10k"), 
+               ends_with("incidence")
+          ) %>%
+  pivot_longer(
+    cols = c(ends_with("n_covid_pos"),
+             ends_with("covid_rate"),
+             ends_with("covid_rate_pct"),
+             ends_with("rate10k"), 
+             ends_with("incidence")),
+    names_to = "indicator",
+    values_to = "value")  %>%
+  separate(indicator, into = c("arm", "indicator"), sep = '_', extra = 'merge') %>%
+  mutate(arm = stringr::str_to_title(arm)) %>% # convert to title case
+  filter(indicator == "covid_rate10k" | indicator == "severe_rate10k") #  
+
+## Generate plotly objects  --------------------------------------------------------------
+
+ui_outcome_plot <- function(name, ymax, bgcolor) {
+
+  p <-   
+  vax_data_long %>%
+    filter(short_name == as.character(name)) %>%
+    ggplot(., aes(arm, value)) +
+    geom_col(aes(fill = indicator), position = 'dodge', width = 0.8) +
+    scale_fill_viridis_d(
+      aesthetics = "fill",
+      begin = 0.4,
+      option = "plasma", direction = 1,
+      labels = c("Covid",
+                 "Severe Covid"
+                 )
+    ) +
+    scale_x_discrete(labels=c("Placebo", "Vaccine")) +
+    scale_y_continuous(limits = c(0,ymax)) +
+    labs(y = "Rate per 10k", x = NULL, fill = NULL) +
+    theme_minimal() + 
+    theme(
+      axis.title.x = NULL,
+      axis.title.y = element_text(size=14, margin = margin(t=0,r=8,b=0,l=0),
+                                  face = 'bold', color = 'white'),
+      axis.text.x = element_text(size=16, face = 'bold', color = 'white'),
+      axis.text.y = element_text(size=10, color = 'white'),
+      axis.line = element_blank(),
+      legend.title = NULL,
+      legend.text = element_text(size=12, colour = 'white'),
+      legend.key.size = unit(5,"mm"),
+      legend.position = 'top',
+      legend.direction = 'horizontal',
+      legend.justification = "center",
+      legend.spacing.x = unit(4, 'mm'),
+      legend.box.margin = margin(t=0,r=0,b=0,l=0),
+      legend.box.spacing = unit(0, 'mm'),
+      panel.grid = element_blank(),
+      panel.background = element_rect(fill = "#2c3e50", color = NA),
+      plot.background = element_rect(fill = "#2c3e50", color = NA),
+      panel.border = element_rect(fill = NA, linetype = 'dashed', size = 0)
+    ) +
+    gghighlight(value >= 0) + 
+    geom_label(aes(label = value),
+               position = position_dodge2(0.8), # this width matces colwidth above
+               vjust = -0.2,
+               label.size = 0.25,
+               fill = "#525252", color = 'white', alpha = 0.4)
   
   
-  ## covid data
-  # the thinking here is to generate a binary variable that turns to "yes" at an equivalent
-  # rate over the 10,000 observations that reflects the clinical trial data
-  
-  sim_data <- sim_data %>% # for pfizer
-    mutate(
-      covid_placebo        = F, 
-      severe_placebo       = F, 
-      mortality_placebo     = F,
-      
-      covid_vaccinated     = F, 
-      severe_vaccinated    = F, 
-      mortality_vaccinated  = F
-    )
-  
-  # replace
-  sim_data$covid_placebo[1:vax_data$placebo_covid_rate10k[vax_data$vaccine_name  %in% as.character(name)]] <- TRUE
-  sim_data$severe_placebo[1:vax_data$placebo_severe_rate10k[vax_data$vaccine_name  %in% as.character(name)]] <- TRUE
-  # only replace if the stat is nonmissing
-  if (!is.na(vax_data$placebo_mortality_rate10k[vax_data$vaccine_name  %in% as.character(name)])) {
-    sim_data$mortality_placebo[1:vax_data$placebo_mortality_rate10k[vax_data$vaccine_name %in% as.character(name)]] <- TRUE
-  } else {sim_data$placebo_mortality_rate10k <- NA}
-  
-  sim_data$covid_vaccinated[1:vax_data$treatment_covid_rate10k[vax_data$vaccine_name %in% as.character(name)]] <- TRUE
-  sim_data$severe_vaccinated[1:vax_data$treatment_severe_rate10k[vax_data$vaccine_name  %in% as.character(name)]] <- TRUE
-  
-  # only replace if the stat is non-missing
-  if (!is.na(vax_data$treatment_mortality_rate10k[vax_data$vaccine_name %in% as.character(name)] )) {
-    sim_data$mortality_vaccinated[1:vax_data$treatment_mortality_rate10k[vax_data$vaccine_name   %in% as.character(name)]] <- TRUE
-  } else {sim_data$mortality_vaccinated <- NA}
-  
-  sim_data
+  p
 }
 
 
-# Generate simulated clinical data ===========================================================
-pfizer_sim_data  <- gen_sim_data("Pfizer-BioNTech", 100)
-moderna_sim_data <- gen_sim_data("Moderna", 100)
+### ggplot function call ----
+ui_plot_pfizer <- ui_outcome_plot("Pfizer", 180)
+ui_plot_moderna <- ui_outcome_plot("Moderna", 180)
 
-## export
 
 save(
   vax_data, 
-  moderna_sim_data,
-  pfizer_sim_data,
+  ui_plot_moderna, ui_plot_pfizer,
   file = file.path(data, "app-data.Rdata")
 )
 
+### save a copy to the app directory
+save(
+  vax_data, 
+  ui_plot_moderna, ui_plot_pfizer,
+  file = file.path(app, "app-data.Rdata")
+)
 
-
-p1 <- ggplot(sim_data, aes(x, y, color = covid_placebo)) +
-  geom_point(alpha = 0.7, size = 0.8, shape=16) +
-  scale_color_manual(values = c("TRUE"="red", "FALSE"="lightblue")) +
-  theme_minimal()
-p1
-# 
-# plot_ly() %>%
-#   add_trace(data = sim_data, x = ~x, y = ~y, type = 'scatter', mode = 'markers',
-#             color = ~covid_placebo, alpha = 0.6)
-# 
-# 
-# RColorBrewer::display.brewer.all(type = 'qual', n = 2)
+ui_plot_moderna
