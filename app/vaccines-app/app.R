@@ -414,6 +414,12 @@ server <- function(input, output, session) {
                  size = 2, shape = 20, alpha=1, stroke = 2, show.legend = NA) + 
       scale_color_brewer(palette = "Set1", aesthetics = "colour",
                          guide = 'none') + # remove guide in legend
+      #gghighlight(eff >= 0, label_params = list(position = position_fill())) + # adjusting doesn't seems to work.
+      # geom_label(aes(label = eff),
+      #            position = position_dodge2(0.8), # this width matces colwidth above
+      #            vjust = -0.2,
+      #            label.size = 0.25,
+      #            fill = "#525252", color = 'white', alpha = 0.4) +
       labs(x = "Vaccine Efficacy",
            y = "Covid Cases per 1,000") +
       scale_x_continuous(labels = label_percent()) +
