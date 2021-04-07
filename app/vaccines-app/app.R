@@ -8,6 +8,8 @@ library(shinycssloaders)
 library(reactlog)
 library(plotly)
 library(bslib)
+library(gghighlight)
+library(ggrepel)
 
 reactlog_enable()
 
@@ -22,8 +24,8 @@ theme <- bslib::bs_theme(
 load("data/app-data.Rdata")
 
 # default input values 
-dflt_poprate = 30
-dflt_effrate = 0.8
+dflt_poprate = 100
+dflt_effrate = 0.7
 
 
 # UI =====================================================================================
@@ -297,24 +299,11 @@ server <- function(input, output, session) {
     tibble(
       pop = poprate_B(), 
       eff = effrate_B(), 
-      p_safe = 1-(pop*(1-eff))
+      p_safe = 1-(pop/1000*(1-eff))
     )
   })
   
-  # for actual clinical data
-  eff_clinical_data <- tibble(
-    name = c("Pfizer", "Moderna"),
-    var1 = 1,
-    pop  = c(vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"],
-             vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"]),
-    eff  = c(vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"],
-             vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]),
-    p_safe = 1-((pop/1000)*(1-eff))
-  )
 
-  
-  
-  
     
   
 
@@ -382,50 +371,73 @@ server <- function(input, output, session) {
   ## rainbow curve graph ---- 
   p2 <- reactive({
     ggplot(data = eff_data, aes(x = eff, y = pop)) +
-      geom_contour_filled(aes(z = p_safe), breaks = c(0.8,
-                                                      0.90, 0.95, 0.99,
-                                                      1)) +
+      geom_contour_filled(aes(z = p_safe), stat = "contour_filled",
+                          breaks = breaks
+      ) +
+     # labs(level = break_lvls ) +
       scale_fill_viridis_d(name = "Protection",
                            option = 'plasma', direction = 1,
                            begin = 0.28, end = 0.90,
                            alpha = 1,
-                           labels = c("80 - 90%", "90 - 95%", "95 - 99%", "over 99%"),
+                           labels = break_labs,
                            aesthetics = "fill", 
-                           guide = guide_legend(title.position = 'top',
-                                                ncol = 4)) +
+                           guide = guide_colorsteps(show.limits =TRUE,
+                                                    direction = 'horizontal',
+                                                    barheight = unit(6,'mm'),
+                                                    barwidth  = unit(60,'mm'),
+                                                    label = TRUE, 
+                                                    label.position = 'top',
+                                                    title.position = 'left',
+                                                    title = paste0("Protection", '\n', "Chances (%)")
+                           )) +
       # [user point stuff]
       geom_vline(aes(xintercept = effrate_B()), linetype= "dotdash", alpha = 0.5) +
-      geom_hline(aes(yintercept = poprate_B()), linetype = "dotdash", alpha = 0.5) + 
-      geom_point(data = eff_point(), aes(x = eff, y = pop), 
+      geom_hline(aes(yintercept = poprate_B()), linetype = "dotdash", alpha = 0.5) +
+      geom_point(data = eff_point(), aes(x = eff, y = pop),
                  size = 4, shape = 4, alpha=1, color = 'black', stroke = 4) +
       # {Pfizer data}
       geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"]),
                  linetype= "solid", alpha = 0.3) +
       geom_hline(aes(yintercept = vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"]),
-                 linetype = "solid", alpha = 0.3) + 
+                 linetype = "solid", alpha = 0.3) +
       # {Moderna data}
       geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]),
                  linetype= "dotted", alpha = 0.4) +
       geom_hline(aes(yintercept = vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"]),
-                 linetype = "dotted", alpha = 0.4) + 
+                 linetype = "dotted", alpha = 0.4) +
       # {{point}}
       geom_point(data = eff_clinical_data,
                  aes(x = eff, y = pop, color = name),
-                 size = 2, shape = 20, alpha=1, stroke = 2, show.legend = NA) + 
+                 size = 2, shape = 20, alpha=1, stroke = 2, show.legend = NA) +
       scale_color_brewer(palette = "Set1", aesthetics = "colour",
                          guide = 'none') + # remove guide in legend
-      #gghighlight(eff >= 0, label_params = list(position = position_fill())) + # adjusting doesn't seems to work.
-      # geom_label(aes(label = eff),
-      #            position = position_dodge2(0.8), # this width matces colwidth above
-      #            vjust = -0.2,
-      #            label.size = 0.25,
-      #            fill = "#525252", color = 'white', alpha = 0.4) +
       labs(x = "Vaccine Efficacy",
-           y = "Covid Cases per 1,000") +
+           y = "Covid Cases per 1,000",
+           title = "Protection Chance", 
+           subtitle = paste0("Yellow areas indicate the best\n", "chances of covid protection")) +
       scale_x_continuous(labels = label_percent()) +
       scale_y_continuous() +
+      geom_label_repel(data = eff_clinical_data,
+                       aes(label = paste0(name)), # ' protection: ', as.character(round(p_safe*100,1)), "%"
+                       position = position_nudge_repel(),
+                       hjust='outward', vjust = 1,
+                       label.padding = 0.25, box.padding = 0.1,
+                       size = 4, show.legend = F,
+                       label.size = 0.1, seed = 47, min.segment.length = 10, arrow = NULL,
+                       fill = "#737373", color = "#FFFFFF", alpha = 0.8) +
+      geom_label_repel(data = eff_point(),
+                       aes(label = paste0(as.character(round(p_safe*100,1)), "% \n",
+                                          'Protection Chance')),
+                       position = position_nudge_repel(), # position_nudge(y = 4, x = 0)
+                       hjust='middle', direction = "y",
+                       label.padding = 0.25, box.padding = 1, 
+                       size = 5, show.legend = F, 
+                       label.size = 0.1, seed = 47, min.segment.length = 10, arrow = NULL,
+                       fill = "#525252", color = "#FFFFFF", alpha = 1) +
       theme_minimal() +
       theme(
+        plot.title = element_text(face = "bold", size = 20, hjust = 0.5),
+        plot.subtitle = element_text(size = 14, hjust = 0.5, margin = margin(t=0,r=0,b=10,l=0)),
         legend.key.size = unit(5,'mm'),
         legend.margin = margin(t=0,r=0,b=0,l=0),
         legend.position = 'top',
@@ -434,8 +446,8 @@ server <- function(input, output, session) {
         legend.spacing.y = unit(2,'mm'),
         legend.direction = 'horizontal',
         legend.key = element_rect(linetype = 'solid', fill = 'white', color = "#525252", size = 0.5),
-        legend.title = element_text(size=15, face = "bold"),
-        legend.text = element_text(size=13),
+        legend.title = element_text(size=13, face = "bold"),
+        legend.text = element_text(size=12),
         axis.ticks.length = unit(0,'mm'),
         plot.margin = margin(t=0,r=0,b=0,l=0),
         panel.grid = element_blank(), # how to reduce space between grid/axis labels and plot area?

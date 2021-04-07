@@ -103,19 +103,37 @@ eff_data <- expand_grid(
   p_safe   = 1-((pop/1000)*(1-eff))
 )
 
+# for actual clinical data ----
+eff_clinical_data <- tibble(
+  name = c("Pfizer", "Moderna"),
+  pop  = c(vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"],
+           vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"]),
+  eff  = c(vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"],
+           vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]),
+  p_safe = 1-((pop/1000)*(1-eff))
+)
+
+# store key values
+breaks     <- c(0, seq(from = 0.90, to = 1.00, by = 0.02))
+break_labs <- c("0"="0", "0.9"="90", "0.92"="92", "0.94"="94", "0.96"="96", "0.98"="98", "1"="")
+break_lvls <- unique(base::cut(eff_data$p_safe,
+                               breaks = breaks,
+                               include.lowest = TRUE,
+                               ordered_result = TRUE, right = TRUE))
+
 
 
 
 # export ----
 save(
   vax_data, eff_data,
-  ui_plot_moderna, ui_plot_pfizer,
+  ui_plot_moderna, ui_plot_pfizer, breaks, break_labs, eff_clinical_data, break_lvls,
   file = file.path(data, "app-data.Rdata")
 )
 
 ### save a copy to the app directory
 save(
   vax_data, eff_data, 
-  ui_plot_moderna, ui_plot_pfizer,
+  ui_plot_moderna, ui_plot_pfizer, breaks, break_labs, eff_clinical_data, break_lvls, 
   file = file.path(app, "data/app-data.Rdata")
 )
