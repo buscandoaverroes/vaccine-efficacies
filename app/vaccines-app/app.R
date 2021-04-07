@@ -381,16 +381,18 @@ server <- function(input, output, session) {
 
   ## rainbow curve graph ---- 
   p2 <- reactive({
-    ggplot(data = eff_data, aes(x = eff, y = pop, color = eff)) +
+    ggplot(data = eff_data, aes(x = eff, y = pop)) +
       geom_contour_filled(aes(z = p_safe), breaks = c(0.8,
-                                                      0.90, 0.95, 0.99, 0.995,
+                                                      0.90, 0.95, 0.99,
                                                       1)) +
       scale_fill_viridis_d(name = "Protection",
                            option = 'plasma', direction = 1,
                            begin = 0.28, end = 0.90,
                            alpha = 1,
-                           labels = c("80 - 90%", "90 - 95%", "95 - 99%", "99- 99.5%", "over 99.5%"),
-                           aesthetics = "fill") +
+                           labels = c("80 - 90%", "90 - 95%", "95 - 99%", "over 99%"),
+                           aesthetics = "fill", 
+                           guide = guide_legend(title.position = 'top',
+                                                ncol = 4)) +
       # [user point stuff]
       geom_vline(aes(xintercept = effrate_B()), linetype= "dotdash", alpha = 0.5) +
       geom_hline(aes(yintercept = poprate_B()), linetype = "dotdash", alpha = 0.5) + 
@@ -408,25 +410,23 @@ server <- function(input, output, session) {
                  linetype = "dotted", alpha = 0.4) + 
       # {{point}}
       geom_point(data = eff_clinical_data,
-                 aes(x = eff, y = pop, colour = name),
-                 size = 2, shape = 20, alpha=1, stroke = 2) + 
+                 aes(x = eff, y = pop, color = name),
+                 size = 2, shape = 20, alpha=1, stroke = 2, show.legend = NA) + 
       scale_color_brewer(palette = "Set1", aesthetics = "colour",
-                         name = "Vaccine") +
-      guides(color = guide_legend(title.position = 'top',
-                                  override.aes = list(fill=NA, stroke=NA))) +
-      guides(fill = guide_legend(title.position = 'top')) +
+                         guide = 'none') + # remove guide in legend
       labs(x = "Vaccine Efficacy",
            y = "Covid Cases per 1,000") +
       scale_x_continuous(labels = label_percent()) +
       scale_y_continuous() +
       theme_minimal() +
       theme(
-        legend.key.size = unit(8,'mm'),
+        legend.key.size = unit(5,'mm'),
         legend.margin = margin(t=0,r=0,b=0,l=0),
-        legend.position = 'right',
+        legend.position = 'top',
+        legend.title.align = 0.5,
         legend.spacing.x = unit(2,'mm'),
-        legend.spacing.y = unit(1,'mm'),
-        legend.direction = 'vertical',
+        legend.spacing.y = unit(2,'mm'),
+        legend.direction = 'horizontal',
         legend.key = element_rect(linetype = 'solid', fill = 'white', color = "#525252", size = 0.5),
         legend.title = element_text(size=15, face = "bold"),
         legend.text = element_text(size=13),
