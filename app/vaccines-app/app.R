@@ -45,7 +45,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 
                 HTML(markdown::markdownToHTML(file = 'md/page1-intro.md',
                                               fragment.only = TRUE
-                                              
+
                 )),
      
 
@@ -137,9 +137,9 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    style = 'background: #FFF',
          plotlyOutput("effplot", height = "100%"), ## rainbow curve plot ----
          ), 
-        tags$source("Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)"),
+        tags$source("Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)")
         
-        verbatimTextOutput('see')
+        #verbatimTextOutput('see')
        ),
        
        ## After plot text ----
@@ -180,25 +180,27 @@ server <- function(input, output, session) {
   # input chain ---------------------------------------------------------------------
   
   ## step0: data origin ----
-  origin <- reactiveValues(src = NULL) # start with null data source
-  observeEvent(input$plot_click, { origin$src <- "plot"}, label = "origin plot" )
+  origin <- reactiveValues(src = "") # start with null data source
+  observeEvent(event_data("plotly_click"), { origin$src <- "plot"}, label = "origin plot" )
   observeEvent(input$effrate,    { origin$src <- "user"}, label = "origin effrate")
   observeEvent(input$poprate,    { origin$src <- "user"}, label = "origin poprate")
-
+  
+  
   ## step1: user input ----
   
   ### save click values ----
-  ### (idk why plot input auto-nullifies after ~0.5 seconds...)
-  
+  # save event data
+  d <- reactive({event_data("plotly_click")}) 
   
   ### define reactive values 
-  click <- reactiveValues(x = NULL, y = NULL) 
+  click <- reactiveValues(x = NULL, y = NULL, z = NULL) 
   
   ### update with non-null plot click
   observeEvent(event_data("plotly_click"), {
     
     click$x <- event_data("plotly_click")$x
     click$y <- event_data("plotly_click")$y
+    click$z <- event_data("plotly_click")$z
     
     # also resets presets to explore own to avoid confusion with clinical data 
     updateRadioGroupButtons(session = session, inputId = 'presets',
@@ -285,7 +287,7 @@ server <- function(input, output, session) {
   
   
   
-  output$see <- renderPrint({str(click)})
+  output$see <- renderPrint({str(eff_point())})
   
   
   
@@ -396,7 +398,8 @@ server <- function(input, output, session) {
 
   ## rainbow curve graph ---- 
   p2 <- reactive({
-    plot_ly(eff_data, type = 'contour',
+    ### main data ----
+    plot_ly(eff_data, type = 'contour', 
             x = ~eff, y = ~pop, z = ~p_safe,
             colorscale = "Viridis", zauto = F, zmin = 0.8, zmax = 1, #scaling doesn't seem to work.
             opacity = 0.8, reversescale = F,
@@ -410,10 +413,10 @@ server <- function(input, output, session) {
             autocontour = F, contours = list(
               type = "levels",
               start = 0.9, end = 1, size = 0.02,
-              coloring = 'fill', showlabels = T, # fill or heatmap
+              coloring = 'fill', showlabels = F, # fill or heatmap
               labelfont = list(size=12, color = 'black'),
               labelformat = '%'),
-            line = list(color='black', width=1),
+            line = list(color='black', width=0.5),
             hovertemplate = paste0(
               "<span style='color:white'><b>Protection: %{z:.1%}</b></span><br>",
               "<span style='color:lightgrey'>Covid: %{y} per 1000</span><br>",
@@ -425,24 +428,45 @@ server <- function(input, output, session) {
               font = list(color='white'),
               align = 'left'
             )
-    ) %>%
+    ) %>% ### clinical data ----
       add_trace(data = eff_clinical_data, type = "scatter", mode = 'markers',
                 uid = "clinical_data",
                 x = ~eff, y = ~pop, color = ~name, opacity = 1,
+                texttemplate = paste0("<b>", as.character(eff_clinical_data$name), "</b>"),
+                textposition = 'top left', textfont = list(size = 14),
                 marker = list(
-                  size = 8, color = c("#1F78B4", "#6A3D9A")
+                  size = 8, color = c("#1F78B4", "#6A3D9A") 
                 ),
                 text=paste0( 
-                  "<span style='white'><b>", as.character(eff_clinical_data$name), "</span></b><br>",
-                  "<b>Protection: ", as.character(round(eff_clinical_data$p_safe*100,1)),"%",
-                  "</b>"),
+                  #"<span style='white'><b>", as.character(eff_clinical_data$name), "</span></b><br>",
+                  "<b>Protection: ", as.character(round(eff_clinical_data$p_safe*100,1)),"%</b><br>",
+                  "<span style='color:lightgrey'>Covid: ", as.character(round(eff_clinical_data$pop)), " per 1000</span><br>",
+                  "<span style='color:lightgrey'>Vaccine Efficacy: ",
+                      as.character(round(eff_clinical_data$eff*100,0)), "%</span>"),
                 showlegend = FALSE, hoverinfo="text", 
                 hoverlabel=list(bgcolor=~name),
                 hovertemplate = NULL
-      ) %>% 
-      layout(
+      ) %>% ### user point ----
+      add_trace(data = eff_point(), type = "scatter", mode = 'markers',
+                uid = "user_point", visible = TRUE,
+                x = ~eff, y = ~pop, opacity = 1,
+                texttemplate = "<b>My Point<b>", textposition = 'top middle', textfont = list(size = 14, color = "black"),
+                marker = list(
+                  size = 12, color = "black", symbol = 'circle-open',
+                  line = list(width=4)), 
+                text=paste0(
+                  "<b>Protection: ", as.character(round(eff_point()$p_safe*100,1)), "%</b><br>",
+                  "<span style='color:lightgrey'>Covid: ", as.character(eff_point()$pop), " per 1000</span><br>",
+                  "<span style='color:lightgrey'>Vaccine Efficacy: ",
+                      as.character(round(eff_point()$eff*100,0)), "%</span>"),
+                showlegend = FALSE, hoverinfo="text", 
+                hoverlabel=list(bgcolor=RColorBrewer::brewer.pal(9, "Greys")[8]),
+                hovertemplate = NULL
+      ) %>% ### layout ----
+      layout( 
         font = list(family="Arial"),
         dragmode = FALSE, # disable click/drag
+        uniformtext = list(mode='hide', minsize=8),
         title = list(
           text = "<b>Protection Chances</b>",
           font = list(size=20),
