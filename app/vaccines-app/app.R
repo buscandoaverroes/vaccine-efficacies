@@ -135,8 +135,12 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
          ), # end wellpanel
         wellPanel( align = 'center',
                    style = 'background: #FFF',
-         plotOutput("effplot", click = "plot_click")), ## rainbow curve plot ----
-        tags$source("Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)")
+         plotOutput("effplot", click = "plot_click", ## rainbow curve plot ----
+                               hover = hoverOpts(id = 'plot_hover', delay = 300, delayType = "throttle"))
+         ), 
+        tags$source("Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)"),
+        
+        verbatimTextOutput('see')
        ),
        
        ## After plot text ----
@@ -246,7 +250,6 @@ server <- function(input, output, session) {
   
   ## step3: calculate new values with scalars ----
   effrate_B <- reactive({  effrate_A() - (effrate_A()*scaler_e()) })
-  
   poprate_B <- reactive({ poprate_A() + (poprate_A()*scaler_p()) })
   
   
@@ -257,11 +260,35 @@ server <- function(input, output, session) {
   })
   
 
-  ## step5: calculate user-friendly values ----
+  ## step5: calc user-friendly values ----
   ## poprate per 1k 
   poprate_B_per1k <- reactive({ round(poprate_B())})
   effrate_B_pct   <- reactive({ round(effrate_B()*100, 2)})
   protectrate_pct <- reactive({ round(protectrate()*100,2) })
+  
+  ## prepare hover values 
+  ### 1. determine near points 
+  hover_points <- reactive({
+    # find points
+    pts <- nearPoints(df = eff_clinical_data, coordinfo = input$plot_hover, threshold = 5, maxpoints = 1)
+    
+    # return values, if no values, return null
+    if (nrow(pts) == 0) {
+      return()
+    } 
+    else {
+      pts
+      #round(pts$p_safe*100, 3) 
+    }
+    
+      
+  }, label = 'hover points')
+  
+  
+  
+  output$see <- renderPrint({str(hover_points())})
+  
+  
   
   
   # vaccine buttons ----
@@ -384,7 +411,7 @@ server <- function(input, output, session) {
                            guide = guide_colorsteps(show.limits =TRUE,
                                                     direction = 'horizontal',
                                                     barheight = unit(6,'mm'),
-                                                    barwidth  = unit(60,'mm'),
+                                                    barwidth  = unit(0.6,'npc'), # scaled?
                                                     label = TRUE, 
                                                     label.position = 'top',
                                                     title.position = 'left',
@@ -434,6 +461,15 @@ server <- function(input, output, session) {
                        size = 5, show.legend = F, 
                        label.size = 0.1, seed = 47, min.segment.length = 10, arrow = NULL,
                        fill = "#525252", color = "#FFFFFF", alpha = 1) +
+      # ~~~ hovertip ~~~
+      # geom_label_repel(data = eff, # hbuh, this labels like all underlying points
+      #                  aes(label = paste0(as.character(round(p_safe*100,1)), "%")),
+      #                  position = position_nudge_repel(), # position_nudge(y = 4, x = 0)
+      #                  hjust='middle', direction = "y",
+      #                  label.padding = 0.25, box.padding = 1, 
+      #                  size = 5, show.legend = F, 
+      #                  label.size = 0.1, seed = 47, min.segment.length = 10, arrow = NULL,
+      #                  fill = "#525252", color = "#FFFFFF", alpha = 1) +
       theme_minimal() +
       theme(
         plot.title = element_text(face = "bold", size = 20, hjust = 0.5),
