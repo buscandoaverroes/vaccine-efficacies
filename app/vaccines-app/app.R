@@ -135,8 +135,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
          ), # end wellpanel
         wellPanel( align = 'center',
                    style = 'background: #FFF',
-         plotOutput("effplot", click = "plot_click", ## rainbow curve plot ----
-                               hover = hoverOpts(id = 'plot_hover', delay = 300, delayType = "throttle"))
+         plotlyOutput("effplot", height = "100%"), ## rainbow curve plot ----
          ), 
         tags$source("Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)"),
         
@@ -196,10 +195,10 @@ server <- function(input, output, session) {
   click <- reactiveValues(x = NULL, y = NULL) 
   
   ### update with non-null plot click
-  observeEvent(input$plot_click, {
+  observeEvent(event_data("plotly_click"), {
     
-    click$x <- input$plot_click$x
-    click$y <- input$plot_click$y
+    click$x <- event_data("plotly_click")$x
+    click$y <- event_data("plotly_click")$y
     
     # also resets presets to explore own to avoid confusion with clinical data 
     updateRadioGroupButtons(session = session, inputId = 'presets',
@@ -286,7 +285,7 @@ server <- function(input, output, session) {
   
   
   
-  output$see <- renderPrint({str(hover_points())})
+  output$see <- renderPrint({str(click)})
   
   
   
@@ -397,103 +396,86 @@ server <- function(input, output, session) {
 
   ## rainbow curve graph ---- 
   p2 <- reactive({
-    ggplot(data = eff_data, aes(x = eff, y = pop)) +
-      geom_contour_filled(aes(z = p_safe), stat = "contour_filled",
-                          breaks = breaks
-      ) +
-     # labs(level = break_lvls ) +
-      scale_fill_viridis_d(name = "Protection",
-                           option = 'plasma', direction = 1,
-                           begin = 0.28, end = 0.90,
-                           alpha = 1,
-                           labels = break_labs,
-                           aesthetics = "fill", 
-                           guide = guide_colorsteps(show.limits =TRUE,
-                                                    direction = 'horizontal',
-                                                    barheight = unit(6,'mm'),
-                                                    barwidth  = unit(0.6,'npc'), # scaled?
-                                                    label = TRUE, 
-                                                    label.position = 'top',
-                                                    title.position = 'left',
-                                                    title = paste0("Protection", '\n', "Chances (%)")
-                           )) +
-      # [user point stuff]
-      geom_vline(aes(xintercept = effrate_B()), linetype= "dotdash", alpha = 0.5) +
-      geom_hline(aes(yintercept = poprate_B()), linetype = "dotdash", alpha = 0.5) +
-      geom_point(data = eff_point(), aes(x = eff, y = pop),
-                 size = 4, shape = 4, alpha=1, color = 'black', stroke = 4) +
-      # {Pfizer data}
-      geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"]),
-                 linetype= "solid", alpha = 0.3) +
-      geom_hline(aes(yintercept = vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"]),
-                 linetype = "solid", alpha = 0.3) +
-      # {Moderna data}
-      geom_vline(aes(xintercept = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]),
-                 linetype= "dotted", alpha = 0.4) +
-      geom_hline(aes(yintercept = vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"]),
-                 linetype = "dotted", alpha = 0.4) +
-      # {{point}}
-      geom_point(data = eff_clinical_data,
-                 aes(x = eff, y = pop, color = name),
-                 size = 2, shape = 20, alpha=1, stroke = 2, show.legend = NA) +
-      scale_color_brewer(palette = "Set1", aesthetics = "colour",
-                         guide = 'none') + # remove guide in legend
-      labs(x = "Vaccine Efficacy",
-           y = "Covid Cases per 1,000",
-           title = "Protection Chance", 
-           subtitle = paste0("Yellow areas indicate the best\n", "chances of covid protection")) +
-      scale_x_continuous(labels = label_percent()) +
-      scale_y_continuous() +
-      geom_label_repel(data = eff_clinical_data,
-                       aes(label = paste0(name)), # ' protection: ', as.character(round(p_safe*100,1)), "%"
-                       position = position_nudge_repel(),
-                       hjust='outward', vjust = 1,
-                       label.padding = 0.25, box.padding = 0.1,
-                       size = 4, show.legend = F,
-                       label.size = 0.1, seed = 47, min.segment.length = 10, arrow = NULL,
-                       fill = "#737373", color = "#FFFFFF", alpha = 0.8) +
-      geom_label_repel(data = eff_point(),
-                       aes(label = paste0(as.character(round(p_safe*100,1)), "% \n",
-                                          'Protection Chance')),
-                       position = position_nudge_repel(), # position_nudge(y = 4, x = 0)
-                       hjust='middle', direction = "y",
-                       label.padding = 0.25, box.padding = 1, 
-                       size = 5, show.legend = F, 
-                       label.size = 0.1, seed = 47, min.segment.length = 10, arrow = NULL,
-                       fill = "#525252", color = "#FFFFFF", alpha = 1) +
-      # ~~~ hovertip ~~~
-      # geom_label_repel(data = eff, # hbuh, this labels like all underlying points
-      #                  aes(label = paste0(as.character(round(p_safe*100,1)), "%")),
-      #                  position = position_nudge_repel(), # position_nudge(y = 4, x = 0)
-      #                  hjust='middle', direction = "y",
-      #                  label.padding = 0.25, box.padding = 1, 
-      #                  size = 5, show.legend = F, 
-      #                  label.size = 0.1, seed = 47, min.segment.length = 10, arrow = NULL,
-      #                  fill = "#525252", color = "#FFFFFF", alpha = 1) +
-      theme_minimal() +
-      theme(
-        plot.title = element_text(face = "bold", size = 20, hjust = 0.5),
-        plot.subtitle = element_text(size = 14, hjust = 0.5, margin = margin(t=0,r=0,b=10,l=0)),
-        legend.key.size = unit(5,'mm'),
-        legend.margin = margin(t=0,r=0,b=0,l=0),
-        legend.position = 'top',
-        legend.title.align = 0.5,
-        legend.spacing.x = unit(2,'mm'),
-        legend.spacing.y = unit(2,'mm'),
-        legend.direction = 'horizontal',
-        legend.key = element_rect(linetype = 'solid', fill = 'white', color = "#525252", size = 0.5),
-        legend.title = element_text(size=13, face = "bold"),
-        legend.text = element_text(size=12),
-        axis.ticks.length = unit(0,'mm'),
-        plot.margin = margin(t=0,r=0,b=0,l=0),
-        panel.grid = element_blank(), # how to reduce space between grid/axis labels and plot area?
-        axis.title = element_text(size=15),
-        axis.text = element_text(size=12,margin = margin(t=0,r=0,b=0,l=0)) # is inside another element??
-      )
+    plot_ly(eff_data, type = 'contour',
+            x = ~eff, y = ~pop, z = ~p_safe,
+            colorscale = "Viridis", zauto = F, zmin = 0.8, zmax = 1, #scaling doesn't seem to work.
+            opacity = 0.8, reversescale = F,
+            colorbar = list(
+              thicknessmode = 'fraction', thickness = 0.04,
+              lenmode = 'fraction', len = 0.5, xpad = 0,
+              tickmode = 'array', tickvals = breaks,
+              tickformat = '%', tickfont = list(size=10),
+              title = list(text="", font=list(size=14)) # for now, no title.
+            ),
+            autocontour = F, contours = list(
+              type = "levels",
+              start = 0.9, end = 1, size = 0.02,
+              coloring = 'fill', showlabels = T, # fill or heatmap
+              labelfont = list(size=12, color = 'black'),
+              labelformat = '%'),
+            line = list(color='black', width=1),
+            hovertemplate = paste0(
+              "<span style='color:white'><b>Protection: %{z:.1%}</b></span><br>",
+              "<span style='color:lightgrey'>Covid: %{y} per 1000</span><br>",
+              "<span style='color:lightgrey'>Vaccine Efficacy: %{x:%}</span>",
+              "<extra></extra>"
+            ),
+            hoverlabel = list(
+              bgcolor = RColorBrewer::brewer.pal(9, "Greys")[8],
+              font = list(color='white'),
+              align = 'left'
+            )
+    ) %>%
+      add_trace(data = eff_clinical_data, type = "scatter", mode = 'markers',
+                uid = "clinical_data",
+                x = ~eff, y = ~pop, color = ~name, opacity = 1,
+                marker = list(
+                  size = 8, color = c("#1F78B4", "#6A3D9A")
+                ),
+                text=paste0( 
+                  "<span style='white'><b>", as.character(eff_clinical_data$name), "</span></b><br>",
+                  "<b>Protection: ", as.character(round(eff_clinical_data$p_safe*100,1)),"%",
+                  "</b>"),
+                showlegend = FALSE, hoverinfo="text", 
+                hoverlabel=list(bgcolor=~name),
+                hovertemplate = NULL
+      ) %>% 
+      layout(
+        font = list(family="Arial"),
+        dragmode = FALSE, # disable click/drag
+        title = list(
+          text = "<b>Protection Chances</b>",
+          font = list(size=20),
+          pad = list(t=2,r=0,b=2,l=0)
+        ),
+        height = 400,
+        margin = list(t=40,r=2,b=20,l=10),
+        paper_bgcolor = "", plot_bgcolor = "",
+        xaxis = list(
+          title = list(
+            text = "Vaccine Efficacy",
+            font = list(size=15),
+            standoff = 12),
+          tickmode = 'linear', tick0 = 0, dtick = 0.2,
+          tickformat = "%",
+          showline = FALSE, showgrid = FALSE
+        ),
+        yaxis = list(
+          title = list(
+            text = "Covid Cases per 1,000",
+            font = list(size=15),
+            standoff = 4),
+          showline = FALSE, showgrid = FALSE
+        )
+      ) %>%
+      config(displayModeBar = FALSE) %>%
+      onRender("function(el, x)
+           {Plotly.d3.select('.cursor-crosshair').style('cursor',
+           'default')}")
     
   })
     
-  output$effplot <- renderPlot({p2()})
+  output$effplot <- renderPlotly({p2()})
 
   
   
