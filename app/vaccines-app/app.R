@@ -43,10 +43,10 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      fluidPage( title = "Covid-19 Vaccine Data Explorer",
                 
                 
-                HTML(markdown::markdownToHTML(file = 'md/page1-intro.md',
-                                              fragment.only = TRUE
-
-                )),
+                # HTML(markdown::markdownToHTML(file = 'md/page1-intro.md',
+                #                               fragment.only = TRUE
+                # 
+                # )),
      
 
        
