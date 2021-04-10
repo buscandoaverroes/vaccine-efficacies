@@ -10,11 +10,12 @@ library(plotly)
 library(bslib)
 library(gghighlight)
 library(ggrepel)
+library(shinyBS)
 
 reactlog_enable()
 
 theme <- bslib::bs_theme(
-  version = 4, bootswatch = "cosmo",
+  version = "3", bootswatch = "cosmo",
   spacer = '1rem',
   enable_rounded = TRUE,
   primary = "#7C36B0"
@@ -51,7 +52,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
 
        
        br(), hr(),
-       prettySwitch('showmath', 'Show Math', slim = T, inline = T, status = 'info'),
+       tipify(prettySwitch('showmath', 'Show Math', slim = T, inline = T, status = 'info'),
+              title = 'a very nice title'),
        wellPanel(align='center',
                  style= 'background: #2c3e50',
                  
