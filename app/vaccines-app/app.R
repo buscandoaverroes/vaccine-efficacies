@@ -10,12 +10,15 @@ library(plotly)
 library(bslib)
 library(gghighlight)
 library(ggrepel)
-library(shinyBS)
+library(htmlwidgets)
+library(bsplus)
 
 reactlog_enable()
+use_bs_tooltip() # must call once
+use_bs_popover()
 
 theme <- bslib::bs_theme(
-  version = "3", bootswatch = "cosmo",
+  version = "4", bootswatch = "cosmo", 
   spacer = '1rem',
   enable_rounded = TRUE,
   primary = "#7C36B0"
@@ -35,6 +38,8 @@ ui = navbarPage(title = NULL,
                 collapsible = TRUE,
                 theme = theme,
                 header = list(tags$br(), tags$br(), tags$br()),
+                
+    
 
 # Application title
 
@@ -52,17 +57,24 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
 
        
        br(), hr(),
-       tipify(prettySwitch('showmath', 'Show Math', slim = T, inline = T, status = 'info'),
-              title = 'a very nice title'),
+       
        wellPanel(align='center',
                  style= 'background: #2c3e50',
+                 
+                 prettySwitch('showmath', 'Show Math', slim = T, inline = T, status = 'info'),
+                 bs_button(label = "info?", button_type = "default", button_size = "default") %>%
+                   bs_embed_popover(title = 'Welcome!', 
+                                    content = "Welcome to the Covid-19 Vaccine Calculator. Estimate your chances
+                                    of protection from covid by starting with preset information directly from
+                                    the Pfizer and Moderna clinical trials. Alternatively, create your own 
+                                    scenario by adjusting the sliders or clicking on the rainbow graph below."),
+                 hr(),
                  
                  radioGroupButtons(
                    'presets', label = NULL,
                    choices = c("Explore Own", "Pfizer", "Moderna"),
                    status = 'primary',  selected = "Explore Own",
-                   size = "lg", direction = 'horizontal', individual = T
-                 ),
+                   size = "lg", direction = 'horizontal', individual = T),
                  
             conditionalPanel(
               condition = 'input.presets == "Explore Own"',
@@ -90,8 +102,10 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        splitLayout( ##  main input panels ----------------------------------------
                     wellPanel( align='center', 
 
-                               tags$h5(tags$b("Covid Infections")),
-                               tags$body(("in population")),
+                               tags$h5(tags$b("Covid Cases"),
+                               icon("question-circle")) %>%
+                                 bs_embed_tooltip(title = "The rate of covid-infections in the general population",
+                                                  placement = "top"),
 
                  conditionalPanel(  
                    condition = 'input.presets == "Explore Own"',
@@ -104,8 +118,11 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                     ),  # end first element of splitpanel
                     
                  wellPanel( align='center',
-                  tags$h5(tags$b("Efficacy Rate")),
-                  tags$body(("Risk reduction")),
+                            
+                  tags$h5(tags$b("Efficacy Rate"), icon("question-circle")) %>%
+                   bs_embed_tooltip(title = "The reduction of risk from getting covid",
+                                    placement = "top"),
+                  
                   
                   conditionalPanel(    
                     condition = 'input.presets == "Explore Own"',
@@ -132,7 +149,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    style= 'background: #D9F9E5',
                    
                    
-                   tags$h3(tags$b("Estimated Chance of Protection")),
+                   tags$h3(tags$b("Chance of Protection"), icon('question-circle')) %>%
+                     bs_embed_tooltip(title = "An estimate of the chance that you won't get infected with covid, once fully vaccinated"),
                    htmlOutput("center_protectrate")
          ), # end wellpanel
         wellPanel( align = 'center',
