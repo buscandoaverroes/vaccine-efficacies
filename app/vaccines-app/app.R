@@ -54,13 +54,20 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 # 
                 # )),
      
-
-       
-       br(), hr(),
-       
+                
+          
+       absolutePanel(  
+         align='center',
+         width = '100%',
+         top = 0, left = 0,
+         style= 'background: #2c3e50; opacity: 1; z-index: 10',
+         
+         fixed = TRUE,
+         
        wellPanel(align='center',
                  style= 'background: #2c3e50',
                  
+                  br(),
                  prettySwitch('showmath', 'Show Math', slim = T, inline = T, status = 'info'),
                  bs_button(label = "info?", button_type = "default", button_size = "default") %>%
                    bs_embed_popover(title = 'Welcome!', 
@@ -78,7 +85,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                  
             conditionalPanel(
               condition = 'input.presets == "Explore Own"',
-              
+
               radioGroupButtons(
                 'variants', label = NULL, disabled = FALSE,
                 choices = c("Variant A", "Variant B", "No Variants"),
@@ -96,9 +103,11 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                   
               plotOutput('uiclinical', height = '150px')
          
-       )),
+       ))),
+       br(), br(), br(), br(), br(),br(), br(), br(), br(), br(), br(),br(), br(),br(), br(),
+       htmlOutput('summary'),
+       conditionalPanel(condition = 'input.presets != "Explore Own"', htmlOutput('explanation')),
        
-
        splitLayout( ##  main input panels ----------------------------------------
                     wellPanel( align='center', 
 
@@ -120,7 +129,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                  wellPanel( align='center',
                             
                   tags$h5(tags$b("Efficacy Rate"), icon("question-circle")) %>%
-                   bs_embed_tooltip(title = "The reduction of risk from getting covid",
+                   bs_embed_tooltip(title = "The vaccine's reduction of your risk from getting covid",
                                     placement = "top"),
                   
                   
@@ -286,6 +295,8 @@ server <- function(input, output, session) {
   poprate_B_per1k <- reactive({ round(poprate_B())})
   effrate_B_pct   <- reactive({ round(effrate_B()*100, 2)})
   protectrate_pct <- reactive({ round(protectrate()*100,2) })
+  protectrate_pct1 <- reactive({ round(protectrate()*100,1) })
+  
   
   ## prepare hover values 
   ### 1. determine near points 
@@ -353,7 +364,17 @@ server <- function(input, output, session) {
   
 
     
-  
+  # create name of selected vaccine 
+  selected_vax_name <- reactive({
+    if (input$presets == "Pfizer") {
+      "Pfizer"
+    }
+    else if (input$presets == "Moderna") {
+      "Moderna"
+    } else if (input$presets == "Explore Own") {
+      "hypothetical"
+    }
+  })
 
 
   
@@ -395,6 +416,34 @@ server <- function(input, output, session) {
     withMathJax(helpText(math_eq()))
   })
   
+  
+  ## summary + expl ----
+  sum_intro <- reactive({if (input$presets != "Explore Own") {"Clinical data suggests the "} else {"The "}})
+  output$summary <- renderText({ 
+    paste0(
+      "<font size=4>", sum_intro(), "<b><font color= \"#54278F\">", as.character(selected_vax_name()), "</font></b>",
+      " vaccine should protect people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
+      protectrate_pct1(), "%", "</font></b> of the time, on average.<br><br>"
+    )
+  })
+  
+  output$explanation <- renderText({
+    paste0(
+      "In the clinical trials, about ", "<b><font color=\"#000000\">",
+      as.character(poprate_B_per1k()), "</font>", " per ", "1,000", "</b>", " non-vaccinated people ",
+      "got covid. However, participants with the ", as.character(selected_vax_name()), " vaccine  had ",
+      "<b><font color=\"#000000\">",
+      as.character(round(vax_data$treatment_covid_incidence[vax_data$short_name %in% selected_vax_name()],1)),
+      "</font>", " per ", "1,000", "</b>", " infections, a rate that was ",
+      "<font color=\"#2171B5\"><b>", round(effrate_B_pct(),1), "%", "</b></font>",
+      " lower"
+    )
+  })
+  
+  vax_data$treatment_covid_incidence[vax_data$vaccine_name %in% "Moderna"]
+  
+  
+  
   # html styles ----
   style_infectionrate <- reactive({
     case_when(
@@ -411,6 +460,7 @@ server <- function(input, output, session) {
       input$variants[1] == "Variant B"   ~ paste0('background: #FEE6CE')
     )
   })
+  
   
   
   
