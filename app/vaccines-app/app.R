@@ -19,7 +19,7 @@ use_bs_popover()
 
 theme <- bslib::bs_theme(
   version = "4", bootswatch = "cosmo", 
-  spacer = '1rem',
+  spacer = '0.5rem',
   enable_rounded = TRUE,
   primary = "#7C36B0"
                          )
@@ -36,7 +36,7 @@ dflt_effrate = 0.7
 ui = navbarPage(title = NULL, 
                 position = "fixed-top",
                 collapsible = TRUE,
-                theme = theme,
+                #theme = theme,
                 header = list(tags$br(), tags$br(), tags$br()),
                 
     
@@ -66,119 +66,144 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
          
        wellPanel(align='center',
                  style= 'background: #2c3e50',
-                 
-                  br(),
-                 prettySwitch('showmath', 'Show Math', slim = T, inline = T, status = 'info'),
-                 bs_button(label = "info?", button_type = "default", button_size = "default") %>%
-                   bs_embed_popover(title = 'Welcome!', 
-                                    content = "Welcome to the Covid-19 Vaccine Calculator. Estimate your chances
-                                    of protection from covid by starting with preset information directly from
-                                    the Pfizer and Moderna clinical trials. Alternatively, create your own 
-                                    scenario by adjusting the sliders or clicking on the rainbow graph below."),
-                 hr(),
-                 
+                 br(), br(),
                  radioGroupButtons(
                    'presets', label = NULL,
-                   choices = c("Explore Own", "Pfizer", "Moderna"),
-                   status = 'primary',  selected = "Explore Own",
-                   size = "lg", direction = 'horizontal', individual = T),
+                   choices = c("Explore", "Pfizer", "Moderna"),
+                   status = 'primary',  selected = "Explore",
+                   size = "normal", direction = 'horizontal', individual = T),
                  
-            conditionalPanel(
-              condition = 'input.presets == "Explore Own"',
-
-              radioGroupButtons(
-                'variants', label = NULL, disabled = FALSE,
-                choices = c("Variant A", "Variant B", "No Variants"),
-                status = 'primary',  selected = "No Variants",
-                size = "sm", direction = 'horizontal', individual = FALSE
-              )
-            ),
-
-       conditionalPanel( ## ui clinical data plot -----------------------------------
-              condition = 'input.presets != "Explore Own"',
-              
-            
-                  align='center',
-                  style= 'background: #2c3e50',
-                  
-              plotOutput('uiclinical', height = '150px')
-         
+      
+                        
+                        #verbatimTextOutput('see')
        ))),
-       br(), br(), br(), br(), br(),br(), br(), br(), br(), br(), br(),br(), br(),br(), br(),
-       htmlOutput('summary'),
-       conditionalPanel(condition = 'input.presets != "Explore Own"', htmlOutput('explanation')),
        
-       splitLayout( ##  main input panels ----------------------------------------
-                    wellPanel( align='center', 
-
-                               tags$h5(tags$b("Covid Cases"),
-                               icon("question-circle")) %>%
-                                 bs_embed_tooltip(title = "The rate of covid-infections in the general population",
-                                                  placement = "top"),
-
-                 conditionalPanel(  
-                   condition = 'input.presets == "Explore Own"',
-                   
-                   sliderInput("poprate", 
-                               label = NULL,
+       
+       br(), br(), br(), br(), br(),br(),
+     
+     htmlOutput('summary'), ## summary ----
+     
+     ### aux buttons and els ------
+     conditionalPanel(condition = 'input.presets == "Explore"',
+      helpText("Adjust the sliders or click the graph to explore your chances of protection.")                  
+                      ),
+     
+     conditionalPanel(condition = 'input.presets != "Explore"',
+     #### panel
+     span( align = 'center', style = 'padding: 0px',
+       h6(bs_button(label = "why?", button_type = 'default', button_size = 'small') %>%
+            bs_attach_collapse(id_collapse = 'el_explanation'),
+       bs_button(label = 'show/hide data', button_type = 'default', button_size = 'small') %>%
+         bs_attach_collapse(id_collapse = 'el_uiclinical'),
+       bs_button(label = 'show/hide math', button_type = 'default', button_size = 'small') %>%
+         bs_attach_collapse(id_collapse = 'el_math')
+     )), br(),
+     
+     #### elements
+     bs_collapse(id = 'el_explanation', 
+                 wellPanel(align = 'left',
+                           style = 'background: #FFF; padding: 3px',
+                 htmlOutput('explanation'))),
+     bs_collapse(id = 'el_uiclinical', 
+                 wellPanel(align='center',
+                           style='background: #2c3e50; padding: 1px',
+                 plotOutput('uiclinical', height = '200px'))),
+     bs_collapse(id = 'el_math', 
+                 wellPanel(align='center',
+                           style='background: #F6F1FB; padding:3px',
+                           
+                           htmlOutput('math', container = tags$b)
+                 )
+     )),
+     
+     br(),
+     
+     splitLayout( ##  main input panels ----------------------------------------
+                  wellPanel( align='center', 
+                             style = 'background:#FFF; padding: 5px',
+                             
+                             tags$h5(tags$b("Covid Cases"),
+                                     icon("question-circle")) %>%
+                               bs_embed_tooltip(title = "The rate of covid-infections in the general population",
+                                                placement = "top"),
+                             
+                             conditionalPanel(  
+                               condition = 'input.presets == "Explore"',
+                               
+                               sliderInput("poprate", 
+                                           label = NULL,
                                            width = '100%', ticks = F,
                                            min = 1, max = 200, value = dflt_poprate, step = 1)),
-                               htmlOutput('right_poprate', width = 6)
-                    ),  # end first element of splitpanel
-                    
-                 wellPanel( align='center',
-                            
-                  tags$h5(tags$b("Efficacy Rate"), icon("question-circle")) %>%
-                   bs_embed_tooltip(title = "The vaccine's reduction of your risk from getting covid",
-                                    placement = "top"),
+                             htmlOutput('right_poprate', width = 6)
+                  ),  # end first element of splitpanel
                   
-                  
-                  conditionalPanel(    
-                    condition = 'input.presets == "Explore Own"',
-                    
-                   sliderInput("effrate",
-                               label = NULL,
-                               width = '100%', ticks = F, 
-                               min = 0, max = 1, value = dflt_effrate, step = 0.01)),
-                   htmlOutput('right_effrate', width = 6 )
-                    )), # end main input panel, end second element
+                  wellPanel( align='center',
+                             style = 'background:#FFF; padding: 5px',
+                             
+                             tags$h5(tags$b("Efficacy Rate"), icon("question-circle")) %>%
+                               bs_embed_tooltip(title = "The vaccine's reduction of your risk from getting covid",
+                                                placement = "top"),
+                             
+                             
+                             conditionalPanel(    
+                               condition = 'input.presets == "Explore"',
+                               
+                               sliderInput("effrate",
+                                           label = NULL,
+                                           width = '100%', ticks = F, 
+                                           min = 0, max = 1, value = dflt_effrate, step = 0.01)),
+                             htmlOutput('right_effrate', width = 6 )
+                  )), # end main input panel, end second element
+     
+     
+     verticalLayout(
+       wellPanel(align='center', ## protection rate ----
+                 style= 'background: #D9F9E5; padding: 5px',
+                 
+                 
+                 tags$h4(tags$b("Chance of Protection"), icon('question-circle')) %>%
+                   bs_embed_tooltip(
+                     title = "An estimate of the chance that you won't get infected with covid, once fully vaccinated"),
+                 htmlOutput("center_protectrate")
+       ), # end wellpanel
        
+       
+       span(align = 'center',
+            h3(tags$b("Protection Comparison"),
+               bs_button(label = icon('question'), button_type = "default", button_size = "sm") %>%
+            bs_embed_popover(title = "title",
+                             content = "We can estimate our chances of protection from the vaccine 
+                             effiacy rate and how prevalent covid is in our communities. The numbers 
+                             on the bottom of the graph correspond to the vaccine efficacy rate, and the 
+                             numbers on the left to how many people per year become infected with covid.
+                             The colors tell us are estimated chances of protection from covid: we want to be
+                             in the green zone, where we have at least a 98% chance of staying protected
+                             if fully vaccinated."))),
+       
+       
+       plotlyOutput("effplot", height = "100%"), ## rainbow curve plot ----
 
-       verticalLayout(  ## math ----
-        conditionalPanel(
-          condition = 'input.showmath',
-          
-          wellPanel(align='center',
-                    style='background: #F6F1FB',
-                    
-                    htmlOutput('math', container = tags$b)
-          )
-        ),
-         wellPanel(align='center', ## protection rate ----
-                   style= 'background: #D9F9E5',
-                   
-                   
-                   tags$h3(tags$b("Chance of Protection"), icon('question-circle')) %>%
-                     bs_embed_tooltip(title = "An estimate of the chance that you won't get infected with covid, once fully vaccinated"),
-                   htmlOutput("center_protectrate")
-         ), # end wellpanel
-        wellPanel( align = 'center',
-                   style = 'background: #FFF',
-         plotlyOutput("effplot", height = "100%"), ## rainbow curve plot ----
-         ), 
-        tags$source("Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)")
-        
-        #verbatimTextOutput('see')
-       ),
+       tags$source("Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)"),
+       
+       
        
        ## After plot text ----
        HTML(markdown::markdownToHTML(file = 'md/page1-end.md',
                                      fragment.only = TRUE
                                      
-       ))
+       )),
        
+       conditionalPanel(
+         condition = 'input.presets == "Explore"',
+         
+         radioGroupButtons(
+           'variants', label = NULL, disabled = FALSE,
+           choices = c("Variant A", "Variant B", "No Variants"),
+           status = 'primary',  selected = "No Variants",
+           size = "sm", direction = 'horizontal', individual = FALSE
+         )
 
-     )), # end tab panel, fluid page              
+     ))), # end tab panel, fluid page              
           
          
 
@@ -231,9 +256,9 @@ server <- function(input, output, session) {
     click$y <- event_data("plotly_click")$y
     click$z <- event_data("plotly_click")$z
     
-    # also resets presets to explore own to avoid confusion with clinical data 
+    # also resets presets to Explore to avoid confusion with clinical data 
     updateRadioGroupButtons(session = session, inputId = 'presets',
-                            selected = "Explore Own" )
+                            selected = "Explore" )
     
   }, ignoreNULL = TRUE, label = 'preseve last plot click') 
   
@@ -326,7 +351,7 @@ server <- function(input, output, session) {
   # vaccine buttons ----
 
   observeEvent(input$presets, { 
-    # if (input$presets[1] == "Explore Own") {
+    # if (input$presets[1] == "Explore") {
     #  
     # }
     if (input$presets[1] == "Pfizer") {
@@ -371,12 +396,11 @@ server <- function(input, output, session) {
     }
     else if (input$presets == "Moderna") {
       "Moderna"
-    } else if (input$presets == "Explore Own") {
+    } else if (input$presets == "Explore") {
       "hypothetical"
     }
   })
-
-
+  
   
   
 
@@ -385,7 +409,7 @@ server <- function(input, output, session) {
   ## efficacies ----
   output$right_poprate <- renderText({
     paste0(
-      "<b><font color=\"#000000\" size=5>",
+      "<b><font color=\"#000000\" size=4>",
       poprate_B_per1k(), " per ", "1,000",
       "</b></font>"
     )
@@ -393,7 +417,7 @@ server <- function(input, output, session) {
   
   output$right_effrate <- renderText({
     paste0(
-      "<b><font color=\"#000000\" size=5>",
+      "<b><font color=\"#2171B5\" size=4>",
       effrate_B_pct(), "%",
       "</b></font>"
     )
@@ -401,13 +425,15 @@ server <- function(input, output, session) {
   
   output$center_protectrate <- renderText({
     paste0(
-      "<b><font color=\"#41AB5D\" size=8>",
+      "<b><font color=\"#41AB5D\" size=6>",
       protectrate_pct(), "%",
       "</b></font>"
     )
   })
   math_eq <- reactive({
     paste0( "$$", 
+   "\\text{Protect Rate} = 1 - (\\frac{\\text{Infect. Rate}}{1000}*(1 - \\text{Efficacy Rate}))$$",
+   "$$",
       round(protectrate(), 4), " = 1 - (", "\\frac{", round(poprate_B()), "}{1000}","*(1 - ",
            round(effrate_B(),3),"))", '$$'
                  )
@@ -418,25 +444,30 @@ server <- function(input, output, session) {
   
   
   ## summary + expl ----
-  sum_intro <- reactive({if (input$presets != "Explore Own") {"Clinical data suggests the "} else {"The "}})
+  sum_intro <- reactive({if (input$presets != "Explore") {"Clinical data suggests the "} else {"The "}})
   output$summary <- renderText({ 
     paste0(
       "<font size=4>", sum_intro(), "<b><font color= \"#54278F\">", as.character(selected_vax_name()), "</font></b>",
       " vaccine should protect people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
       protectrate_pct1(), "%", "</font></b> of the time, on average.<br><br>"
+      # <br><br><font size=3>This figure will likely vary between
+      # individuals and rapid developments in vaccination campaigns, variants, and local infection rates. </font><br><br>"
     )
   })
   
   output$explanation <- renderText({
     paste0(
-      "In the clinical trials, about ", "<b><font color=\"#000000\">",
-      as.character(poprate_B_per1k()), "</font>", " per ", "1,000", "</b>", " non-vaccinated people ",
-      "got covid. However, participants with the ", as.character(selected_vax_name()), " vaccine  had ",
+      "In ", selected_vax_name(), "'s  clinical trials, non-vaccinated people got covid at a rate of
+      about ", "<b><font color=\"#000000\">",
+      as.character(poprate_B_per1k()), "</font>", " per ", "1,000", "</b>", " people. However, participants with the ",
+      as.character(selected_vax_name()), " vaccine got infected only ",
       "<b><font color=\"#000000\">",
       as.character(round(vax_data$treatment_covid_incidence[vax_data$short_name %in% selected_vax_name()],1)),
-      "</font>", " per ", "1,000", "</b>", " infections, a rate that was ",
+      "</font>", " per ", "1,000", "</b>", " people, a rate that was ",
       "<font color=\"#2171B5\"><b>", round(effrate_B_pct(),1), "%", "</b></font>",
-      " lower"
+      " lower. About ", "<b><font color=\"#41AB5D\">", 
+      protectrate_pct1(), "%", "</font></b>", " of the time, participants with the ",selected_vax_name(), 
+      " vaccine did not test positive for covid."
     )
   })
   
@@ -538,9 +569,9 @@ server <- function(input, output, session) {
         dragmode = FALSE, # disable click/drag
         uniformtext = list(mode='hide', minsize=8),
         title = list(
-          text = "<b>Protection Chances</b>",
-          font = list(size=20),
-          pad = list(t=2,r=0,b=2,l=0)
+          text = "Lighter colors indicate better chances of protection",
+          font = list(size=16),
+          pad = list(t=1,r=0,b=1,l=0)
         ),
         height = 400,
         margin = list(t=40,r=2,b=20,l=10),
@@ -592,8 +623,7 @@ server <- function(input, output, session) {
 
   output$uiclinical <-  renderPlot({ui_plot()})
 
-    
-
+  
 
 } # end server ------------------------------------------------------------------------
 

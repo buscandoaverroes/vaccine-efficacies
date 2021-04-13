@@ -14,26 +14,23 @@ vax_data <- readRDS(file.path(data, "vax_data.rda"))
 # clinical trial outcome data ================================================================
 ## outcome data ------------------------------------------------------------------------------
 
+ind <- c("treatment_n_participants", "placebo_n_participants", 
+         "placebo_n_covid_pos", "treatment_n_covid_pos", 
+         "placebo_n_severe", "treatment_n_severe")
+
 # tilt long from vax_data
 vax_data_long <-
-  select(vax_data, short_name,
-               ends_with("n_covid_pos"),
-               ends_with("covid_rate"),
-               ends_with("covid_rate_pct"),
-               ends_with("rate10k"), 
-               ends_with("incidence")
+  select(vax_data, short_name, ind
           ) %>%
   pivot_longer(
-    cols = c(ends_with("n_covid_pos"),
-             ends_with("covid_rate"),
-             ends_with("covid_rate_pct"),
-             ends_with("rate10k"), 
-             ends_with("incidence")),
+    cols = ind,
     names_to = "indicator",
-    values_to = "value")  %>%
+    values_to = "value") %>%
   separate(indicator, into = c("arm", "indicator"), sep = '_', extra = 'merge') %>%
-  mutate(arm = stringr::str_to_title(arm)) %>% # convert to title case
-  filter(indicator == "covid_rate10k" | indicator == "severe_rate10k") #  
+  mutate(arm = stringr::str_to_title(arm)) # convert to title case
+  # filter(indicator == "treatment_n_participants" | indicator == "placebo_n_participants" |
+  #          indicator == "placebo_n_covid_pos" | indicator == "treatment_n_covid_pos" |
+  #          indicator == "placebo_n_severe" | indicator == "treatment_n_severe")
 
 ## Generate ggplot objects  --------------------------------------------------------------
 
@@ -41,20 +38,22 @@ ui_outcome_plot <- function(name, ymax, bgcolor) {
 
   p <-   
   vax_data_long %>%
-    filter(short_name == as.character(name)) %>%
-    ggplot(., aes(indicator, value)) +
-    geom_col(aes(fill = arm), position = 'dodge', width = 0.8) +
+    filter(short_name == as.character(name) & indicator != "n_participants") %>%
+    ggplot(., aes(arm, value)) +
+    geom_col(aes(fill = indicator), position = 'stack', width = 0.8) +
     scale_fill_viridis_d(
       aesthetics = "fill",
-      begin = 0.4,
+      begin = 0.42, end = 0.92,
       option = "plasma", direction = 1,
-      labels = c("No Vaccine",
-                 "Vaccine"
-                 )
-    ) +
-    scale_x_discrete(labels=c("Covid", "Severe Covid")) +
+      labels = c("Covid", "Severe Covid")) +
+    scale_x_discrete(labels=c("No Vaccine", paste(as.character(name), " Vaccine"))) + 
     scale_y_continuous(limits = c(0,ymax)) +
-    labs(y = "Rate per 10k", x = NULL, fill = NULL) +
+    labs(y = "Cases", x = NULL, fill = NULL,
+         caption = paste0("Placebo n = ", prettyNum(
+                          vax_data$placebo_n_participants[vax_data$short_name %in% as.character(name)], big.mark = ','),
+                          "; Treatment n = ", prettyNum(
+                          vax_data$treatment_n_participants[vax_data$short_name %in% as.character(name)],
+                          big.mark = ','))) +
     theme_minimal() + 
     theme(
       axis.title.x = NULL,
@@ -75,14 +74,23 @@ ui_outcome_plot <- function(name, ymax, bgcolor) {
       panel.grid = element_blank(),
       panel.background = element_rect(fill = "#2c3e50", color = NA),
       plot.background = element_rect(fill = "#2c3e50", color = NA),
+      plot.margin = margin(t=0,r=0,b=0,l=0),
+      plot.caption = element_text(color = 'white', size = 10, margin = margin(t=10,r=5,b=5,l=5)),
+      plot.caption.position = 'panel',
       panel.border = element_rect(fill = NA, linetype = 'dashed', size = 0)
     ) +
-    gghighlight(value >= 0) + 
+    gghighlight(value > 0) + 
     geom_label(aes(label = value),
-               position = position_dodge2(0.8), # this width matces colwidth above
-               vjust = -0.2,
-               label.size = 0.25,
-               fill = "#525252", color = 'white', alpha = 0.4)
+               position = position_dodge2(width = 0.25), 
+               label.size = 0.25, 
+               fill = "#525252", color = 'white', alpha = 0.7) 
+    # annotate("text", x= 1, y= -0.2, label = paste0( "n = ", # placebo
+    #            vax_data$placebo_n_participants[vax_data$short_name %in% as.character(name)]),
+    #          colour = "white", size = 4) +
+    # annotate("text", x= 2, y = 0, label = paste0( "n = ", # treatment
+    #           vax_data$treatment_n_participants[vax_data$short_name %in% as.character(name)]),
+    #          colour = "white", size = 4) +
+    # coord_cartesian(ylim = c(-20,ymax), expand = TRUE, default = TRUE, clip = "off")
   
   
   p
@@ -90,10 +98,11 @@ ui_outcome_plot <- function(name, ymax, bgcolor) {
 
 
 ### ggplot function call ----
-ui_plot_pfizer <- ui_outcome_plot("Pfizer", 180)
-ui_plot_moderna <- ui_outcome_plot("Moderna", 180)
+ui_plot_pfizer <- ui_outcome_plot("Pfizer", 250)
+ui_plot_moderna <- ui_outcome_plot("Moderna", 250)
 
-
+ui_plot_moderna
+ui_plot_pfizer
 
 # generate data for rainbow plot ----
 eff_data <- expand_grid(
@@ -138,3 +147,5 @@ save(
   ui_plot_moderna, ui_plot_pfizer, breaks, break_labs, eff_clinical_data, break_lvls, 
   file = file.path(app, "data/app-data.Rdata")
 )
+
+ui_plot_moderna
