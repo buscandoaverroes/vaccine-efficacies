@@ -40,7 +40,7 @@ ui_outcome_plot <- function(name, ymax, bgcolor) {
   vax_data_long %>%
     filter(short_name == as.character(name) & indicator != "n_participants") %>%
     ggplot(., aes(arm, value)) +
-    geom_col(aes(fill = indicator), position = 'stack', width = 0.8) +
+    geom_col(aes(fill = indicator), position = 'stack', width = 0.6) +
     scale_fill_viridis_d(
       aesthetics = "fill",
       begin = 0.42, end = 0.92,
@@ -84,14 +84,6 @@ ui_outcome_plot <- function(name, ymax, bgcolor) {
                position = position_dodge2(width = 0.25), 
                label.size = 0.25, 
                fill = "#525252", color = 'white', alpha = 0.7) 
-    # annotate("text", x= 1, y= -0.2, label = paste0( "n = ", # placebo
-    #            vax_data$placebo_n_participants[vax_data$short_name %in% as.character(name)]),
-    #          colour = "white", size = 4) +
-    # annotate("text", x= 2, y = 0, label = paste0( "n = ", # treatment
-    #           vax_data$treatment_n_participants[vax_data$short_name %in% as.character(name)]),
-    #          colour = "white", size = 4) +
-    # coord_cartesian(ylim = c(-20,ymax), expand = TRUE, default = TRUE, clip = "off")
-  
   
   p
 }
@@ -100,9 +92,6 @@ ui_outcome_plot <- function(name, ymax, bgcolor) {
 ### ggplot function call ----
 ui_plot_pfizer <- ui_outcome_plot("Pfizer", 250)
 ui_plot_moderna <- ui_outcome_plot("Moderna", 250)
-
-ui_plot_moderna
-ui_plot_pfizer
 
 # generate data for rainbow plot ----
 eff_data <- expand_grid(

@@ -239,6 +239,22 @@ server <- function(input, output, session) {
   observeEvent(input$effrate,    { origin$src <- "user"}, label = "origin effrate")
   observeEvent(input$poprate,    { origin$src <- "user"}, label = "origin poprate")
   
+  ### similarly, explore, preset mode 
+  mode <- reactiveValues(preset = NULL)
+  observeEvent(input$presets, {
+      if (input$presets == "Pfizer") {
+        mode$preset <- TRUE
+      }
+      else if (input$presets == "Moderna") {
+        mode$preset <- TRUE
+      } else if (input$presets == "Explore") {
+        mode$preset <- FALSE
+      }
+  }, label = "mode_presets")
+  observeEvent(event_data("plotly_click"), {
+    mode$preset <- TRUE
+  }, label = "mode_plotclick")
+  
   
   ## step1: user input ----
   
@@ -321,26 +337,6 @@ server <- function(input, output, session) {
   effrate_B_pct   <- reactive({ round(effrate_B()*100, 2)})
   protectrate_pct <- reactive({ round(protectrate()*100,2) })
   protectrate_pct1 <- reactive({ round(protectrate()*100,1) })
-  
-  
-  ## prepare hover values 
-  ### 1. determine near points 
-  hover_points <- reactive({
-    # find points
-    pts <- nearPoints(df = eff_clinical_data, coordinfo = input$plot_hover, threshold = 5, maxpoints = 1)
-    
-    # return values, if no values, return null
-    if (nrow(pts) == 0) {
-      return()
-    } 
-    else {
-      pts
-      #round(pts$p_safe*100, 3) 
-    }
-    
-      
-  }, label = 'hover points')
-  
   
   
   output$see <- renderPrint({str(eff_point())})
@@ -497,6 +493,22 @@ server <- function(input, output, session) {
   
   # graphs ----------------------------------------------------------------------------------
 
+  texttemplate <- reactive({
+    if (mode$preset) {
+      NULL
+    } else {
+      "<b>My Point<b>"
+    }
+  })
+  
+  # textfont <- reactive({
+  #   if (mode$preset) {
+  #     NULL
+  #   } else {
+  #     list(size = 14, color = "black")
+  #   }
+  # })
+  
   ## rainbow curve graph ---- 
   p2 <- reactive({
     ### main data ----
@@ -551,7 +563,8 @@ server <- function(input, output, session) {
       add_trace(data = eff_point(), type = "scatter", mode = 'markers',
                 uid = "user_point", visible = TRUE,
                 x = ~eff, y = ~pop, opacity = 1,
-                texttemplate = "<b>My Point<b>", textposition = 'top middle', textfont = list(size = 14, color = "black"),
+                texttemplate = "<b>My Point<b>", 
+                textposition = 'top middle', textfont = list(size = 14, color = "black"),
                 marker = list(
                   size = 12, color = "black", symbol = 'circle-open',
                   line = list(width=4)), 
