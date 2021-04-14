@@ -33,13 +33,13 @@ dflt_effrate = 0.7
 
 
 # UI =====================================================================================
-ui = navbarPage(title = NULL, 
-                position = "fixed-top",
+ui = navbarPage(title = "Covid-19 Vaccine Explorer", 
+                position = "static-top", selected = "Data Explorer", windowTitle = "Vaccine Explorer",
                 collapsible = TRUE,
                 #theme = theme,
-                header = list(tags$br(), tags$br(), tags$br()),
+               # header = list(tags$br(), tags$br(), tags$br()),
                 
-    
+               # tags$style(type='text/css', "body{padding-top: 70px;}"),
 
 # Application title
 
@@ -55,14 +55,18 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 # )),
      
                 
-          
+     dropdownButton(inputId = 'dropdown_main',
+      circle = TRUE, status = 'default', size = 'default', icon = icon('gear'),
+      label = "Collapse", tooltip = tooltipOptions(placement = 'right', title = "Collapse", html = TRUE),
+      margin = '10px', width = '100%',
+       
        absolutePanel(  
          align='center',
          width = '100%',
-         top = 0, left = 0,
-         style= 'background: #2c3e50; opacity: 1; z-index: 10',
+         top = 200, left = 0,
+         style= 'background: #2c3e50; opacity: 1; z-index: 10; overflow: visible',
          
-         fixed = TRUE,
+         fixed = FALSE, draggable = TRUE,
          
        wellPanel(align='center',
                  style= 'background: #2c3e50',
@@ -70,12 +74,11 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                  radioGroupButtons(
                    'presets', label = NULL,
                    choices = c("Explore", "Pfizer", "Moderna"),
-                   status = 'primary',  selected = "Explore",
+                   status = 'primary',  selected = "Moderna",
                    size = "normal", direction = 'horizontal', individual = T),
                  
       
                         
-                        #verbatimTextOutput('see')
        ))),
        
        
@@ -181,9 +184,13 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                              if fully vaccinated."))),
        
        
-       plotlyOutput("effplot", height = "100%"), ## rainbow curve plot ----
-
-       tags$source("Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)"),
+       plotlyOutput("effplot", height = "100%"), br(), ## rainbow curve plot ----
+                          
+       wellPanel( align = 'left',              ### sources
+                  style = 'background: #FFF; padding:3px',
+                  
+          HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)</font>"),
+       ),
        
        
        
@@ -203,13 +210,26 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
            size = "sm", direction = 'horizontal', individual = FALSE
          )
 
-     ))), # end tab panel, fluid page              
+     )))), # end tab panel, fluid page              
+   
+tabPanel("Q+A",
+         fluidPage(
+          br(),
+          h1("Q+A"), 
+          HTML(markdown::markdownToHTML(file = 'md/page2.md',
+                                        fragment.only = TRUE,
+                                        options = c('latex_math', 'toc')
+          ))
           
+          
+         
+           
+  )), # end fluidpage, tabPanel
          
 
 
        
-tabPanel("About", # PAGE2: about ----------------------------------------------------------------------
+tabPanel("About", # PAGE3: about ----------------------------------------------------------------------
          fluidPage( title = "About Covid-19 Vaccine Data Explorer",
           tags$br(),
           
