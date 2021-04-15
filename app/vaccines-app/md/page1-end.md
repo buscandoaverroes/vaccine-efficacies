@@ -6,7 +6,7 @@
 
 1.  The average person's chances of being protected from covid are higher than the efficacy.
 2.  Vaccines work. All approved COVID-19 vaccines drastically reduce the average person's chances of contracting the virus.
-3.  If you're concerned about staying protected from covid, mathematically, the biggest difference you can make is just to get vaccinated. Variations in vaccine efficacies aren't as important as simply getting vaccinated.
+3.  If you're concerned about staying protected from covid, mathematically, the biggest difference you can make is just to get vaccinated. Variations in vaccines aren't as important as simply getting one.
 
 ### Keep in Mind
 

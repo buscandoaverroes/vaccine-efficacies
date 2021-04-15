@@ -115,7 +115,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      bs_collapse(id = 'el_uiclinical', 
                  wellPanel(align='center',
                            style='background: #2c3e50; padding: 1px',
-                 plotOutput('uiclinical', height = '200px'))),
+                 plotOutput('uiclinical', height = '210px'))),
      bs_collapse(id = 'el_math', 
                  wellPanel(align='center',
                            style='background: #F5F1F9; padding:3px',
@@ -145,17 +145,14 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                                
                                sliderInput("poprate", 
                                            label = NULL,
-                                           width = '100%', ticks = F,
+                                           width = '90%', ticks = F,
                                            min = 1, max = 200, value = dflt_poprate, step = 1)),
                              htmlOutput('right_poprate', width = 6)),
              wellPanel(
                     style = 'background:#00000000; padding: 0px; border-width: 0px; border-color: #fff;
                              margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
-                 # wellPanel( align='center',
-                 #             style = 'background:#F5F1F9; padding: 5px; border-width: 1px; border-color: #9954bb;
-                 #             margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
-                 #             
-                             tags$h5(tags$b("Efficacy Rate"), icon("question-circle")) %>%
+
+                          tags$h5(tags$b("Efficacy Rate"), icon("question-circle")) %>%
                                bs_embed_tooltip(title = "The vaccine's reduction of your risk from getting covid",
                                                 placement = "top"),
                              
@@ -165,7 +162,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                                
                                sliderInput("effrate",
                                            label = NULL,
-                                           width = '100%', ticks = F, 
+                                           width = '90%', ticks = F, 
                                            min = 0, max = 1, value = dflt_effrate, step = 0.01)),
                              htmlOutput('right_effrate', width = 6 )
                   ))), # end main input panel, end second element
@@ -205,19 +202,17 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        HTML(markdown::markdownToHTML(file = 'md/page1-end.md',
                                      fragment.only = TRUE
                                      
-       )),
+       ))
        
-       conditionalPanel(
-         condition = 'input.presets == "Explore"',
-         
-         radioGroupButtons(
-           'variants', label = NULL, disabled = FALSE,
-           choices = c("Variant A", "Variant B", "No Variants"),
-           status = 'primary',  selected = "No Variants",
-           size = "sm", direction = 'horizontal', individual = FALSE
-         )
+     
+         # radioGroupButtons(
+         #   'variants', label = NULL, disabled = FALSE,
+         #   choices = c("Variant A", "Variant B", "No Variants"),
+         #   status = 'primary',  selected = "No Variants",
+         #   size = "sm", direction = 'horizontal', individual = FALSE
+         # )
 
-     )))), # end tab panel, fluid page              
+     ))), # end tab panel, fluid page              
    
 tabPanel("Q+A",
          fluidPage(
@@ -328,21 +323,23 @@ server <- function(input, output, session) {
 
 
   ## step2: multiplier ----
-  scaler_e <- reactive({
-    case_when(
-      input$variants[1] == "Variant A"   ~ 0.15,
-      input$variants[1] == "Variant B"   ~ 0.10,
-      input$variants[1] == "No Variants" ~ 0
-    )
-  })
-  
-  scaler_p <- reactive({
-    case_when(
-      input$variants[1] == "Variant A"   ~ 0.10,
-      input$variants[1] == "Variant B"   ~ 0.40,
-      input$variants[1] == "No Variants" ~ 0
-    )
-  })
+  scaler_e <- reactive({0})
+  #   reactive({
+  #   case_when(
+  #     input$variants[1] == "Variant A"   ~ 0.15,
+  #     input$variants[1] == "Variant B"   ~ 0.10,
+  #     input$variants[1] == "No Variants" ~ 0
+  #   )
+  # })
+  # 
+  scaler_p <- reactive({0})
+  #   reactive({
+  #   case_when(
+  #     input$variants[1] == "Variant A"   ~ 0.10,
+  #     input$variants[1] == "Variant B"   ~ 0.40,
+  #     input$variants[1] == "No Variants" ~ 0
+  #   )
+  # })
     
 
   
@@ -365,9 +362,7 @@ server <- function(input, output, session) {
   protectrate_pct <- reactive({ round(protectrate()*100,2) })
   protectrate_pct1 <- reactive({ round(protectrate()*100,1) })
   
-  
-  output$see <- renderPrint({str(eff_point())})
-  
+
   
   
   
