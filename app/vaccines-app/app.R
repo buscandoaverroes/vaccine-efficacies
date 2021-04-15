@@ -46,21 +46,30 @@ ui = navbarPage(title = "Covid-19 Vaccine Explorer",
 tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------------------------------------------
      fluidPage( title = "Covid-19 Vaccine Data Explorer",
               
-              HTML("<h2><b>Covid-19 Vaccine Explorer</b></h2>"),  
-              wellPanel(align = 'left', 
-                        style = 'background:#FFF; padding: 5px',
-                HTML(markdown::markdownToHTML(file = 'md/page1-intro.md',
-                                              fragment.only = TRUE
-                                              
-              ))),
+              HTML("<h2><b>Covid-19 Vaccine Explorer</b></h2>"), 
+              br(),
+              HTML("
+                   
+                   <font size=4>
+                   The efficacy rate is not the chance you'll be protected. Use
+                   the tool below to estimate an average person's chances of protection
+                   from Covid-19 based the actual clinical data.
+                   </font>
+                   "),
+              # wellPanel(align = 'left', 
+              #           style = 'background:#FFF; padding: 5px',
+                # HTML(markdown::markdownToHTML(file = 'md/page1-intro.md',
+                #                               fragment.only = TRUE)),
      
-           br(),     
+           br(),br(),br(),     
        
        absolutePanel(  
+
          align='center',
          width = '100%', height = '80px',
          top = 0, left = 0,
-         style= 'background: #2c3e50; opacity: 1; z-index: 10; position: sticky; padding: 0px;  opacity:1',
+         style= 'background: #2c3e50; opacity: 1; z-index: 10; position: sticky;
+         padding: 0px;  opacity:1; border-radius: 5px',
          
          fixed = TRUE, 
          
@@ -101,7 +110,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      #### elements
      bs_collapse(id = 'el_explanation', 
                  wellPanel(align = 'left',
-                           style = 'background: #FFF; padding: 3px',
+                           style = 'background: #FFF; padding: 3px; border-color:#373a3c; border-width: 1px',
                  htmlOutput('explanation'))),
      bs_collapse(id = 'el_uiclinical', 
                  wellPanel(align='center',
@@ -109,7 +118,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                  plotOutput('uiclinical', height = '200px'))),
      bs_collapse(id = 'el_math', 
                  wellPanel(align='center',
-                           style='background: #F6F1FB; padding:3px',
+                           style='background: #F5F1F9; padding:3px',
                            
                            htmlOutput('math', container = tags$b)
                  )
@@ -117,9 +126,14 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      
      br(),
      
-     splitLayout( ##  main input panels ----------------------------------------
-                  wellPanel( align='center', 
-                             style = 'background:#FFF; padding: 5px',
+                      ##  main input panels ----------------------------------------
+           wellPanel( align='center', 
+                       style = 'background:#F5F1F9; padding: 5px; border-width: 1px; border-color: #9954bb;
+                             margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',  
+            splitLayout( 
+              wellPanel(
+                style = 'background:#00000000; padding: 5px; border-width: 0px; border-color: #fff;
+                             margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
                              
                              tags$h5(tags$b("Covid Cases"),
                                      icon("question-circle")) %>%
@@ -133,12 +147,14 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                                            label = NULL,
                                            width = '100%', ticks = F,
                                            min = 1, max = 200, value = dflt_poprate, step = 1)),
-                             htmlOutput('right_poprate', width = 6)
-                  ),  # end first element of splitpanel
-                  
-                  wellPanel( align='center',
-                             style = 'background:#FFF; padding: 5px',
-                             
+                             htmlOutput('right_poprate', width = 6)),
+             wellPanel(
+                    style = 'background:#00000000; padding: 0px; border-width: 0px; border-color: #fff;
+                             margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
+                 # wellPanel( align='center',
+                 #             style = 'background:#F5F1F9; padding: 5px; border-width: 1px; border-color: #9954bb;
+                 #             margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
+                 #             
                              tags$h5(tags$b("Efficacy Rate"), icon("question-circle")) %>%
                                bs_embed_tooltip(title = "The vaccine's reduction of your risk from getting covid",
                                                 placement = "top"),
@@ -152,12 +168,12 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                                            width = '100%', ticks = F, 
                                            min = 0, max = 1, value = dflt_effrate, step = 0.01)),
                              htmlOutput('right_effrate', width = 6 )
-                  )), # end main input panel, end second element
+                  ))), # end main input panel, end second element
      
      
      verticalLayout(
        wellPanel(align='center', ## protection rate ----
-                 style= 'background: #D9F9E5; padding: 5px',
+                 style= 'background: #D9F9E5; padding: 0px; border-width: 1px; border-color: #41AB5D',
                  
                  
                  tags$h4(tags$b("Chance of Protection"), icon('question-circle')) %>%
@@ -181,13 +197,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        
        
        plotlyOutput("effplot", height = "100%"), br(), ## rainbow curve plot ----
-                          
-       wellPanel( align = 'left',              ### sources
-                  style = 'background: #FFF; padding:3px',
-                  
-          HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)</font>"),
-       ),
-       
+      HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)</font>"),
+      br(), 
        
        
        ## After plot text ----
@@ -444,7 +455,7 @@ server <- function(input, output, session) {
   })
   math_eq <- reactive({
     paste0( "$$", 
-   "\\text{Protect Rate} = 1 - (\\frac{\\text{Infect. Rate}}{1000}*(1 - \\text{Efficacy Rate}))$$",
+   "\\text{Protection} = 1 - (\\frac{\\text{Infect Rate}}{1000}*(1 - \\text{Efficacy}))$$",
    "$$",
       round(protectrate(), 4), " = 1 - (", "\\frac{", round(poprate_B()), "}{1000}","*(1 - ",
            round(effrate_B(),3),"))", '$$'
