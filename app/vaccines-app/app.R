@@ -36,41 +36,37 @@ dflt_effrate = 0.7
 ui = navbarPage(title = "Covid-19 Vaccine Explorer", 
                 position = "static-top", selected = "Data Explorer", windowTitle = "Vaccine Explorer",
                 collapsible = TRUE,
-                #theme = theme,
-               # header = list(tags$br(), tags$br(), tags$br()),
-                
+                theme = theme,
+
                # tags$style(type='text/css', "body{padding-top: 70px;}"),
 
-# Application title
 
-                
+          
   
 tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------------------------------------------
      fluidPage( title = "Covid-19 Vaccine Data Explorer",
-                
-                
-                # HTML(markdown::markdownToHTML(file = 'md/page1-intro.md',
-                #                               fragment.only = TRUE
-                # 
-                # )),
+              
+              HTML("<h2><b>Covid-19 Vaccine Explorer</b></h2>"),  
+              wellPanel(align = 'left', 
+                        style = 'background:#FFF; padding: 5px',
+                HTML(markdown::markdownToHTML(file = 'md/page1-intro.md',
+                                              fragment.only = TRUE
+                                              
+              ))),
      
-                
-     dropdownButton(inputId = 'dropdown_main',
-      circle = TRUE, status = 'default', size = 'default', icon = icon('gear'),
-      label = "Collapse", tooltip = tooltipOptions(placement = 'right', title = "Collapse", html = TRUE),
-      margin = '10px', width = '100%',
+           br(),     
        
        absolutePanel(  
          align='center',
-         width = '100%',
-         top = 200, left = 0,
-         style= 'background: #2c3e50; opacity: 1; z-index: 10; overflow: visible',
+         width = '100%', height = '80px',
+         top = 0, left = 0,
+         style= 'background: #2c3e50; opacity: 1; z-index: 10; position: sticky; padding: 0px;  opacity:1',
          
-         fixed = FALSE, draggable = TRUE,
+         fixed = TRUE, 
          
        wellPanel(align='center',
-                 style= 'background: #2c3e50',
-                 br(), br(),
+                 style= 'background: #2c3e50; height: 80px',
+                 
                  radioGroupButtons(
                    'presets', label = NULL,
                    choices = c("Explore", "Pfizer", "Moderna"),
@@ -79,10 +75,10 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                  
       
                         
-       ))),
+       )),
        
        
-       br(), br(), br(), br(), br(),br(),
+       br(), 
      
      htmlOutput('summary'), ## summary ----
      
@@ -473,13 +469,13 @@ server <- function(input, output, session) {
   
   output$explanation <- renderText({
     paste0(
-      "In ", selected_vax_name(), "'s  clinical trials, non-vaccinated people got covid at a rate of
-      about ", "<b><font color=\"#000000\">",
-      as.character(poprate_B_per1k()), "</font>", " per ", "1,000", "</b>", " people. However, participants with the ",
+      "In ", selected_vax_name(), "'s  clinical trials, non-vaccinated people got covid at a rate equivalent
+      to ", "<b><font color=\"#000000\">",
+      as.character(poprate_B_per1k()), "</font>", " per ", "1,000", "</b>", " people years. However, participants with the ",
       as.character(selected_vax_name()), " vaccine got infected only ",
       "<b><font color=\"#000000\">",
       as.character(round(vax_data$treatment_covid_incidence[vax_data$short_name %in% selected_vax_name()],1)),
-      "</font>", " per ", "1,000", "</b>", " people, a rate that was ",
+      "</font>", " per ", "1,000", "</b>", ", a rate that was ",
       "<font color=\"#2171B5\"><b>", round(effrate_B_pct(),1), "%", "</b></font>",
       " lower. About ", "<b><font color=\"#41AB5D\">", 
       protectrate_pct1(), "%", "</font></b>", " of the time, participants with the ",selected_vax_name(), 
@@ -603,7 +599,7 @@ server <- function(input, output, session) {
         uniformtext = list(mode='hide', minsize=8),
         title = list(
           text = "Lighter colors indicate better chances of protection",
-          font = list(size=16),
+          font = list(size=14),
           pad = list(t=1,r=0,b=1,l=0)
         ),
         height = 400,

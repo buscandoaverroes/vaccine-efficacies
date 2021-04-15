@@ -14,4 +14,4 @@ The clinical trials occurred in different places and stages of the pandemic, so 
 
 ### Still have Questions?
 
-For general information on Covid-19 and vaccines, visit the CDC or consult your physician. The [Pfizer](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7745181/) and [Moderna](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7787219/) papers themselves contain detailed and accessible information on the clinical trials themselves. Finally, my About page has a few in-progress notes about the project.
+For general information on Covid-19 and vaccines, visit the CDC or consult your physician. The [Pfizer](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7745181/) and [Moderna](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7787219/) papers contain detailed and accessible information on the clinical trials themselves. Finally, my About page has a few in-progress notes about the project.
