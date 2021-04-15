@@ -54,16 +54,10 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 # 
                 # )),
      
-                
-          
-       absolutePanel(  
-         align='center',
-         width = '100%',
-         top = 0, left = 0,
-         style= 'background: #2c3e50; opacity: 1; z-index: 10',
-         
-         fixed = TRUE,
-         
+
+       
+       br(), hr(),
+       prettySwitch('showmath', 'Show Math', slim = T, inline = T, status = 'info'),
        wellPanel(align='center',
                  style= 'background: #2c3e50',
                  
