@@ -131,11 +131,12 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      br(),
      
           ##  main input panels ----------------------------------------
-           wellPanel( align='center', ### Cases ----
+           wellPanel( align='center', 
                        style = 'background:#F5F1F9; padding: 5px; border-width: 1px; border-color: #9954bb;
-                             margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',  
+                             margin-left: 0px; margin-right: 0px; 
+                             padding:0.2em; width: 100%',  
             splitLayout( 
-              wellPanel(
+              wellPanel( ### Cases ----
                 style = 'background:#00000000; padding: 5px; border-width: 0px; border-color: #fff;
                              margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
                              
@@ -144,53 +145,73 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                                bs_embed_tooltip(title = "The rate of covid-infections in the general population",
                                                 placement = "top"),
                              
-                             conditionalPanel(  
-                               condition = 'input.presets == "Explore"',
-                               HTML(" <button id='popratelow' type='button'
-                                class='btn action-button btn-default btn-sm' 
-                                style='padding: 2px'>Low</button> "), # to make action-able, add action-button to class list
-                               HTML(" <button id='popratemed' type='button'
-                                class='btn action-button btn-default btn-sm' 
-                                style='padding: 2px'>Med</button> "), # to make action-able, add action-button to class list
-                               HTML(" <button id='popratehigh' type='button'
-                                class='btn action-button btn-default btn-sm' 
-                                style='padding: 2px'>High</button> "), # to make action-able, add action-button to class list
-                               
-                               
-                               sliderInput("poprate", 
-                                           label = NULL,
-                                           width = '90%', ticks = F,
-                                           min = 1, max = 200, value = dflt_poprate, step = 1)),
-                             htmlOutput('right_poprate', width = 6)),
+                             
+                             htmlOutput('right_poprate', width = 6, inline = FALSE),
+              
+              conditionalPanel(  
+                condition = 'input.presets == "Explore"', 
+                style = 'margin-top: 20px',
+                
+                HTML(" <button id='popratelow' type='button'
+                                class='btn action-button btn-sm' 
+                                style='padding: 2px; margin-right: 1%; background-color:#EBDDF9; width: 30px;
+                                border-color: #9954bb'; border-width: 3px'>Low</button> "), # to make action-able, add action-button to class list
+                HTML(" <button id='popratemed' type='button'
+                                class='btn action-button btn-sm' 
+                                style='padding: 2px; margin-right: 1%; background-color:#EBDDF9; width: 30px;
+                                border-color: #9954bb'; border-width: 3px'>Med</button> "), # to make action-able, add action-button to class list
+                HTML(" <button id='popratehigh' type='button'
+                                class='btn action-button  btn-sm' 
+                                style='padding: 2px; background-color:#EBDDF9; width: 30px;
+                                border-color: #9954bb'; border-width: 3px'>High</button> "), # to make action-able, add action-button to class list
+                
+                
+                sliderInput("poprate", 
+                            label = NULL,
+                            width = '90%', ticks = F,
+                            min = 1, max = 200, value = dflt_poprate, step = 1))),
+              
+              
+              
              wellPanel( ### Efficacy ----
                     style = 'background:#00000000; padding: 0px; border-width: 0px; border-color: #fff;
-                             margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
+                             margin-left: 0px; margin-right: 0px; 
+                             padding:0em; width: 100%',
 
                           tags$h5(tags$b("Efficacy Rate"), icon("question-circle")) %>%
                                bs_embed_tooltip(title = "The vaccine's reduction of your risk from getting covid",
                                                 placement = "top"),
                              
                              
-                             conditionalPanel(    
-                               condition = 'input.presets == "Explore"',
-                               HTML(" <button id='effrate90' type='button'
-                                class='btn action-button btn-default btn-sm' 
-                                style='padding: 2px'>90</button> "), # to make action-able, add action-button to class list
-                               HTML(" <button id='effrate94' type='button'
-                                class='btn action-button btn-default btn-sm' 
-                                style='padding: 2px'>94</button> "), # to make action-able, add action-button to class list
-                               HTML(" <button id='effrate95' type='button'
-                                class='btn action-button btn-default btn-sm' 
-                                style='padding: 2px'>95</button> "), # to make action-able, add action-button to class list
-                               
-                              
-                               
-                               sliderInput("effrate",
-                                           label = NULL,
-                                           width = '90%', ticks = F, 
-                                           min = 0, max = 1, value = dflt_effrate, step = 0.01)),
-                             htmlOutput('right_effrate', width = 6 )
-                  ))), # end main input panel, end second element
+                             htmlOutput('right_effrate', width = 6 ),
+                    
+                    conditionalPanel(    
+                      condition = 'input.presets == "Explore"',
+                      style = 'margin-top: 20px',
+                      
+                      HTML(" <button id='effrate90' type='button'
+                                class='btn action-button btn-sm' 
+                                style='padding: 2px; margin-right: 1%; width: 30px; background-color:#EBDDF9;
+                                border-color: #9954bb'; border-width: 3px'>90</button> "),
+                      HTML(" <button id='effrate94' type='button'
+                                class='btn action-button btn-sm' 
+                                style='padding: 2px; margin-right: 1% ; width: 30px; background-color:#EBDDF9;
+                                border-color: #9954bb'; border-width: 3px'>94</button> "), 
+                      HTML(" <button id='effrate95' type='button'
+                                class='btn action-button btn-sm' 
+                                style='padding: 2px; width: 30px; background-color:#EBDDF9;
+                                border-color: #9954bb'; border-width: 3px'>95</button> "),
+                      # to make action-able, add action-button to class list
+                      # color=font color
+                      # 
+                      
+                      
+                      
+                      sliderInput("effrate",
+                                  label = NULL,
+                                  width = '90%', ticks = F, 
+                                  min = 0, max = 1, value = dflt_effrate, step = 0.01)))
+                  )), # end main input panel, end second element
      
      
      verticalLayout( ### Protection ----
@@ -462,13 +483,13 @@ server <- function(input, output, session) {
     paste0(
       "<b><font color=\"#000000\" size=4>",
       poprate_B_per1k(), " per ", "1,000",
-      "</b></font>"
+      "</b></font></style>"
     )
   })
   
   output$right_effrate <- renderText({
     paste0(
-      "<b><font color=\"#2171B5\" size=4>",
+      "<b><font color=\"#2171B5\" size=4rem>",
       effrate_B_pct(), "%",
       "</b></font>"
     )
