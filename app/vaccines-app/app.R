@@ -169,7 +169,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 sliderInput("poprate", 
                             label = NULL,
                             width = '90%', ticks = F,
-                            min = 1, max = 200, value = dflt_poprate, step = 1))),
+                            min = 5, max = 300, value = dflt_poprate, step = 5))),
               
               
               
@@ -447,7 +447,7 @@ server <- function(input, output, session) {
   
   observeEvent(input$popratelow, {updateSliderInput('poprate', session = session, value = 25)})
   observeEvent(input$popratemed, {updateSliderInput('poprate', session = session, value = 100)})
-  observeEvent(input$popratehigh, {updateSliderInput('poprate', session = session, value = 180)})
+  observeEvent(input$popratehigh, {updateSliderInput('poprate', session = session, value = 250)})
   
   # eff data for plot ----
   # for hypothetical point data
@@ -481,7 +481,7 @@ server <- function(input, output, session) {
   ## efficacies ----
   output$right_poprate <- renderText({
     paste0(
-      "<b><font color=\"#000000\" size=4>",
+      "<b><font color=\"#000000\" size=5>",
       poprate_B_per1k(), " per ", "1,000",
       "</b></font></style>"
     )
@@ -489,7 +489,7 @@ server <- function(input, output, session) {
   
   output$right_effrate <- renderText({
     paste0(
-      "<b><font color=\"#2171B5\" size=4rem>",
+      "<b><font color=\"#2171B5\" size=5>",
       effrate_B_pct(), "%",
       "</b></font>"
     )
@@ -529,7 +529,9 @@ server <- function(input, output, session) {
   
   output$explanation <- renderText({
     paste0(
-      "In ", selected_vax_name(), "'s  clinical trials, non-vaccinated people got covid at a rate equivalent
+      "This figure is based on ", selected_vax_name(), "'s efficacy rate and how frequently
+      non-vaccinated people became infected with covid during the clinical trial.
+      In ", selected_vax_name(), "'s trials, non-vaccinated people got covid at a rate equivalent
       to ", "<b><font color=\"#000000\">",
       as.character(poprate_B_per1k()), "</font>", " per ", "1,000", "</b>", " people years. However, participants with the ",
       as.character(selected_vax_name()), " vaccine got infected only ",

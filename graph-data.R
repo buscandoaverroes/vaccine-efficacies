@@ -95,7 +95,7 @@ ui_plot_moderna <- ui_outcome_plot("Moderna", 250)
 
 # generate data for rainbow plot ----
 eff_data <- expand_grid(
-  pop    = seq(from = 0, to = 200, by = 1),
+  pop    = seq(from = 0, to = 300, by = 1),
   eff    = seq(from = 0, to = 1, by = 0.01)
 ) %>% mutate(
   p_safe   = 1-((pop/1000)*(1-eff))
