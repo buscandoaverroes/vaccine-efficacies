@@ -12,6 +12,7 @@ library(gghighlight)
 library(ggrepel)
 library(htmlwidgets)
 library(bsplus)
+library(shinyBS)
 
 reactlog_enable()
 use_bs_tooltip() # must call once
@@ -129,8 +130,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      
      br(),
      
-                      ##  main input panels ----------------------------------------
-           wellPanel( align='center', 
+          ##  main input panels ----------------------------------------
+           wellPanel( align='center', ### Cases ----
                        style = 'background:#F5F1F9; padding: 5px; border-width: 1px; border-color: #9954bb;
                              margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',  
             splitLayout( 
@@ -145,13 +146,23 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                              
                              conditionalPanel(  
                                condition = 'input.presets == "Explore"',
+                               HTML(" <button id='popratelow' type='button'
+                                class='btn action-button btn-default btn-sm' 
+                                style='padding: 2px'>Low</button> "), # to make action-able, add action-button to class list
+                               HTML(" <button id='popratemed' type='button'
+                                class='btn action-button btn-default btn-sm' 
+                                style='padding: 2px'>Med</button> "), # to make action-able, add action-button to class list
+                               HTML(" <button id='popratehigh' type='button'
+                                class='btn action-button btn-default btn-sm' 
+                                style='padding: 2px'>High</button> "), # to make action-able, add action-button to class list
+                               
                                
                                sliderInput("poprate", 
                                            label = NULL,
                                            width = '90%', ticks = F,
                                            min = 1, max = 200, value = dflt_poprate, step = 1)),
                              htmlOutput('right_poprate', width = 6)),
-             wellPanel(
+             wellPanel( ### Efficacy ----
                     style = 'background:#00000000; padding: 0px; border-width: 0px; border-color: #fff;
                              margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
 
@@ -162,6 +173,17 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                              
                              conditionalPanel(    
                                condition = 'input.presets == "Explore"',
+                               HTML(" <button id='effrate90' type='button'
+                                class='btn action-button btn-default btn-sm' 
+                                style='padding: 2px'>90</button> "), # to make action-able, add action-button to class list
+                               HTML(" <button id='effrate94' type='button'
+                                class='btn action-button btn-default btn-sm' 
+                                style='padding: 2px'>94</button> "), # to make action-able, add action-button to class list
+                               HTML(" <button id='effrate95' type='button'
+                                class='btn action-button btn-default btn-sm' 
+                                style='padding: 2px'>95</button> "), # to make action-able, add action-button to class list
+                               
+                              
                                
                                sliderInput("effrate",
                                            label = NULL,
@@ -171,8 +193,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                   ))), # end main input panel, end second element
      
      
-     verticalLayout(
-       wellPanel(align='center', ## protection rate ----
+     verticalLayout( ### Protection ----
+       wellPanel(align='center',
                  style= 'background: #D9F9E5; padding: 0px; border-width: 1px; border-color: #41AB5D',
                  
                  
@@ -368,8 +390,8 @@ server <- function(input, output, session) {
 
   
   
-  
-  # vaccine buttons ----
+  # preset buttons ----
+  ## vaccines ----
 
   observeEvent(input$presets, { 
     # if (input$presets[1] == "Explore") {
@@ -396,7 +418,15 @@ server <- function(input, output, session) {
     
   }, label = "update from vaccine presets")
   
-
+  
+  ## explore values ----
+  observeEvent(input$effrate90, {updateSliderInput('effrate', session = session, value = 0.9)})
+  observeEvent(input$effrate94, {updateSliderInput('effrate', session = session, value = 0.94)})
+  observeEvent(input$effrate95, {updateSliderInput('effrate', session = session, value = 0.95)})
+  
+  observeEvent(input$popratelow, {updateSliderInput('poprate', session = session, value = 25)})
+  observeEvent(input$popratemed, {updateSliderInput('poprate', session = session, value = 100)})
+  observeEvent(input$popratehigh, {updateSliderInput('poprate', session = session, value = 180)})
   
   # eff data for plot ----
   # for hypothetical point data
