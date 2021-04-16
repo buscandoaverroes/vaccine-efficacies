@@ -82,7 +82,10 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    status = 'primary',  selected = "Moderna",
                    size = "normal", direction = 'horizontal', individual = T),
                  
-      
+      conditionalPanel(
+        condition = 'input.presets == "Explore"',
+        
+      ),
                         
        )),
        
