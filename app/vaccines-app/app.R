@@ -516,15 +516,22 @@ server <- function(input, output, session) {
   
   
   ## summary + expl ----
-  sum_intro <- reactive({if (input$presets != "Explore") {"Clinical data suggests the "} else {"The "}})
-  output$summary <- renderText({ 
+  sum <- reactive({if (input$presets != "Explore") {
     paste0(
-      "<font size=4>", sum_intro(), "<b><font color= \"#54278F\">", as.character(selected_vax_name()), "</font></b>",
-      " vaccine should protect people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
-      protectrate_pct1(), "%", "</font></b> of the time, on average.<br><br>"
-      # <br><br><font size=3>This figure will likely vary between
-      # individuals and rapid developments in vaccination campaigns, variants, and local infection rates. </font><br><br>"
+      "<font size=4>During clinical trials, the <b><font color= \"#54278F\">", as.character(selected_vax_name()), "</font></b>",
+      " vaccine protected people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
+      protectrate_pct1(), "%", "</font></b> of the time.<br><br>"
     )
+  } else {
+    paste0(
+      "<font size=4>The <b><font color= \"#54278F\">", as.character(selected_vax_name()), "</font></b>",
+      " vaccine would protect people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
+      protectrate_pct1(), "%", "</font></b> of the time given the selected infection rate and efficacy rate
+      below.<br><br>"
+    )
+    }})
+  output$summary <- renderText({ 
+    sum()
   })
   
   output$explanation <- renderText({
@@ -722,8 +729,8 @@ server <- function(input, output, session) {
 # Run the application 
 
 
-bslib::run_with_themer(
+#bslib::run_with_themer(
   shinyApp(ui = ui, server = server, options = list("launch.browswer" = TRUE))
-)
+#)
 
 
