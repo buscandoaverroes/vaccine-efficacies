@@ -79,7 +79,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                  
                  radioGroupButtons(
                    'presets', label = NULL,
-                   choices = c("Explore", "Pfizer", "Moderna"),
+                   choices = c("Explore", "Pfizer", "Moderna", "mRNA"),
                    status = 'primary',  selected = "Moderna",
                    size = "normal", direction = 'horizontal', individual = T),
                  
@@ -176,7 +176,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 sliderInput("poprate", 
                             label = NULL,
                             width = '90%', ticks = F,
-                            min = 5, max = 300, value = dflt_poprate, step = 5))),
+                            min = 5, max = 600, value = dflt_poprate, step = 5))),
               
               
               
@@ -322,6 +322,8 @@ server <- function(input, output, session) {
       }
       else if (input$presets == "Moderna") {
         mode$preset <- TRUE
+      } else if (input$presets == "mRNA") {
+        mode$preset <- TRUE
       } else if (input$presets == "Explore") {
         mode$preset <- FALSE
       }
@@ -443,6 +445,13 @@ server <- function(input, output, session) {
                         value = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"])
     }
     
+    if (input$presets[1] == "mRNA") {
+      updateSliderInput('poprate', session = session,
+                        value = vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer or Moderna"])
+      updateSliderInput('effrate', session = session,
+                        value = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer or Moderna"])
+    }
+    
     
   }, label = "update from vaccine presets")
   
@@ -455,6 +464,8 @@ server <- function(input, output, session) {
   observeEvent(input$popratelow, {updateSliderInput('poprate', session = session, value = 25)})
   observeEvent(input$popratemed, {updateSliderInput('poprate', session = session, value = 100)})
   observeEvent(input$popratehigh, {updateSliderInput('poprate', session = session, value = 250)})
+  
+  
   
   # eff data for plot ----
   # for hypothetical point data
@@ -475,6 +486,8 @@ server <- function(input, output, session) {
     }
     else if (input$presets == "Moderna") {
       "Moderna"
+    } else if (input$presets == "mRNA") {
+      "Pfizer or Moderna"
     } else if (input$presets == "Explore") {
       "hypothetical"
     }

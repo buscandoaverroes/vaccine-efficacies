@@ -111,7 +111,7 @@ eff_clinical_data <- tibble(
   name_abb = c("Pfz", "Mod", "mRNA"),
   pop  = c(vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"],
            vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"],
-           vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer or Moderna"]),
+           round(vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer or Moderna"])),
   eff  = c(vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"],
            vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"],
            vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer or Moderna"]),
