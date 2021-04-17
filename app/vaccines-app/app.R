@@ -13,6 +13,7 @@ library(ggrepel)
 library(htmlwidgets)
 library(bsplus)
 library(shinyBS)
+library(lubridate)
 
 reactlog_enable()
 use_bs_tooltip() # must call once
@@ -575,15 +576,26 @@ server <- function(input, output, session) {
   # variant text explanation --
   variant_text <- reactive({
     paste0(
-      "The ", selected_vax_name(), " trial ran from ", "trial_start", "to ", "trial_end", ". 
+      "The ", vax_data$trial_name[vax_data$short_name %in% selected_vax_name()],
+      " trial ran from <b>", day(vax_data$start_date[vax_data$short_name %in% selected_vax_name()]), " ",
+      month(vax_data$start_date[vax_data$short_name %in% selected_vax_name()], label = TRUE, abbr = FALSE), " ", 
+      year(vax_data$start_date[vax_data$short_name %in% selected_vax_name()]),
+      "</b> to <b>",
+      day(vax_data$end_date[vax_data$short_name %in% selected_vax_name()]), " ",
+      month(vax_data$end_date[vax_data$short_name %in% selected_vax_name()], label = TRUE, abbr = FALSE), " ", 
+      year(vax_data$end_date[vax_data$short_name %in% selected_vax_name()]),
+     "</b> in the United States
+      and ", vax_data$n_countries[vax_data$short_name %in% selected_vax_name()]-1, " other countries. 
       Research is ongoing to understand how or if varaints affect vaccine efficacy."
     )
   })
   
+  
+  lubridate::day(date)
+  
   output$variants <- renderText({
     variant_text()
   })
-  
   
   
   # html styles ----
@@ -742,7 +754,10 @@ server <- function(input, output, session) {
       }
     else if (input$presets[1] == "Pfizer") {
       ui_plot_pfizer
-      }
+    }
+    else if (input$presets[1] == "mRNA") {
+      ui_plot_cdc
+    }
     else {
       NULL
     }
