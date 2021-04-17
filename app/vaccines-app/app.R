@@ -54,7 +54,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    <font size=4>
                    The efficacy rate is not the chance you'll be protected. Use
                    the tool below to estimate an average person's chances of protection
-                   from Covid-19 based the actual clinical data.
+                   from Covid-19 based on actual clinical data.
                    </font>
                    "),
               # wellPanel(align = 'left', 
@@ -67,15 +67,15 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        absolutePanel(  
 
          align='center',
-         width = '100%', height = '80px',
+         width = '100%', height = '70px',
          top = 0, left = 0,
-         style= 'background: #2c3e50; opacity: 1; z-index: 10; position: sticky;
-         padding: 0px;  opacity:1; border-radius: 5px',
+         style= 'background: #ffffff; opacity: 1; z-index: 10; position: sticky;
+         padding: 0px; border-radius: 5px; border-color: #2c3e50; border-width: 10px',
          
          fixed = TRUE, 
          
        wellPanel(align='center',
-                 style= 'background: #2c3e50; height: 80px',
+                 style= 'background: #2c3e5075; height: 70px; border-color: #2c3e50; border-width: 1px',
                  
                  radioGroupButtons(
                    'presets', label = NULL,
@@ -722,8 +722,8 @@ server <- function(input, output, session) {
 # Run the application 
 
 
-#bslib::run_with_themer(
+bslib::run_with_themer(
   shinyApp(ui = ui, server = server, options = list("launch.browswer" = TRUE))
-#)
+)
 
 
