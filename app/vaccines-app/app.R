@@ -103,11 +103,14 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      conditionalPanel(condition = 'input.presets != "Explore"',
      #### panel
      span( align = 'center', style = 'padding: 0px',
-       h6(bs_button(label = "why?", button_type = 'default', button_size = 'small') %>%
+       h6(
+       bs_button(label = "why?", button_type = 'default', button_size = 'small') %>%
             bs_attach_collapse(id_collapse = 'el_explanation'),
-       bs_button(label = 'show/hide data', button_type = 'default', button_size = 'small') %>%
+       bs_button(label = "variants", button_type = 'default', button_size = 'small') %>%
+         bs_attach_collapse(id_collapse = 'el_variants'),
+       bs_button(label = 'data', button_type = 'default', button_size = 'small') %>%
          bs_attach_collapse(id_collapse = 'el_uiclinical'),
-       bs_button(label = 'show/hide math', button_type = 'default', button_size = 'small') %>%
+       bs_button(label = 'math', button_type = 'default', button_size = 'small') %>%
          bs_attach_collapse(id_collapse = 'el_math')
      )), br(),
      
@@ -116,6 +119,10 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                  wellPanel(align = 'left',
                            style = 'background: #FFF; padding: 3px; border-color:#373a3c; border-width: 1px',
                  htmlOutput('explanation'))),
+     bs_collapse(id = 'el_variants', 
+                 wellPanel(align = 'left',
+                           style = 'background: #FFF; padding: 3px; border-color:#373a3c; border-width: 1px',
+                  htmlOutput('variants'))),
      bs_collapse(id = 'el_uiclinical', 
                  wellPanel(align='center',
                            style='background: #2c3e50; padding: 1px',
@@ -552,7 +559,17 @@ server <- function(input, output, session) {
     )
   })
   
-  vax_data$treatment_covid_incidence[vax_data$vaccine_name %in% "Moderna"]
+  # variant text explanation --
+  variant_text <- reactive({
+    paste0(
+      "The ", selected_vax_name(), " trial ran from ", "trial_start", "to ", "trial_end", ". 
+      Research is ongoing to understand how or if varaints affect vaccine efficacy."
+    )
+  })
+  
+  output$variants <- renderText({
+    variant_text()
+  })
   
   
   
