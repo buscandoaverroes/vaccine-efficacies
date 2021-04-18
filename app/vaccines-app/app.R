@@ -352,8 +352,8 @@ server <- function(input, output, session) {
     click$z <- event_data("plotly_click")$z
     
     # also resets presets to Explore to avoid confusion with clinical data
-    # updateRadioGroupButtons(session = session, inputId = 'presets',
-    #                         selected = "Explore"  )
+    updateRadioGroupButtons(session = session, inputId = 'presets',
+                            selected = "Explore"  )
     #  this may trigger the switch, yes, what happens is the user clicks the plot, it 
     #  switches to explore mode, then it changes back input to 'user' because the switch
     #  changes the value of input$effrate and input$poprate.
@@ -440,23 +440,23 @@ server <- function(input, output, session) {
       #                         disabledChoices = c("Variant A", "Variant B"), selected = "No Variants")
 
       updateSliderInput('poprate', session = session,
-                        value = vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"])
+                        value = round(vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"]))
       updateSliderInput('effrate', session = session,
-                        value = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"])
+                        value = round(vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"], 2))
       
     }
     if (input$presets[1] == "Moderna") {
       updateSliderInput('poprate', session = session,
-                        value = vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"])
+                        value = round(vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"]))
       updateSliderInput('effrate', session = session,
-                        value = vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"])
+                        value = round(vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"], 2))
     }
     
     if (input$presets[1] == "mRNA") {
       updateSliderInput('poprate', session = session,
-                        value = vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer or Moderna"])
+                        value = round(vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer or Moderna"]))
       updateSliderInput('effrate', session = session,
-                        value = vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer or Moderna"])
+                        value = round(vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer or Moderna"], 2))
     }
     
     
@@ -607,8 +607,6 @@ server <- function(input, output, session) {
     )
   })
   
-  
-  lubridate::day(date)
   
   output$variants <- renderText({
     variant_text()
