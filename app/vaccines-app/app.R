@@ -82,13 +82,9 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    'presets', label = NULL,
                    choices = c("Explore", "Pfizer", "Moderna", "mRNA"),
                    status = 'primary',  selected = "Moderna",
-                   size = "normal", direction = 'horizontal', individual = T),
+                   size = "normal", direction = 'horizontal', individual = T)
                  
-      conditionalPanel(
-        condition = 'input.presets == "Explore"',
-        
-      ),
-                        
+                     
        )),
        
        
@@ -250,6 +246,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        plotlyOutput("effplot", height = "100%"), br(), ## rainbow curve plot ----
       HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)</font>"),
       br(), 
+      verbatimTextOutput('see'),
+      verbatimTextOutput('see2'),
        
        
        ## After plot text ----
@@ -312,7 +310,10 @@ server <- function(input, output, session) {
   ## step0: data origin ----
   origin <- reactiveValues(src = "") # start with null data source
   observeEvent(event_data("plotly_click"), { origin$src <- "plot"}, label = "origin plot" )
-  observeEvent(input$effrate,    { origin$src <- "user"}, label = "origin effrate")
+  observeEvent(input$effrate,    {
+    #if ()
+    origin$src <- "user"
+    }, label = "origin effrate")
   observeEvent(input$poprate,    { origin$src <- "user"}, label = "origin poprate")
   
   ### similarly, explore, preset mode 
@@ -350,9 +351,14 @@ server <- function(input, output, session) {
     click$y <- event_data("plotly_click")$y
     click$z <- event_data("plotly_click")$z
     
-    # also resets presets to Explore to avoid confusion with clinical data 
-    updateRadioGroupButtons(session = session, inputId = 'presets',
-                            selected = "Explore" )
+    # also resets presets to Explore to avoid confusion with clinical data
+    # updateRadioGroupButtons(session = session, inputId = 'presets',
+    #                         selected = "Explore"  )
+    #  this may trigger the switch, yes, what happens is the user clicks the plot, it 
+    #  switches to explore mode, then it changes back input to 'user' because the switch
+    #  changes the value of input$effrate and input$poprate.
+    #  how to distinguish the moving of data from going to 'explore' b/c of plotclick 
+    #  and how because of someone actually moving
     
   }, ignoreNULL = TRUE, label = 'preseve last plot click') 
   
@@ -780,7 +786,9 @@ server <- function(input, output, session) {
 
 
   output$uiclinical <-  renderPlot({ui_plot()})
-
+  
+  output$see <- renderPrint({str(origin$src)})
+  output$see2<- renderPrint({str(event_data("plotly_click"))})
   
 
 } # end server ------------------------------------------------------------------------
