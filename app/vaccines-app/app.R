@@ -537,20 +537,31 @@ server <- function(input, output, session) {
   
   
   ## summary + expl ----
-  sum <- reactive({if (input$presets != "Explore") {
-    paste0(
-      "<font size=4>During clinical trials, the <b><font color= \"#54278F\">", as.character(selected_vax_name()), "</font></b>",
-      " vaccine protected people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
-      protectrate_pct1(), "%", "</font></b> of the time.<br><br>"
-    )
-  } else {
+  sum <- reactive({if (input$presets == "Explore") {
     paste0(
       "<font size=4>The <b><font color= \"#54278F\">", as.character(selected_vax_name()), "</font></b>",
       " vaccine would protect people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
       protectrate_pct1(), "%", "</font></b> of the time given the selected infection rate and efficacy rate
       below.<br><br>"
     )
-    }})
+  } else if (input$presets == "mRNA") {
+    paste0(
+      "<font size=4>The CDC conducted a trial of only <b>frontline and essential workers</b>. Vaccinated 
+      participants received either the Pfizer or the Moderna vaccine.
+      Since both companies' vaccines use mRNA technology, the results were reported together. <br><br>
+      In the CDC's trial, the <b><font color= \"#54278F\"> mRNA vaccines </font></b>",
+      " protected fully-vaccinated people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
+      protectrate_pct1(), "%", "</font></b> of the time, even in frontline situations.<br><br>"
+    )
+  }
+    else {
+      paste0(
+        "<font size=4>During clinical trials, the <b><font color= \"#54278F\">", as.character(selected_vax_name()), "</font></b>",
+        " vaccine protected people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
+        protectrate_pct1(), "%", "</font></b> of the time.<br><br>"
+      )
+    }
+    })
   output$summary <- renderText({ 
     sum()
   })
