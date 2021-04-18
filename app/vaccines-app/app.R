@@ -246,9 +246,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        plotlyOutput("effplot", height = "100%"), br(), ## rainbow curve plot ----
       HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)</font>"),
       br(), 
-      verbatimTextOutput('see'),
-      verbatimTextOutput('see2'),
-       
+
        
        ## After plot text ----
        HTML(markdown::markdownToHTML(file = 'md/page1-end.md',
@@ -257,13 +255,6 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        ))
        
      
-         # radioGroupButtons(
-         #   'variants', label = NULL, disabled = FALSE,
-         #   choices = c("Variant A", "Variant B", "No Variants"),
-         #   status = 'primary',  selected = "No Variants",
-         #   size = "sm", direction = 'horizontal', individual = FALSE
-         # )
-
      ))), # end tab panel, fluid page              
    
 tabPanel("Q+A",
@@ -576,7 +567,7 @@ server <- function(input, output, session) {
     paste0(
       "This figure is based on ", selected_vax_name(), "'s efficacy rate and how frequently
       non-vaccinated people became infected with covid during the clinical trial.
-      In ", selected_vax_name(), "'s trials, non-vaccinated people got covid at a rate equivalent
+      In ", vax_data$trial_name[vax_data$short_name %in% selected_vax_name()], "'s trials, non-vaccinated people got covid at a rate equivalent
       to ", "<b><font color=\"#000000\">",
       as.character(poprate_B_per1k()), "</font>", " per ", "1,000", "</b>", " people years. However, participants with the ",
       as.character(selected_vax_name()), " vaccine got infected only ",
@@ -785,9 +776,7 @@ server <- function(input, output, session) {
 
   output$uiclinical <-  renderPlot({ui_plot()})
   
-  output$see <- renderPrint({str(origin$src)})
-  output$see2<- renderPrint({str(event_data("plotly_click"))})
-  
+
 
 } # end server ------------------------------------------------------------------------
 
