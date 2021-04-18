@@ -60,8 +60,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    "),
               # wellPanel(align = 'left', 
               #           style = 'background:#FFF; padding: 5px',
-                # HTML(markdown::markdownToHTML(file = 'md/page1-intro.md',
-                #                               fragment.only = TRUE)),
+              # HTML(markdown::markdownToHTML(file = 'md/page1-intro.md',
+              #                               fragment.only = TRUE)),
      
            br(),br(),br(),     
        
@@ -330,7 +330,7 @@ server <- function(input, output, session) {
       }
   }, label = "mode_presets")
   observeEvent(event_data("plotly_click"), {
-    mode$preset <- TRUE
+    mode$preset <- FALSE
   }, label = "mode_plotclick")
   
   
