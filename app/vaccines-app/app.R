@@ -646,7 +646,11 @@ server <- function(input, output, session) {
   #     list(size = 14, color = "black")
   #   }
   # })
-  
+  point_colors <- c(
+    brewer.pal(9, "Oranges")[6],
+    brewer.pal(5, "RdBu")[5],                
+    brewer.pal(3, "RdPu")[3]
+  )
   ## rainbow curve graph ---- 
   p2 <- reactive({
     ### main data ----
@@ -684,15 +688,15 @@ server <- function(input, output, session) {
                 uid = "clinical_data",
                 x = ~eff, y = ~pop, color = ~name, opacity = 1,
                 texttemplate = paste0("<b>", as.character(eff_clinical_data$name), "</b>"),
-                textposition = 'top left', textfont = list(size = 14),
+                textposition = 'top left', textfont = list(size = 14, color=point_colors),
                 marker = list(
-                  size = 8, color = c("#1F78B4", "#6A3D9A") 
+                  size = 8, color = point_colors #c("#1F78B4", "#6A3D9A") 
                 ),
                 text=paste0( 
                   #"<span style='white'><b>", as.character(eff_clinical_data$name), "</span></b><br>",
                   "<b>Protection: ", as.character(round(eff_clinical_data$p_safe*100,1)),"%</b><br>",
-                  "<span style='color:lightgrey'>Covid: ", as.character(round(eff_clinical_data$pop)), " per 1000</span><br>",
-                  "<span style='color:lightgrey'>Vaccine Efficacy: ",
+                  "<span style='color:#F0F0F0'>Covid: ", as.character(round(eff_clinical_data$pop)), " per 1000</span><br>",
+                  "<span style='color:#F0F0F0'>Vaccine Efficacy: ",
                       as.character(round(eff_clinical_data$eff*100,0)), "%</span>"),
                 showlegend = FALSE, hoverinfo="text", 
                 hoverlabel=list(bgcolor=~name),
@@ -701,8 +705,8 @@ server <- function(input, output, session) {
       add_trace(data = eff_point(), type = "scatter", mode = 'markers',
                 uid = "user_point", visible = TRUE,
                 x = ~eff, y = ~pop, opacity = 1,
-                texttemplate = "<b>My Point<b>", 
-                textposition = 'top middle', textfont = list(size = 14, color = "black"),
+                # texttemplate = "<b>My Point<b>", 
+                # textposition = 'top middle', textfont = list(size = 14, color = "black"),
                 marker = list(
                   size = 12, color = "black", symbol = 'circle-open',
                   line = list(width=4)), 
