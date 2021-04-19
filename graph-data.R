@@ -46,7 +46,7 @@ ui_outcome_plot <- function(name, ymax, bgcolor) {
       begin = 0.42, end = 0.92,
       option = "plasma", direction = 1,
       labels = c("Covid", "Severe Covid")) +
-    scale_x_discrete(labels=c("No Vaccine", paste(as.character(name), " Vaccine"))) + 
+    scale_x_discrete(labels=c("No \n Vaccine", paste(as.character(name), "\n Vaccine"))) + 
     scale_y_continuous(limits = c(0,ymax)) +
     labs(y = "Cases", x = NULL, fill = NULL,
          caption = paste0("Placebo n = ", prettyNum(
@@ -90,12 +90,16 @@ ui_outcome_plot <- function(name, ymax, bgcolor) {
 
 
 ### ggplot function call ----
-ui_plot_pfizer <- ui_outcome_plot("Pfizer", 250)
-ui_plot_moderna <- ui_outcome_plot("Moderna", 250)
+ui_plot_pfizer   <- ui_outcome_plot("Pfizer", 250)
+ui_plot_moderna  <- ui_outcome_plot("Moderna", 250)
+ui_plot_cdc      <- ui_outcome_plot("Pfizer or Moderna", 250)
 
+ui_plot_cdc
+ui_plot_moderna
 # generate data for rainbow plot ----
+
 eff_data <- expand_grid(
-  pop    = seq(from = 0, to = 200, by = 1),
+  pop    = seq(from = 0, to = 600, by = 5),
   eff    = seq(from = 0, to = 1, by = 0.01)
 ) %>% mutate(
   p_safe   = 1-((pop/1000)*(1-eff))
@@ -103,12 +107,14 @@ eff_data <- expand_grid(
 
 # for actual clinical data ----
 eff_clinical_data <- tibble(
-  name = c("Pfizer", "Moderna"),
-  name_abb = c("Pfz", "Mod"),
+  name = c("Pfizer", "Moderna", "CDC-mRNA"),
+  name_abb = c("Pfz", "Mod", "mRNA"),
   pop  = c(vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"],
-           vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"]),
+           vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"],
+           round(vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer or Moderna"])),
   eff  = c(vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer"],
-           vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"]),
+           vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"],
+           vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer or Moderna"]),
   p_safe = 1-((pop/1000)*(1-eff))
 )
 

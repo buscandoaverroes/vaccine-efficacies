@@ -46,7 +46,7 @@ Yes, please do. I designed the app to be entirely open-source so that every step
 
 **Person-years** `population infection rate` and `treatment infection rate` are both recorded in "1000 person-years." This is admittedly not a natural way to think about rates, but it resolves a standardization problem described below in [Time]. Think about it this way: 1000 person-years is the equivalent to the total collective covid "risk" of 1000 people going about their daily lives for a year. If your general population has an infection rate of, say, `40` in `thousand person-years` , then on average 40 people for every 1,000 got infected with covid over a single year.
 
-**Population Infection Rate:** The rate at which unvaccinated people test positive for COVID-19, on average, in `1000 person-years`. Person-year data are reported in the clinical papers The population infection rate is conceptually defined as: $\frac{\text{No. Covid Positives in Placebo Group}}{\text{Surveillance Period}}$ @polack2020. This figure excludes those who tested positive for Covid before receiving placebo or treatment and both mRNA vaccines studies used serologic or PCR-based tests to measure for COVID-19 [@baden2021; @polack2020].
+**Population Infection Rate:** The rate at which unvaccinated people test positive for COVID-19, on average, in `1000 person-years`. Person-year data are reported in the clinical papers The population infection rate is conceptually defined as: $\frac{\text{No. Covid Positives in Placebo Group}}{\text{Surveillance Period}}$ @polack2020. This figure excludes those who tested positive for Covid before receiving placebo or treatment and both mRNA vaccines studies used serologic or PCR-based tests to measure for COVID-19 [@baden2021; @polack2020]. The CDC paper reports their figures in person-days, so I scale by 365 to get the equivalent figure in person years @thompson2021.
 
 **Treatment Infection Rate:** The rate at which people with the vaccine people test positive for COVID-19, on average, in `1000 person-years`. Person-year data are reported in the clinical papers The population infection rate is conceptually defined as: $\frac{\text{No. Covid Positives in Vaccine Group}}{\text{No. Surveillance Period}}$ . This figure excludes those who tested positive for Covid before receiving placebo or treatment and both mRNA vaccines studies used serologic or PCR-based tests to measure for COVID-19 [@baden2021; @polack2020].
 
@@ -71,6 +71,10 @@ The clinical trials occurred over different times and places during the pandemic
 -   The user sees the entire data flow -- that is, from population infection rate, to vaccine infection rate, to protection rate. All three key numbers change as the user moves from study to study to reflect the reality of the contingent circumstances. The final graph intentionally highlights the different `x` and `y` coordinates to this end.
 
 -   There is a clear demarcation in user experience between exploring the clinical data and exploring hypothetical data. I do not want the user to confuse aspects of one for the other.
+
+# Contact
+
+Here's my GitHub <https://github.com/buscandoaverroes>. You can also reach me at my icloud.com email address with the same name as my GitHub username. (Read more about Averroes here: <https://en.wikipedia.org/wiki/Averroes>)
 
 # Sources
 

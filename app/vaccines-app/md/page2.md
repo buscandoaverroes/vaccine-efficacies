@@ -2,7 +2,17 @@
 bibliography: references.bib
 ---
 
-## Slightly Nerdy Questions
+## Vaccine Questions
+
+### Why did the CDC show a higher infection rate among non-vaccinated people?
+
+To be entirely transparent, I'll provide my opinion as a data scientist, not a doctor. My guess is that the study found a higher rate of covid infection among **non-vaccinated** people primarily because their study only included frontline workers, which are normally at higher risk than most people. (Specifically, "frontline workers" includes doctors, nurse practitioners, first responders, teachers and hospitality workers, among others @thompson2021.) Also, the CDC conducted its study very recently, from December 2020 to March 2021, and variants in the US were likely more prevalent during this time period than the summer and fall of 2020, when Pfizer and Moderna conducted their trials.
+
+Most importantly, the CDC study confirmed that the Pfizer and Moderna vaccines provided very high rates of protection for vaccinated participants, despite risky frontline conditions.
+
+### Which study is should I trust the most?
+
+All three studies provide valid, accurate, and high-quality data that work together to tell a clear story: mRNA vaccines continue to be highly effective against Covid-19. The CDC says that it's findings "in real-world conditions compliment and expand upon the vaccines effectiveness estimates from other recent studies" @thompson2021.
 
 ### Do the results chance across age, race, or status of underlying health conditions?
 
