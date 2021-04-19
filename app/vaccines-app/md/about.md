@@ -80,6 +80,8 @@ Here's my GitHub <https://github.com/buscandoaverroes>. You can also reach me at
 
 Baden, Lindsey R et al. "Efficacy and Safety of the mRNA-1273 SARS-CoV-2 Vaccine." The New England journal of medicine vol. 384,5 (2021): 403-416. <doi:10.1056/NEJMoa2035389>
 
+Centers for Disease Control and Prevention. "Covid-19 Vaccines Work." Updated on 7 April, 2021. URL: <https://www.cdc.gov/coronavirus/2019-ncov/vaccines/effectiveness/work.html>
+
 Polack, Fernando P et al. "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine." The New England journal of medicine vol. 383,27 (2020): 2603-2615. <doi:10.1056/NEJMoa2034577>
 
 Sadoff, Jerald et al. "Interim Results of a Phase 1-2a Trial of Ad26.COV2.S Covid-19 Vaccine." The New England journal of medicine, NEJMoa2034201. 13 Jan. 2021, <doi:10.1056/NEJMoa2034201>

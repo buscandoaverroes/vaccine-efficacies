@@ -610,6 +610,8 @@ server <- function(input, output, session) {
   # variant text explanation --
   variant_text <- reactive({
     paste0(
+      "According to the CDC, data suggests that the ", vax_data$short_name[vax_data$short_name %in% selected_vax_name()],
+      " vaccine should remain effective against Covid-19 variants (CDC, 7 April). ",
       "The ", vax_data$trial_name[vax_data$short_name %in% selected_vax_name()],
       " trial ran from <b>", day(vax_data$start_date[vax_data$short_name %in% selected_vax_name()]), " ",
       month(vax_data$start_date[vax_data$short_name %in% selected_vax_name()], label = TRUE, abbr = FALSE), " ", 
@@ -619,8 +621,7 @@ server <- function(input, output, session) {
       month(vax_data$end_date[vax_data$short_name %in% selected_vax_name()], label = TRUE, abbr = FALSE), " ", 
       year(vax_data$end_date[vax_data$short_name %in% selected_vax_name()]),
      "</b> in the United States
-      and ", vax_data$n_countries[vax_data$short_name %in% selected_vax_name()]-1, " other countries. 
-      Research is ongoing to understand how or if varaints affect vaccine efficacy."
+      and ", vax_data$n_countries[vax_data$short_name %in% selected_vax_name()]-1, " other countries."
     )
   })
   
@@ -805,9 +806,9 @@ server <- function(input, output, session) {
 
   # bs alert ----
   createAlert(session = session, anchorId = 'disclaimer', title = "Welcome", dismiss = TRUE, style = 'info',
-              content = "This is an early development version of the app. Please do write me with 
-                        any constructive feedback, new feature requests, or if something isn't working.
-                        Contact info is in <b>About</b> tab. "
+              content = "This is an early development version of the app. Please write me with 
+                        constructive feedback, new feature requests, or if something isn't working.
+                        Contact info is in <b>About</b> tab."
               )
 
 } # end server ------------------------------------------------------------------------
