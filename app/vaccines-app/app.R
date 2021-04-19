@@ -234,23 +234,32 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        ), # end wellpanel
        
        
-       span(align = 'center',
-            h3(tags$b("Protection Comparison"),
-               bs_button(label = icon('question'), button_type = "default", button_size = "sm") %>%
-            bs_embed_popover(title = "title",
-                             content = "We can estimate our chances of protection from the vaccine 
-                             effiacy rate and how prevalent covid is in our communities. The numbers 
-                             on the bottom of the graph correspond to the vaccine efficacy rate, and the 
-                             numbers on the left to how many people per year become infected with covid.
-                             The colors tell us are estimated chances of protection from covid: we want to be
-                             in the green zone, where we have at least a 98% chance of staying protected
-                             if fully vaccinated.")),
-            awesomeCheckbox(inputId = 'click', label = "Clickable", value = FALSE, status = 'info')),
-       
+       wellPanel(align = 'center',
+                 style = 'background: #FFFFFF00; padding: 0px; border-width: 1px; border-color: #41AB5D;
+                             margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
+                 
+                 
+            HTML("<font size=5><b>Protection Comparison</b></font>"),
+            dropdownButton(  inputId = 'drop1',
+              circle = TRUE, status = 'default', size = 'xs', tooltip = tooltipOptions(title = "Options"),
+              icon = icon("question"), right = TRUE, up = F, inline = TRUE, width = '320px',
+              
+              radioGroupButtons(inputId = 'click', label = "Plot Click:", justified = TRUE, width = '300px',
+                                choices = c("Shows hover info", "Moves point")),
+              HTML("<font size=2>Read this graph by color and orientation: points on the right show indicate high efficacy rates.
+                   Their poisition up and down shows the population infection rate that was measured. Look for points in green/blue areas, as they 
+                   show vaccines with high average chances of protection considering both population infection and vaccine efficacy. <font>")
+              
+            ),
+               #bs_button(label = icon('question'), button_type = "default", button_size = "small") %>%
+            # bs_embed_popover(title = "title",
+            #                  content = ),
+            
+            HTML("<br><font size=3>Lighter areas indicate better chances of protection</font>"),
        
        plotlyOutput("effplot", height = "100%"), br(), ## rainbow curve plot ----
       HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021), Polack, Fernando P et al. (2020), and 
-           Thompson MG, Burgess JL, Naleway AL, et al (2021)</font>"),
+           Thompson MG, Burgess JL, Naleway AL, et al (2021)</font>")),
       br(), 
 
        
@@ -314,7 +323,7 @@ server <- function(input, output, session) {
   
   # if user clicks or double clicks on plot, it will switch to plot source
   observeEvent(event_data(interaction2), { 
-    if (input$click)
+    if (input$click == "Moves point")
     origin$src <- "plot"
     }, label = "origin plot3" )
   
@@ -353,7 +362,7 @@ server <- function(input, output, session) {
   
   ### update with non-null plot click
   observeEvent(event_data(interaction2), {
-    if (input$click) {
+    if (input$click == "Moves point") {
     click$x <- event_data(interaction2)$x
     click$y <- event_data(interaction2)$y
     click$z <- event_data(interaction2)$z
@@ -736,12 +745,12 @@ server <- function(input, output, session) {
         dragmode = FALSE, # disable click/drag
         uniformtext = list(mode='hide', minsize=8),
         title = list(
-          text = "Lighter colors indicate better chances of protection",
-          font = list(size=14),
-          pad = list(t=1,r=0,b=1,l=0)
+          text = NULL
+          # font = list(size=14),
+          # pad = list(t=1,r=0,b=1,l=0)
         ),
         height = 400,
-        margin = list(t=40,r=2,b=20,l=10),
+        margin = list(t=0,r=2,b=20,l=10),
         paper_bgcolor = "", plot_bgcolor = "",
         xaxis = list(
           title = list(
