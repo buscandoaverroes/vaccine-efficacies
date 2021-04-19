@@ -245,7 +245,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        
        
        plotlyOutput("effplot", height = "100%"), br(), ## rainbow curve plot ----
-      HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021) and Polack, Fernando P et al. (2020)</font>"),
+      HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021), Polack, Fernando P et al. (2020), and 
+           Thompson MG, Burgess JL, Naleway AL, et al (2021)</font>"),
       br(), 
 
        
@@ -300,8 +301,16 @@ server <- function(input, output, session) {
   # input chain ---------------------------------------------------------------------
   
   ## step0: data origin ----
+  ### set the type of interaction 
+  interaction1 <- "plotly_hover"
+  interaction2 <- "plotly_click"
+  interaction3 <- "plotly_doubleclick"
+  
   origin <- reactiveValues(src = "") # start with null data source
-  observeEvent(event_data("plotly_click"), { origin$src <- "plot"}, label = "origin plot" )
+  
+  # if user clicks or double clicks on plot, it will switch to plot source
+  observeEvent(event_data(interaction2), { origin$src <- "plot"}, label = "origin plot3" )
+  
   observeEvent(input$effrate,    {
     #if ()
     origin$src <- "user"
@@ -322,26 +331,24 @@ server <- function(input, output, session) {
         mode$preset <- FALSE
       }
   }, label = "mode_presets")
-  observeEvent(event_data("plotly_click"), {
-    mode$preset <- FALSE
-  }, label = "mode_plotclick")
   
+  observeEvent(event_data(interaction2), { mode$preset <- FALSE }, label = "mode_plot-doubleclick")
   
   ## step1: user input ----
   
   ### save click values ----
   # save event data
-  d <- reactive({event_data("plotly_click")}) 
+  d <- reactive({event_data(interaction2)}) 
   
   ### define reactive values 
   click <- reactiveValues(x = NULL, y = NULL, z = NULL) 
   
   ### update with non-null plot click
-  observeEvent(event_data("plotly_click"), {
+  observeEvent(event_data(interaction2), {
     
-    click$x <- event_data("plotly_click")$x
-    click$y <- event_data("plotly_click")$y
-    click$z <- event_data("plotly_click")$z
+    click$x <- event_data(interaction2)$x
+    click$y <- event_data(interaction2)$y
+    click$z <- event_data(interaction2)$z
     
     # also resets presets to Explore to avoid confusion with clinical data
     updateRadioGroupButtons(session = session, inputId = 'presets',
