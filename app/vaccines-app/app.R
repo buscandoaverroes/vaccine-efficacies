@@ -47,9 +47,11 @@ ui = navbarPage(title = "Covid-19 Vaccine Explorer",
   
 tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------------------------------------------
      fluidPage( title = "Covid-19 Vaccine Data Explorer",
-              
+               
+              bsAlert("disclaimer"),
               HTML("<h2><b>Covid-19 Vaccine Explorer</b></h2>"), 
               br(),
+    
               HTML("
                    
                    <font size=4>
@@ -785,6 +787,12 @@ server <- function(input, output, session) {
   output$uiclinical <-  renderPlot({ui_plot()})
   
 
+  # bs alert ----
+  createAlert(session = session, anchorId = 'disclaimer', title = "Welcome", dismiss = TRUE, style = 'info',
+              content = "This is an early development version of the app. Please do write me with 
+                        any constructive feedback, new feature requests, or if something isn't working.
+                        Contact info is in <b>About</b> tab. "
+              )
 
 } # end server ------------------------------------------------------------------------
 
