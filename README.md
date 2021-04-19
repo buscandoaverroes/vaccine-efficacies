@@ -1,7 +1,9 @@
 # vaccine-efficacies
+
 Visualizes vaccine efficacy rates from clinical trial data.
 
 ## The Issue
-What is does a vaccine's "efficacy rate" mean in practicality? The medical community often reports final data in "odds-ratios", which make empirical sense, but may be difficult for the average non-scientist to interpret.
 
-In my intermediate Statistics course in school, my professor presented us with this very conundrum -- and this repo is a sandbox to see if I can construct a visualization that presents vaccines efficacy rates in a slightly more intiuite way.
+Contrary to very reasonable assumptions, the vaccine efficacy rate is **not** the average chances you'll be protected from Covid. Instead, the efficacy rate is a reduction in risk: with the 90% effective vaccine, people can expect their risk of contracting covid to be **reduced** by 90%.
+
+But what's our "original" risk of catching covid, and what's our new, lower risk once we're fully vaccinated? For individuals, that depends on a lot of things like age, health status, etc that are hard to predict. But when talking in averages, there is enough data out there to get at least a rough estimate of our chances of protection. And I think people should know.
