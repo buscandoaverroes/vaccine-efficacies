@@ -223,7 +223,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      
      verticalLayout( ### Protection ----
        wellPanel(align='center',
-                 style= 'background: #D9F9E5; padding: 0px; border-width: 1px; border-color: #41AB5D',
+                 style= 'background: #D9F9E5; padding: 0px; border-width: 1px; border-color: #41AB5D;
+                         margin-bottom: 20px',
                  
                  
                  tags$h4(tags$b("Chance of Protection"), icon('question-circle')) %>%
@@ -243,7 +244,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                              numbers on the left to how many people per year become infected with covid.
                              The colors tell us are estimated chances of protection from covid: we want to be
                              in the green zone, where we have at least a 98% chance of staying protected
-                             if fully vaccinated."))),
+                             if fully vaccinated.")),
+            awesomeCheckbox(inputId = 'click', label = "Clickable", value = FALSE, status = 'info')),
        
        
        plotlyOutput("effplot", height = "100%"), br(), ## rainbow curve plot ----
@@ -311,10 +313,12 @@ server <- function(input, output, session) {
   origin <- reactiveValues(src = "") # start with null data source
   
   # if user clicks or double clicks on plot, it will switch to plot source
-  observeEvent(event_data(interaction2), { origin$src <- "plot"}, label = "origin plot3" )
+  observeEvent(event_data(interaction2), { 
+    if (input$click)
+    origin$src <- "plot"
+    }, label = "origin plot3" )
   
   observeEvent(input$effrate,    {
-    #if ()
     origin$src <- "user"
     }, label = "origin effrate")
   observeEvent(input$poprate,    { origin$src <- "user"}, label = "origin poprate")
@@ -336,6 +340,8 @@ server <- function(input, output, session) {
   
   observeEvent(event_data(interaction2), { mode$preset <- FALSE }, label = "mode_plot-doubleclick")
   
+  
+  
   ## step1: user input ----
   
   ### save click values ----
@@ -347,7 +353,7 @@ server <- function(input, output, session) {
   
   ### update with non-null plot click
   observeEvent(event_data(interaction2), {
-    
+    if (input$click) {
     click$x <- event_data(interaction2)$x
     click$y <- event_data(interaction2)$y
     click$z <- event_data(interaction2)$z
@@ -355,6 +361,7 @@ server <- function(input, output, session) {
     # also resets presets to Explore to avoid confusion with clinical data
     updateRadioGroupButtons(session = session, inputId = 'presets',
                             selected = "Explore"  )
+    }
     #  this may trigger the switch, yes, what happens is the user clicks the plot, it 
     #  switches to explore mode, then it changes back input to 'user' because the switch
     #  changes the value of input$effrate and input$poprate.
