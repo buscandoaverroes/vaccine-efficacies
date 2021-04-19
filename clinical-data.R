@@ -24,6 +24,24 @@ vax_data <- vax_data_import %>%
 
 # calculations ================================================================================
 
+# data specific to CDC/Moderna-Pfizer data
+# the CDC recorded the data slightly differently than the Pfizer/Moderna papers:
+#   - used person-days and not person years (convert-able)
+#   - adjusted for final efficacy based on location fixed-effects. I'm not going to try to reproduce this, I will 
+#   just use their final number. I will however convert person days into person years to be consistent with the rest
+
+# convert surveillance time from person-days to person-years 
+vax_data <- vax_data %>%
+  mutate(
+    treatment_surv_time_pyrs = if_else(is.na(treatment_surv_time_pyrs), 
+                                       true  = treatment_surv_time_pdays / 365,
+                                       false = treatment_surv_time_pyrs),
+    placebo_surv_time_pyrs = if_else(is.na(placebo_surv_time_pyrs), 
+                                       true  = placebo_surv_time_pdays / 365,
+                                       false = placebo_surv_time_pyrs)
+  )
+
+
 ## rates: this is simply a ratio of people within each treatment arm that experienced a condition ----
 # (ie, tested positive for covid19). In fraction terms, the number of people who 
 # experienced the condition / the total number of people in that treatment arm.
@@ -61,10 +79,10 @@ vax_data <- vax_data %>%
 
 vax_data <- vax_data %>%
   mutate(
-    covid_efficacy = (1 - (treatment_covid_incidence/placebo_covid_incidence)) # this is the main outcome variable
-    # severe_efficacy= (1 - (treatment_severe_rate/placebo_severe_rate)),
-    # mortality_efficacy= (1 - (treatment_mortality_rate/placebo_mortality_rate))
-  )
+    covid_efficacy = if_else(alt_name != "CDC",
+                               true = (1 - (treatment_covid_incidence/placebo_covid_incidence)), # for non cdc studies 
+                               false= covid_efficacy_site_corrected)) # use the provided data for the CDC study
+   
 
 ## check that the calculated efficacy is virtually the same as the stated efficacy 
 ##  here, we are saying that there is no case where the difference 
