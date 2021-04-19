@@ -72,6 +72,10 @@ The clinical trials occurred over different times and places during the pandemic
 
 -   There is a clear demarcation in user experience between exploring the clinical data and exploring hypothetical data. I do not want the user to confuse aspects of one for the other.
 
+# Contact
+
+Here's my GitHub <https://github.com/buscandoaverroes>. You can also reach me at my icloud.com email address with the same name as my GitHub username. (Read more about Averroes here: <https://en.wikipedia.org/wiki/Averroes>)
+
 # Sources
 
 Baden, Lindsey R et al. "Efficacy and Safety of the mRNA-1273 SARS-CoV-2 Vaccine." The New England journal of medicine vol. 384,5 (2021): 403-416. <doi:10.1056/NEJMoa2035389>

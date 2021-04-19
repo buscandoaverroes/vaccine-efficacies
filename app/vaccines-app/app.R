@@ -286,7 +286,7 @@ tabPanel("About", # PAGE3: about -----------------------------------------------
            
            HTML(markdown::markdownToHTML(file = 'md/about.md',
                                          fragment.only = TRUE,
-                                         options = c('latex_math')
+                                         options = c('latex_math', 'toc')
                                          ))
            
          )) # end page2 tabpanel, fluidpage
