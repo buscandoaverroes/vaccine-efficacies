@@ -68,16 +68,16 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        absolutePanel(  
 
          align='center',
-         width = '100%', height = '70px',
+         width = '100%', height = '65px',
          top = 0, left = 0,
-         style= 'background: #ffffff; opacity: 1; z-index: 10; position: sticky; 
+         style= 'background: #ffffff; opacity: 1; z-index: 10; position: sticky;
          padding: 0px; border-radius: 5px; border-color: #2c3e50; border-width: 1px',
          
          fixed = TRUE, 
          
        wellPanel(align='center',
                  style= 'background: #2c3e5075; height: 65px; border-color: #2c3e50; border-width: 1px;
-                        padding-top: 12px; padding-bottom: 5px',
+                        padding-top: 12px; padding-bottom: 0px',
                  
                  radioGroupButtons(
                    'presets', label = NULL, width = '100%',
