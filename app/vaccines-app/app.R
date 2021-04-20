@@ -253,6 +253,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
       HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021), Polack, Fernando P et al. (2020), and 
            Thompson MG, Burgess JL, Naleway AL, et al (2021)</font>")),
       br(), 
+      
+      verbatimTextOutput('see'),
 
        
        ## After plot text ----
@@ -321,10 +323,18 @@ server <- function(input, output, session) {
     origin$src <- "plot"
     }, label = "origin plot3" )
   
-  observeEvent(input$effrate,    {
-    origin$src <- "user"
-    }, label = "origin effrate")
+   # if changes the efficacy rate, or poprate it goes back to the user
+  observeEvent(input$effrate,    {origin$src <- "user" }, label = "origin effrate")
   observeEvent(input$poprate,    { origin$src <- "user"}, label = "origin poprate")
+  
+  # if the presets are equal to vaccines then it goes to user (this is the same as mode$preset == TRUE)
+  observeEvent(mode$preset, {
+    if (mode$preset) {
+      origin$src <- "user"
+    }
+  }, label =  "origin presets")
+  
+  
   
   ### similarly, explore, preset mode 
   mode <- reactiveValues(preset = NULL)
@@ -801,7 +811,7 @@ server <- function(input, output, session) {
   # bs alert ----
   createAlert(session = session, anchorId = 'disclaimer', title = "Welcome", dismiss = TRUE, style = 'info',
               content = "This is an early development version of the app. Please write me with 
-                        constructive feedback, new feature requests, or if something isn't working.
+                        feedback, new feature requests, or if something isn't working.
                         Contact info is in <b>About</b> tab."
               )
   
@@ -822,6 +832,8 @@ server <- function(input, output, session) {
       
     )
   })
+  
+  output$see <- renderPrint({str(origin$src)})
 
 } # end server ------------------------------------------------------------------------
 
