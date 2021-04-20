@@ -15,6 +15,8 @@ library(bsplus)
 library(shinyBS)
 library(lubridate)
 
+
+
 reactlog_enable()
 use_bs_tooltip() # must call once
 use_bs_popover()
@@ -24,7 +26,9 @@ theme <- bslib::bs_theme(
   spacer = '0.5rem',
   enable_rounded = TRUE,
   primary = "#7C36B0"
-                         )
+   
+  )
+
 
 # load data 
 load("data/app-data.Rdata")
@@ -223,7 +227,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      
      verticalLayout( ### Protection ----
        wellPanel(align='center',
-                 style= 'background: #D9F9E5; padding: 0px; border-width: 1px; border-color: #41AB5D',
+                 style= 'background: #D9F9E5; padding: 0px; border-width: 1px; border-color: #41AB5D;
+                         margin-bottom: 20px',
                  
                  
                  tags$h4(tags$b("Chance of Protection"), icon('question-circle')) %>%
@@ -233,24 +238,26 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        ), # end wellpanel
        
        
-       span(align = 'center',
-            h3(tags$b("Protection Comparison"),
-               bs_button(label = icon('question'), button_type = "default", button_size = "sm") %>%
-            bs_embed_popover(title = "title",
-                             content = "We can estimate our chances of protection from the vaccine 
-                             effiacy rate and how prevalent covid is in our communities. The numbers 
-                             on the bottom of the graph correspond to the vaccine efficacy rate, and the 
-                             numbers on the left to how many people per year become infected with covid.
-                             The colors tell us are estimated chances of protection from covid: we want to be
-                             in the green zone, where we have at least a 98% chance of staying protected
-                             if fully vaccinated."))),
-       
+       wellPanel(align = 'center',
+                 style = 'background: #FFFFFF00; padding: 0px; border-width: 1px; border-color: #41AB5D;
+                             margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
+                 
+                 
+            HTML("<font size=5><b>Protection Comparison</b></font>"),
+            #HTML("<br><font size=3>Better chances of protection are in green</font>"),
+            uiOutput( "dropdown"), 
+              
+              
+               #bs_button(label = icon('question'), button_type = "default", button_size = "small") %>%
+            # bs_embed_popover(title = "title",
+            #                  content = ),
+            
        
        plotlyOutput("effplot", height = "100%"), br(), ## rainbow curve plot ----
       HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021), Polack, Fernando P et al. (2020), and 
-           Thompson MG, Burgess JL, Naleway AL, et al (2021)</font>"),
+           Thompson MG, Burgess JL, Naleway AL, et al (2021)</font>")),
       br(), 
-
+      
        
        ## After plot text ----
        HTML(markdown::markdownToHTML(file = 'md/page1-end.md',
@@ -261,6 +268,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      
      ))), # end tab panel, fluid page              
    
+
+
 tabPanel("Q+A",
          fluidPage(
           br(),
@@ -311,13 +320,23 @@ server <- function(input, output, session) {
   origin <- reactiveValues(src = "") # start with null data source
   
   # if user clicks or double clicks on plot, it will switch to plot source
-  observeEvent(event_data(interaction2), { origin$src <- "plot"}, label = "origin plot3" )
+  observeEvent(event_data(interaction2), { 
+    if (input$click == "Moves point")
+    origin$src <- "plot"
+    }, label = "origin plot3" )
   
-  observeEvent(input$effrate,    {
-    #if ()
-    origin$src <- "user"
-    }, label = "origin effrate")
+   # if changes the efficacy rate, or poprate it goes back to the user
+  observeEvent(input$effrate,    {origin$src <- "user" }, label = "origin effrate")
   observeEvent(input$poprate,    { origin$src <- "user"}, label = "origin poprate")
+  
+  # if the presets are equal to vaccines then it goes to user (this is the same as mode$preset == TRUE)
+  observeEvent(mode$preset, {
+    if (mode$preset) {
+      origin$src <- "user"
+    }
+  }, label =  "origin presets")
+  
+  
   
   ### similarly, explore, preset mode 
   mode <- reactiveValues(preset = NULL)
@@ -336,6 +355,8 @@ server <- function(input, output, session) {
   
   observeEvent(event_data(interaction2), { mode$preset <- FALSE }, label = "mode_plot-doubleclick")
   
+  
+  
   ## step1: user input ----
   
   ### save click values ----
@@ -347,7 +368,7 @@ server <- function(input, output, session) {
   
   ### update with non-null plot click
   observeEvent(event_data(interaction2), {
-    
+    if (input$click == "Moves point") {
     click$x <- event_data(interaction2)$x
     click$y <- event_data(interaction2)$y
     click$z <- event_data(interaction2)$z
@@ -355,6 +376,7 @@ server <- function(input, output, session) {
     # also resets presets to Explore to avoid confusion with clinical data
     updateRadioGroupButtons(session = session, inputId = 'presets',
                             selected = "Explore"  )
+    }
     #  this may trigger the switch, yes, what happens is the user clicks the plot, it 
     #  switches to explore mode, then it changes back input to 'user' because the switch
     #  changes the value of input$effrate and input$poprate.
@@ -471,7 +493,7 @@ server <- function(input, output, session) {
   
   observeEvent(input$popratelow, {updateSliderInput('poprate', session = session, value = 25)})
   observeEvent(input$popratemed, {updateSliderInput('poprate', session = session, value = 100)})
-  observeEvent(input$popratehigh, {updateSliderInput('poprate', session = session, value = 250)})
+  observeEvent(input$popratehigh, {updateSliderInput('poprate', session = session, value = 400)})
   
   
   
@@ -576,7 +598,7 @@ server <- function(input, output, session) {
   output$explanation <- renderText({
     paste0(
       "This figure is based on ", selected_vax_name(), "'s efficacy rate and how frequently
-      non-vaccinated people became infected with covid during the clinical trial.
+      non-vaccinated people became infected with covid at the time of the clinical trial.
       In ", vax_data$trial_name[vax_data$short_name %in% selected_vax_name()], "'s trials, non-vaccinated people got covid at a rate equivalent
       to ", "<b><font color=\"#000000\">",
       as.character(poprate_B_per1k()), "</font>", " per ", "1,000", "</b>", " people years. However, participants with the ",
@@ -594,6 +616,8 @@ server <- function(input, output, session) {
   # variant text explanation --
   variant_text <- reactive({
     paste0(
+      "According to the CDC, data suggest that the ", vax_data$short_name[vax_data$short_name %in% selected_vax_name()],
+      " vaccine should remain effective against Covid-19 variants (CDC, 7 April). ",
       "The ", vax_data$trial_name[vax_data$short_name %in% selected_vax_name()],
       " trial ran from <b>", day(vax_data$start_date[vax_data$short_name %in% selected_vax_name()]), " ",
       month(vax_data$start_date[vax_data$short_name %in% selected_vax_name()], label = TRUE, abbr = FALSE), " ", 
@@ -603,8 +627,7 @@ server <- function(input, output, session) {
       month(vax_data$end_date[vax_data$short_name %in% selected_vax_name()], label = TRUE, abbr = FALSE), " ", 
       year(vax_data$end_date[vax_data$short_name %in% selected_vax_name()]),
      "</b> in the United States
-      and ", vax_data$n_countries[vax_data$short_name %in% selected_vax_name()]-1, " other countries. 
-      Research is ongoing to understand how or if varaints affect vaccine efficacy."
+      and ", vax_data$n_countries[vax_data$short_name %in% selected_vax_name()]-1, " other countries."
     )
   })
   
@@ -729,12 +752,12 @@ server <- function(input, output, session) {
         dragmode = FALSE, # disable click/drag
         uniformtext = list(mode='hide', minsize=8),
         title = list(
-          text = "Lighter colors indicate better chances of protection",
-          font = list(size=14),
-          pad = list(t=1,r=0,b=1,l=0)
+          text = NULL
+          # font = list(size=14),
+          # pad = list(t=1,r=0,b=1,l=0)
         ),
         height = 400,
-        margin = list(t=40,r=2,b=20,l=10),
+        margin = list(t=0,r=2,b=20,l=10),
         paper_bgcolor = "", plot_bgcolor = "",
         xaxis = list(
           title = list(
@@ -789,19 +812,33 @@ server <- function(input, output, session) {
 
   # bs alert ----
   createAlert(session = session, anchorId = 'disclaimer', title = "Welcome", dismiss = TRUE, style = 'info',
-              content = "This is an early development version of the app. Please do write me with 
-                        any constructive feedback, new feature requests, or if something isn't working.
-                        Contact info is in <b>About</b> tab. "
+              content = "This is an early development version of the app. Please write me with 
+                        feedback, new feature requests, or if something isn't working."
               )
+  
+  # dropdown UI ----
+  output$dropdown <- renderUI({
+    dropdownButton(
+      inputId = 'drop1', label = "Graph Info",
+      circle = FALSE, status = 'default', size = 'sm', tooltip = tooltipOptions(title = NULL),
+      icon = icon("gear"), right = TRUE, up = F, inline = TRUE, width = '320px',
+      
+      radioGroupButtons(inputId = 'click', label = "Plot Click:", justified = TRUE, width = '300px',
+                        choices = c("Shows hover info", "Moves point")),
+      HTML("<font size=3>Info:</font><br>
+                   <font size=2>Points on the right side indicate better efficacy rates. Likewise, points that are lower show
+                   lower rates of covid among non-vaccinated people when the trial was conducted.
+                   Look for points in green/blue areas, as they 
+                   show vaccines with good average chances of protection considering both these dimensions. <font>")
+      
+    )
+  })
+  
 
 } # end server ------------------------------------------------------------------------
 
 
-# Run the application 
 
-
-#bslib::run_with_themer(
-  shinyApp(ui = ui, server = server, options = list("launch.browswer" = TRUE))
-#)
+shinyApp(ui = ui, server = server, options = list("launch.browswer" = TRUE))
 
 

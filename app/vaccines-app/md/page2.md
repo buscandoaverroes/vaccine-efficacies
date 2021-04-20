@@ -14,7 +14,7 @@ Most importantly, the CDC study confirmed that the Pfizer and Moderna vaccines p
 
 All three studies provide valid, accurate, and high-quality data that work together to tell a clear story: mRNA vaccines continue to be highly effective against Covid-19. The CDC says that it's findings "in real-world conditions compliment and expand upon the vaccines effectiveness estimates from other recent studies" @thompson2021.
 
-### Do the results chance across age, race, or status of underlying health conditions?
+### Do the results change across age, race, or status of underlying health conditions?
 
 It's too early to say for sure. The clinical trials did test across subgroups of age, race, and risk of covid, but measuring for differences in vaccines efficacy was not the primary goal of the studies and more data is needed before any preliminary conclusions are drawn @baden2021 @polack2020. This is because large numbers of participants are required to say with confidence that very small differences in measured outcomes are probably not due to random chance.
 
@@ -22,7 +22,7 @@ It's too early to say for sure. The clinical trials did test across subgroups of
 
 Math :) because protection chances depend on both efficacy rate and baseline risk of getting covid. The Pfizer clinical trials showed a higher "baseline" population infection rate in the placebo group compared to the data in the Moderna trials. Essentially, the Pfizer data measured a greater risk of catching covid, and this makes up for the difference in a higher efficacy rate.
 
-These differences are so minor and the conditions in the clinical trials are unlikely to hold *exactly* every person in eternity. The takeaway is that both vaccines leave the average person with extremely good chances of protection from covid across a range of scenarios.
+These differences are so minor and the conditions in the clinical trials are not going to hold *exactly* for every person equally in eternity. The takeaway is that both vaccines leave the average person with extremely good chances of protection from covid across a range of scenarios.
 
 ## Very Nerdy Questions
 
