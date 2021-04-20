@@ -594,7 +594,7 @@ server <- function(input, output, session) {
   output$explanation <- renderText({
     paste0(
       "This figure is based on ", selected_vax_name(), "'s efficacy rate and how frequently
-      non-vaccinated people became infected with covid during the clinical trial.
+      non-vaccinated people became infected with covid at the time of the clinical trial.
       In ", vax_data$trial_name[vax_data$short_name %in% selected_vax_name()], "'s trials, non-vaccinated people got covid at a rate equivalent
       to ", "<b><font color=\"#000000\">",
       as.character(poprate_B_per1k()), "</font>", " per ", "1,000", "</b>", " people years. However, participants with the ",
