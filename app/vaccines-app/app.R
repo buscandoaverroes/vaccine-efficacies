@@ -15,6 +15,8 @@ library(bsplus)
 library(shinyBS)
 library(lubridate)
 
+
+
 reactlog_enable()
 use_bs_tooltip() # must call once
 use_bs_popover()
@@ -834,11 +836,7 @@ server <- function(input, output, session) {
 } # end server ------------------------------------------------------------------------
 
 
-# Run the application 
 
-
-#bslib::run_with_themer(
-  shinyApp(ui = ui, server = server, options = list("launch.browswer" = TRUE))
-#)
+shinyApp(ui = ui, server = server, options = list("launch.browswer" = TRUE))
 
 
