@@ -240,22 +240,14 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                  
                  
             HTML("<font size=5><b>Protection Comparison</b></font>"),
-            dropdownButton(  inputId = 'drop1',
-              circle = TRUE, status = 'default', size = 'xs', tooltip = tooltipOptions(title = "Options"),
-              icon = icon("question"), right = TRUE, up = F, inline = TRUE, width = '320px',
+            #HTML("<br><font size=3>Better chances of protection are in green</font>"),
+            uiOutput( "dropdown"), 
               
-              radioGroupButtons(inputId = 'click', label = "Plot Click:", justified = TRUE, width = '300px',
-                                choices = c("Shows hover info", "Moves point")),
-              HTML("<font size=2>Read this graph by color and orientation: points on the right show indicate high efficacy rates.
-                   Their poisition up and down shows the population infection rate that was measured. Look for points in green/blue areas, as they 
-                   show vaccines with high average chances of protection considering both population infection and vaccine efficacy. <font>")
               
-            ),
                #bs_button(label = icon('question'), button_type = "default", button_size = "small") %>%
             # bs_embed_popover(title = "title",
             #                  content = ),
             
-            HTML("<br><font size=3>Lighter areas indicate better chances of protection</font>"),
        
        plotlyOutput("effplot", height = "100%"), br(), ## rainbow curve plot ----
       HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021), Polack, Fernando P et al. (2020), and 
@@ -272,6 +264,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      
      ))), # end tab panel, fluid page              
    
+
+
 tabPanel("Q+A",
          fluidPage(
           br(),
@@ -487,7 +481,7 @@ server <- function(input, output, session) {
   
   observeEvent(input$popratelow, {updateSliderInput('poprate', session = session, value = 25)})
   observeEvent(input$popratemed, {updateSliderInput('poprate', session = session, value = 100)})
-  observeEvent(input$popratehigh, {updateSliderInput('poprate', session = session, value = 250)})
+  observeEvent(input$popratehigh, {updateSliderInput('poprate', session = session, value = 400)})
   
   
   
@@ -810,6 +804,24 @@ server <- function(input, output, session) {
                         constructive feedback, new feature requests, or if something isn't working.
                         Contact info is in <b>About</b> tab."
               )
+  
+  # dropdown UI ----
+  output$dropdown <- renderUI({
+    dropdownButton(
+      inputId = 'drop1', label = "Graph Info",
+      circle = FALSE, status = 'default', size = 'sm', tooltip = tooltipOptions(title = "Options"),
+      icon = icon("gear"), right = TRUE, up = F, inline = TRUE, width = '320px',
+      
+      radioGroupButtons(inputId = 'click', label = "Plot Click:", justified = TRUE, width = '300px',
+                        choices = c("Shows hover info", "Moves point")),
+      HTML("<font size=3>Graph Info:</font><br>
+                   <font size=2>Points on the right side indicate better efficacy rates. Likewise, points that are lower show
+                   lower rates of covid among non-vaccinated people when the trial was conducted.
+                   Look for points in green/blue areas, as they 
+                   show vaccines with good average chances of protection considering both these dimensions. <font>")
+      
+    )
+  })
 
 } # end server ------------------------------------------------------------------------
 

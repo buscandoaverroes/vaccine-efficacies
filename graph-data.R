@@ -49,9 +49,9 @@ ui_outcome_plot <- function(name, ymax, bgcolor) {
     scale_x_discrete(labels=c("No \n Vaccine", paste(as.character(name), "\n Vaccine"))) + 
     scale_y_continuous(limits = c(0,ymax)) +
     labs(y = "Cases", x = NULL, fill = NULL,
-         caption = paste0("Placebo n = ", prettyNum(
+         caption = paste0("No Vaccine n = ", prettyNum(
                           vax_data$placebo_n_participants[vax_data$short_name %in% as.character(name)], big.mark = ','),
-                          "; Treatment n = ", prettyNum(
+                          "; Vaccine n = ", prettyNum(
                           vax_data$treatment_n_participants[vax_data$short_name %in% as.character(name)],
                           big.mark = ','))) +
     theme_minimal() + 
