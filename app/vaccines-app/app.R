@@ -26,7 +26,9 @@ theme <- bslib::bs_theme(
   spacer = '0.5rem',
   enable_rounded = TRUE,
   primary = "#7C36B0"
-                         )
+   
+  )
+
 
 # load data 
 load("data/app-data.Rdata")
