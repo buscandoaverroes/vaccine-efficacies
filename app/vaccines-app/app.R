@@ -254,8 +254,6 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
            Thompson MG, Burgess JL, Naleway AL, et al (2021)</font>")),
       br(), 
       
-      verbatimTextOutput('see'),
-
        
        ## After plot text ----
        HTML(markdown::markdownToHTML(file = 'md/page1-end.md',
@@ -614,7 +612,7 @@ server <- function(input, output, session) {
   # variant text explanation --
   variant_text <- reactive({
     paste0(
-      "According to the CDC, data suggests that the ", vax_data$short_name[vax_data$short_name %in% selected_vax_name()],
+      "According to the CDC, data suggest that the ", vax_data$short_name[vax_data$short_name %in% selected_vax_name()],
       " vaccine should remain effective against Covid-19 variants (CDC, 7 April). ",
       "The ", vax_data$trial_name[vax_data$short_name %in% selected_vax_name()],
       " trial ran from <b>", day(vax_data$start_date[vax_data$short_name %in% selected_vax_name()]), " ",
@@ -811,20 +809,19 @@ server <- function(input, output, session) {
   # bs alert ----
   createAlert(session = session, anchorId = 'disclaimer', title = "Welcome", dismiss = TRUE, style = 'info',
               content = "This is an early development version of the app. Please write me with 
-                        feedback, new feature requests, or if something isn't working.
-                        Contact info is in <b>About</b> tab."
+                        feedback, new feature requests, or if something isn't working."
               )
   
   # dropdown UI ----
   output$dropdown <- renderUI({
     dropdownButton(
       inputId = 'drop1', label = "Graph Info",
-      circle = FALSE, status = 'default', size = 'sm', tooltip = tooltipOptions(title = "Options"),
+      circle = FALSE, status = 'default', size = 'sm', tooltip = tooltipOptions(title = NULL),
       icon = icon("gear"), right = TRUE, up = F, inline = TRUE, width = '320px',
       
       radioGroupButtons(inputId = 'click', label = "Plot Click:", justified = TRUE, width = '300px',
                         choices = c("Shows hover info", "Moves point")),
-      HTML("<font size=3>Graph Info:</font><br>
+      HTML("<font size=3>Info:</font><br>
                    <font size=2>Points on the right side indicate better efficacy rates. Likewise, points that are lower show
                    lower rates of covid among non-vaccinated people when the trial was conducted.
                    Look for points in green/blue areas, as they 
@@ -833,7 +830,6 @@ server <- function(input, output, session) {
     )
   })
   
-  output$see <- renderPrint({str(origin$src)})
 
 } # end server ------------------------------------------------------------------------
 
