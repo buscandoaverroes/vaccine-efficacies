@@ -94,8 +94,6 @@ ui_plot_pfizer   <- ui_outcome_plot("Pfizer", 250)
 ui_plot_moderna  <- ui_outcome_plot("Moderna", 250)
 ui_plot_cdc      <- ui_outcome_plot("Pfizer or Moderna", 250)
 
-ui_plot_cdc
-ui_plot_moderna
 # generate data for rainbow plot ----
 
 eff_data <- expand_grid(
@@ -132,15 +130,14 @@ break_lvls <- unique(base::cut(eff_data$p_safe,
 # export ----
 save(
   vax_data, eff_data,
-  ui_plot_moderna, ui_plot_pfizer, breaks, break_labs, eff_clinical_data, break_lvls,
+  ui_plot_moderna, ui_plot_pfizer, ui_plot_cdc, breaks, break_labs, eff_clinical_data, break_lvls,
   file = file.path(data, "app-data.Rdata")
 )
 
 ### save a copy to the app directory
 save(
   vax_data, eff_data, 
-  ui_plot_moderna, ui_plot_pfizer, breaks, break_labs, eff_clinical_data, break_lvls, 
+  ui_plot_moderna, ui_plot_pfizer, ui_plot_cdc, breaks, break_labs, eff_clinical_data, break_lvls, 
   file = file.path(app, "data/app-data.Rdata")
 )
 
-ui_plot_moderna
