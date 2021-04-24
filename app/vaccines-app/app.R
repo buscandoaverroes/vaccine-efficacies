@@ -58,8 +58,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
               
               tags$style(HTML("
                 .MathJax {
-                  font-size: 0.3em;
-                  text-align: center;
+                  font-size: 0.3rem;
+                  font-align: center;
                 }")),
     
               HTML("
