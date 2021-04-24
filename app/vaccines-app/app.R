@@ -55,6 +55,12 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
               bsAlert("disclaimer"),
               HTML("<h2><b>Covid-19 Vaccine Explorer</b></h2>"), 
               br(),
+              
+              tags$style(HTML("
+                .MathJax {
+                  font-size: 0.3em;
+                  text-align: center;
+                }")),
     
               HTML("
                    
@@ -554,10 +560,10 @@ server <- function(input, output, session) {
   })
   math_eq <- reactive({
     paste0( "$$", 
-   "\\text{Protection} = 1 - (\\frac{\\text{Infect Rate}}{1000}*(1 - \\text{Efficacy}))$$",
-   "$$",
-      round(protectrate(), 4), " = 1 - (", "\\frac{", round(poprate_B()), "}{1000}","*(1 - ",
-           round(effrate_B(),3),"))", '$$'
+   "\\begin{align}
+   \\text{Protection} &= 1 - (\\frac{\\text{Infect Rate}}{1000}*(1 - \\text{Efficacy})) \\\\ ",
+      round(protectrate(), 4), " &= 1 - (", "\\frac{", round(poprate_B()), "}{1000}","*(1 - ",
+           round(effrate_B(),3),"))\\end{align}", '$$'
                  )
   })
   output$math <- renderUI({
