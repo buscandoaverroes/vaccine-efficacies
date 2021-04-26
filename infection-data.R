@@ -42,4 +42,4 @@ data <- x %>%
 
 save(
   data, x, 
-  file = "/Volumes/PROJECTS/vaccines/data/infectinon-data.Rdata")
+  file = "/Volumes/PROJECTS/vaccines/data/infection-data.Rdata")
