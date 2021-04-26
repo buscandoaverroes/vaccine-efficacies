@@ -6,10 +6,10 @@ library(coronavirus)
 library(COVID19)
 
 library(mapview)
-library(tmap)
 library(sf)
-library(zoo)
+library(tigris)
 library(lubridate)
+
 
 # 1. Figure out how to import the infection data ----
 
@@ -24,7 +24,7 @@ x <- covid19(country = c("US"), level = 3,
 
 
 # create cumulative incidence, set up time series, make 2 week incidence
-
+# note: key_numeric in USA corresponds to FIPS code.
 data <- x %>%
   mutate(date = ymd(date)) %>%
   group_by(id) %>% # keep only the most recent 2 weeks
@@ -40,19 +40,6 @@ data <- x %>%
   ) %>%
   select(date, id, vaccines, tests, ends_with("2wk"), incidence_cum, everything())
 
-
-# virginia sample
-va <- filter(data, administrative_area_level_2 == "Virginia") %>%
-  select(id, date, vaccines, tests, incidence_cum, confirmed, recovered, deaths, population,
-         ends_with("2wk"),
-         starts_with("admin"), starts_with("iso"), latitude, longitude, starts_with("key"))
-
-
-va_sf <- st_as_sf(va, coords = c("longitude", "latitude"))
-us_sf <- st_as_sf(data, coords = c("longitude", "latitude"), na.fail = FALSE)
-
-## mapview
-mapview(us_sf, zcol = "incidence_cum",
-        at = c(0, 0.05, 0.10, 0.20, 0.30, 1)) # , at = c(0, 0.005, 0.010, 0.015, 0.020, 1) 
-
-# look at tigris for importing US census shapefiles
+save(
+  data, x, 
+  file = "/Volumes/PROJECTS/vaccines/data/infectinon-data.Rdata")
