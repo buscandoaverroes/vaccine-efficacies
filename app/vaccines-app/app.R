@@ -63,13 +63,12 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 }")),
     
               HTML("
-                   
                    <font size=4>
                    The efficacy rate is not the chance you'll be protected. Use
                    the tool below to estimate an average person's chances of protection
                    from Covid-19 based on actual clinical data.
                    </font>
-                   "),
+                   "), 
               # wellPanel(align = 'left', 
               #           style = 'background:#FFF; padding: 5px',
               # HTML(markdown::markdownToHTML(file = 'md/page1-intro.md',
