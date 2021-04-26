@@ -32,7 +32,9 @@ data <- x %>%
   filter(row_number() <= 14) %>%
   mutate(
     confirmed_2wk = max(confirmed) - min(confirmed), # new cases in last 2 weeks
-    incidence_2wk = confirmed_2wk / population) %>% # incidence in last 2 weeks
+    incidence_2wk = confirmed_2wk / population,
+    incidence_2wk_1000py = ((incidence_2wk) * 1000 * (365/14))
+    ) %>% # incidence in last 2 weeks
   filter(row_number() == 1) %>% # only keep one place entry
   ungroup() %>%
   mutate(
