@@ -68,25 +68,39 @@ infection_us <- select(data,
 
 
 ## load US shapefiles ----
-us_2_raw <- counties(state = "Delaware",
-                     cb = TRUE, # this downloads very low res version
-                     year = 2020, 
-                     refresh = TRUE) # refersh = redownload  
+raw <- counties(state = NULL,
+                 cb = TRUE, # this downloads very low res version
+                 year = 2019, 
+                 refresh = FALSE) # true = redownload  
 
+#me <- counties("Maine", cb = TRUE)
+#rappdirs::user_cache_dir("tigris")
 
-us_adm2_sf <- us_2_raw %>%
+## join with infection data ----
+us_adm2_sf <- raw %>%
   mutate(
     fips = as.numeric(GEOID)
   ) %>% 
   select(fips, geometry) %>%
-  left_join(us,
+  left_join(infection_us,
             by = c("fips" = "key_numeric")
   )
 
 
-rappdirs::user_cache_dir("tigris")
+## check ----
+
+### duplicates 
+assert_that( nrow(raw) == nrow(us_adm2_sf)) # no dups from shape files
+assert_that( anyDuplicated(us_adm2_sf$fips) == 0) # no extras from infection_us
+
+### missings \
+### there will be some missings invariably because not all regions will have associated
+### infection data, but we need to check that this number is very small.
+assert_that(sum(is.na(us_adm2_sf$confirmed))/nrow(us_adm2_sf) <= 0.005) 
+
+
 
 # export ----
 save(
-  data, x, 
+  data, x, us_adm2_sf,
   file = "/Volumes/PROJECTS/vaccines/data/infection-data.Rdata")
