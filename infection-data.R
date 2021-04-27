@@ -38,13 +38,21 @@ data <- x %>%
     protection_66    = 1-((incidence_2wk_1000py/1000)*(1-0.90)),
     protection_90    = 1-((incidence_2wk_1000py/1000)*(1-0.90)),
     protection_95    = 1-((incidence_2wk_1000py/1000)*(1-0.95)),
+    lab_incidence_2wk_10k = paste0(round(incidence_2wk_10k),
+                                   " per 1k"),
+    lab_incidence_2wk_10k_long = paste0("",administrative_area_level_3, ", ", 
+                                   administrative_area_level_2, "<br>",
+                                   "<b>",
+                                  round(incidence_2wk_10k)," per 1k</b>"),
+    
     ) %>% # incidence in last 2 weeks
   filter(row_number() == 1) %>% # only keep one place entry
   ungroup() %>%
   mutate(
     incidence_cum = confirmed / population
   ) %>%
-  select(date, id, vaccines, tests, ends_with("2wk"), incidence_cum, everything())
+  select(date, id, vaccines, tests, ends_with("2wk"),
+         incidence_cum, everything())
 
 
 ## check quality ----
@@ -64,15 +72,16 @@ assert_that(n_missing_county_USA <= 2)
 ## subset us infection data
 infection_us <- select(data, 
              date, id, vaccines, tests, population, confirmed, recovered, deaths, hosp, vent, icu,
-             starts_with("incidence"), starts_with("admin"), starts_with("prote"), key_numeric)
+             starts_with("incidence"), starts_with("admin"), starts_with("prote"), starts_with("lab"),
+             key_numeric)
 
 
 ## load US shapefiles ----
-raw <- counties(state = NULL,
-                 cb = TRUE, # generalized?
-                 resolution = '500k', # default
-                 year = 2019, 
-                 refresh = FALSE) # true = redownload
+# raw <- counties(state = NULL,
+#                  cb = TRUE, # generalized?
+#                  resolution = '500k', # default
+#                  year = 2019, 
+#                  refresh = FALSE) # true = redownload
 
 raw2 <- counties(state = NULL,
                  cb = TRUE, # generalized?
