@@ -14,6 +14,8 @@ library(janitor)
 library(mapview)
 library(tigris)
 
+options(tigris_use_cache = TRUE) # set to redownload if FALSE
+
 
 # 1. import infection data ----
 ## import ----
@@ -59,20 +61,18 @@ assert_that(n_missing_county_USA <= 2)
 
 
 # MAP -----------------------------------------------------
-# 
-us_sf <- st_as_sf(data, coords = c("longitude", "latitude"), na.fail = FALSE)
-us <- select(data, 
+## subset us infection data
+infection_us <- select(data, 
              date, id, vaccines, tests, population, confirmed, recovered, deaths, hosp, vent, icu,
              starts_with("incidence"), starts_with("admin"), starts_with("prote"), key_numeric)
 
-mapview(us_sf, zcol = "incidence_cum", 
-        at = c(0, 0.05, 0.10, 0.20, 0.3, 1))
 
-
-# load US shapefiles ----
-us_2_raw <- counties(state = NULL,
+## load US shapefiles ----
+us_2_raw <- counties(state = "Delaware",
                      cb = TRUE, # this downloads very low res version
-                     year = 2019) 
+                     year = 2020, 
+                     refresh = TRUE) # refersh = redownload  
+
 
 us_adm2_sf <- us_2_raw %>%
   mutate(
@@ -84,7 +84,7 @@ us_adm2_sf <- us_2_raw %>%
   )
 
 
-
+rappdirs::user_cache_dir("tigris")
 
 # export ----
 save(
