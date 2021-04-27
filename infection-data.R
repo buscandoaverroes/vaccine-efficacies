@@ -2,29 +2,27 @@
 # imports historical/recent covid-19 infection data
 
 library(tidyverse)
-library(coronavirus)
 library(COVID19)
 
 library(mapview)
 library(sf)
 library(tigris)
 library(lubridate)
+library(assertthat)
+library(janitor)
+
+library(mapview)
+library(tigris)
 
 
-# 1. Figure out how to import the infection data ----
-
-## coronavirus ----
-View(coronavirus) # contains raw new cases per day only, not population rates. 
-                  # but could be combined with isc codes to get estimate of incidence 
-                  
-## COVID19 ----
+# 1. import infection data ----
+## import ----
 ## note: "confirmed" is cumulative count of confirmed cases.
 x <- covid19(country = c("US"), level = 3,
              start = "2021-04-01", end = Sys.Date()) # yay! has population
 
 
-# create cumulative incidence, set up time series, make 2 week incidence
-# note: key_numeric in USA corresponds to FIPS code.
+## create cumulative incidence ----
 data <- x %>%
   mutate(date = ymd(date)) %>%
   group_by(id) %>% # keep only the most recent 2 weeks
@@ -46,6 +44,49 @@ data <- x %>%
   ) %>%
   select(date, id, vaccines, tests, ends_with("2wk"), incidence_cum, everything())
 
+
+## check quality ----
+
+### missings in confirmed ----
+# there are 2 cities in Alaska (US) that have no data, assure this remains true.
+n_missing_county_USA <-
+  filter(data, is.na(confirmed)) %>%
+  distinct(., id, .keep_all = TRUE) %>%
+  nrow()
+
+assert_that(n_missing_county_USA <= 2)
+
+
+
+# MAP -----------------------------------------------------
+# 
+us_sf <- st_as_sf(data, coords = c("longitude", "latitude"), na.fail = FALSE)
+us <- select(data, 
+             date, id, vaccines, tests, population, confirmed, recovered, deaths, hosp, vent, icu,
+             starts_with("incidence"), starts_with("admin"), starts_with("prote"), key_numeric)
+
+mapview(us_sf, zcol = "incidence_cum", 
+        at = c(0, 0.05, 0.10, 0.20, 0.3, 1))
+
+
+# load US shapefiles ----
+us_2_raw <- counties(state = NULL,
+                     cb = TRUE, # this downloads very low res version
+                     year = 2019) 
+
+us_adm2_sf <- us_2_raw %>%
+  mutate(
+    fips = as.numeric(GEOID)
+  ) %>% 
+  select(fips, geometry) %>%
+  left_join(us,
+            by = c("fips" = "key_numeric")
+  )
+
+
+
+
+# export ----
 save(
   data, x, 
   file = "/Volumes/PROJECTS/vaccines/data/infection-data.Rdata")
