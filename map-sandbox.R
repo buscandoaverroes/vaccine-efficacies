@@ -55,9 +55,7 @@ m1 <- mapview(us_adm2_sf, zcol = "incidence_2wk_10k",
          layer.name = "New Infections<br>per 10k people",
          label =  "lab_incidence_2wk_10k_long", 
          popup = NULL
-         ) %>%
-  labelOptions(textsize = "4px", direction = 'auto')
-  
+         ) 
 
 
 ## Protection ----
