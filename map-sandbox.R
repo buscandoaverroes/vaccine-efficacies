@@ -46,6 +46,11 @@ m3
 
 # final maps ----
 ## Incidence ----
+
+mapviewOptions(
+  fgb = TRUE, viewer.suppress = TRUE
+  )
+
 m1 <- mapview(us_adm2_sf, zcol = "incidence_2wk_10k",
          col.regions = mapviewColors(us_adm2_sf, us_adm2_sf$incidence_2wk_10k,
                                      colors = hcl.colors(5, palette = "OrRd", 
@@ -56,13 +61,13 @@ m1 <- mapview(us_adm2_sf, zcol = "incidence_2wk_10k",
          label =  "lab_incidence_2wk_10k_long", 
          popup = NULL
          ) 
-
+  
 
 ## Protection ----
 m2 <-mapview(us_adm2_sf, zcol = "protection_90",
         col.regions = mapviewColors(us_adm2_sf, us_adm2_sf$protection_90,
-                                    colors = hcl.colors(5, palette = "Viridis", 
-                                                        rev = FALSE)),
+                                    colors = hcl.colors(5, palette = "Zissou 1", 
+                                                        rev = TRUE)),
         legend.opacity = 0.9, lwd = 0.1, color = "black",
         layer.name = "Protection<br>Probability",
         label = "lab_protection_90", 
@@ -71,6 +76,17 @@ m2 <-mapview(us_adm2_sf, zcol = "protection_90",
                                          transform = function(x) 100*x)
         #at = c(0, 0.95, 0.98, 0.99, 1)
         ) 
-  
 
-sync(m1, m2, ncol = 1)
+
+# determine mean coords
+cntr_crds <- c(mean(st_coordinates(us_adm2_sf)[ ,1]),
+               mean(st_coordinates(us_adm2_sf)[ ,2]))
+
+# set zoom before sync
+map.a <- m1@map %>% setView(cntr_crds[1], cntr_crds[2], zoom = 4)
+map.b <- m2@map %>% setView(cntr_crds[1], cntr_crds[2], zoom = 4)
+  
+# sync
+map <- sync(map.a, map.b, ncol = 1)
+
+map
