@@ -40,10 +40,19 @@ data <- x %>%
     protection_95    = 1-((incidence_2wk_1000py/1000)*(1-0.95)),
     lab_incidence_2wk_10k = paste0(round(incidence_2wk_10k),
                                    " per 1k"),
-    lab_incidence_2wk_10k_long = paste0("",administrative_area_level_3, ", ", 
+    lab_incidence_2wk_10k_long = paste0(administrative_area_level_3, ", ", 
                                    administrative_area_level_2, "<br>",
                                    "<b>",
-                                  round(incidence_2wk_10k)," per 1k</b>"),
+                                  round(incidence_2wk_10k)," per 10k</b>"),
+    lab_protection_66 = paste0(administrative_area_level_3, ", ", 
+                               administrative_area_level_2, "<br>",
+                               "<b>", round(100*protection_66,1), "% protect probability<b>"),
+    lab_protection_90 =  paste0(administrative_area_level_3, ", ", 
+                               administrative_area_level_2, "<br>",
+                               "<b>", round(100*protection_90,1), "% protect probability<b>"),
+    lab_protection_95 = paste0(administrative_area_level_3, ", ", 
+                               administrative_area_level_2, "<br>",
+                               "<b>", round(100*protection_95,1), "% protect probability<b>")
     
     ) %>% # incidence in last 2 weeks
   filter(row_number() == 1) %>% # only keep one place entry
