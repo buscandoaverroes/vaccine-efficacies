@@ -54,7 +54,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      fluidPage( title = "Covid-19 Vaccine Data Explorer",
                
               bsAlert("disclaimer"),
-              HTML("<h2><b>Covid-19 Vaccine Explorer</b></h2>"), 
+              #HTML("<h1><b>Covid-19 Vaccine Explorer</b></h1>"), 
               br(),
               
               tags$style(HTML("
@@ -64,25 +64,22 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 }")),
     
               HTML("
+                   <font size=4><b>
+                   The efficacy rate is not the chance you'll be protected from covid. Estimate
+                   your chances below.
+                   </b></font>
                    <font size=4>
-                   The efficacy rate is not the chance you'll be protected. Use
-                   the tool below to estimate an average person's chances of protection
-                   from Covid-19 based on actual clinical data.
                    </font>
                    "), 
-              # wellPanel(align = 'left', 
-              #           style = 'background:#FFF; padding: 5px',
-              # HTML(markdown::markdownToHTML(file = 'md/page1-intro.md',
-              #                               fragment.only = TRUE)),
      
-           br(),br(),br(),     
-       
+           br(),br(),
+      HTML("<font size=4><b>All approved vaccines provide excellent average protection</b></font>"), # pt1 ----    
        absolutePanel(  
 
          align='center',
          width = '100%', height = '65px',
          top = 0, left = 0,
-         style= 'background: #ffffff; opacity: 1; z-index: 100; position: sticky;
+         style= 'background: #ffffff; opacity: 1; z-index: 100; position: static;
          padding: 0px; border-radius: 5px; border-color: #2c3e50; border-width: 1px',
          
          fixed = TRUE, 
@@ -102,7 +99,11 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        
        
        br(), 
-     
+     wellPanel( align='center', 
+                style = 'background:#F5F1F9; padding: 5px; border-width: 1px; border-color: #9954bb;
+                             margin-left: 0px; margin-right: 0px; 
+                             padding:0px; width: 100%',
+                
      htmlOutput('summary'), ## summary ----
      
      ### aux buttons and els ------
@@ -143,11 +144,9 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                            
                            htmlOutput('math', container = tags$b)
                  )
-     )),
+     ))), # end 1st panel, well panel
      
-     br(),
-     
-          ##  main input panels ----------------------------------------
+       ##  main input panels ----------------------------------------
            wellPanel( align='center', 
                        style = 'background:#F5F1F9; padding: 5px; border-width: 1px; border-color: #9954bb;
                              margin-left: 0px; margin-right: 0px; 
@@ -243,12 +242,22 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                  htmlOutput("center_protectrate")
        ), # end wellpanel
        
-       uiOutput('map', height = 500), ## map ----
+       HTML("<font size=4><b>Your protection chances depend on local infection rates</b></font>"), # pt2 ----
+       wellPanel(  ## map ----
+         align = 'center',
+         style = 'background: #FFFFFF00; padding: 0px; border-width: 1px; border-color: #41AB5D;
+                             margin-left: 0px; margin-right: 0px; margin-bottom:20px; padding-top:0em;
+                            width: 100%',
        
+       uiOutput('map')
+       ),
        
+       br(),     
+       HTML("<font size=4><b>Frontline jobs put you at higher risk, but vaccines still provide excellent protection
+           </b></font>"), # pt3 ----
        wellPanel(align = 'center',
                  style = 'background: #FFFFFF00; padding: 0px; border-width: 1px; border-color: #41AB5D;
-                             margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
+                             margin-left: 0px; margin-right: 0px; padding-top:0em; width: 100%',
                  
                  
             HTML("<font size=5><b>Protection Comparison</b></font>"),
@@ -259,8 +268,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                #bs_button(label = icon('question'), button_type = "default", button_size = "small") %>%
             # bs_embed_popover(title = "title",
             #                  content = ),
-            
-       
+
        plotlyOutput("effplot", height = "100%"), br(), ## rainbow curve plot ----
       HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021), Polack, Fernando P et al. (2020), and 
            Thompson MG, Burgess JL, Naleway AL, et al (2021)</font>")),
@@ -584,8 +592,8 @@ server <- function(input, output, session) {
   } else if (input$presets == "mRNA") {
     paste0(
       "<font size=4>The CDC conducted a trial of only <b>frontline and essential workers</b>. Vaccinated 
-      participants received either the Pfizer or the Moderna vaccine.
-      Since both companies' vaccines use mRNA technology, the results were reported together. <br><br>
+      participants received either the Pfizer or the Moderna mRNA vaccine 
+      and the results were reported together. <br><br>
       In the CDC's trial, the <b><font color= \"#54278F\"> mRNA vaccines </font></b>",
       " protected fully-vaccinated people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
       protectrate_pct1(), "%", "</font></b> of the time, even in frontline situations.<br><br>"
