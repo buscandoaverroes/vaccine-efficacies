@@ -6,6 +6,8 @@ library(tigris)
 library(leaflet)
 library(leafsync)
 library(htmltools)
+library(tmap)
+
 
 load("/Volumes/PROJECTS/vaccines/data/infection-data.Rdata")
 
@@ -31,10 +33,8 @@ m2 <- mapview(us_adm2_sf, zcol = "protection_66",
         at = c(0, 0.95, 0.98, 0.99, 1)
         ) 
       # be able to toggle back and forth between protection variables, either in mv or shiny
-
-# sync
-sync(m1, m2, 
-     ncol = 1)
+      # 
+ 
 
 # overlay 
 m3 <- mapview(us_adm2_sf, zcol = "incidence_2wk_10k",
@@ -48,7 +48,7 @@ m3
 ## Incidence ----
 
 mapviewOptions(
-  fgb = TRUE, viewer.suppress = TRUE
+  fgb = TRUE, viewer.suppress = FALSE
   )
 
 m1 <- mapview(us_adm2_sf, zcol = "incidence_2wk_10k",
@@ -64,7 +64,7 @@ m1 <- mapview(us_adm2_sf, zcol = "incidence_2wk_10k",
   
 
 ## Protection ----
-m2 <-mapview(us_adm2_sf, zcol = "protection_90",
+m2 <- mapview(us_adm2_sf, zcol = "protection_90",
         col.regions = mapviewColors(us_adm2_sf, us_adm2_sf$protection_90,
                                     colors = hcl.colors(5, palette = "Zissou 1", 
                                                         rev = TRUE)),
@@ -90,3 +90,13 @@ map.b <- m2@map %>% setView(cntr_crds[1], cntr_crds[2], zoom = 4)
 map <- sync(map.a, map.b, ncol = 1)
 
 map
+
+
+
+
+# tmap ===============================
+tm_shape(us_adm2_sf, projection = ) +
+  tm_fill(col = "incidence_2wk_10k", title = "New Infections\nper 10k people",
+          palette = "OrRd", style = 'pretty', showNA = FALSE, legend.show = FALSE) 
+  tm_borders()
+
