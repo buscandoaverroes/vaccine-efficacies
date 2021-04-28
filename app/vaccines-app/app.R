@@ -14,7 +14,8 @@ library(htmlwidgets)
 library(bsplus)
 library(shinyBS)
 library(lubridate)
-
+library(mapview)
+library(leaflet)
 
 
 reactlog_enable()
@@ -241,6 +242,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                      title = "An estimate of the chance that you won't get infected with covid, once fully vaccinated"),
                  htmlOutput("center_protectrate")
        ), # end wellpanel
+       
+       uiOutput('map', height = 500), ## map ----
        
        
        wellPanel(align = 'center',
@@ -659,8 +662,12 @@ server <- function(input, output, session) {
     )
   })
   
+  # map -------------------------------------------------------------------------------------
   
+  # here we would make the map in the server if necessary.
   
+  # render map 
+  output$map <- renderUI({map})
   
   # graphs ----------------------------------------------------------------------------------
 

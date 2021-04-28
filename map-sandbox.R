@@ -48,33 +48,39 @@ m3
 ## Incidence ----
 
 mapviewOptions(
-  fgb = TRUE, viewer.suppress = FALSE
+  fgb = TRUE, viewer.suppress = FALSE, na.color = '#00000000'
   )
 
 m1 <- mapview(us_adm2_sf, zcol = "incidence_2wk_10k",
+              map.types = "CartoDB.DarkMatter",
          col.regions = mapviewColors(us_adm2_sf, us_adm2_sf$incidence_2wk_10k,
                                      colors = hcl.colors(5, palette = "OrRd", 
                                                          rev = TRUE)),
          at = c(0, 10, 20, 50, 100, 500),
-         legend.opacity = 0.9, lwd = 0.1, color = "black", 
+         legend.opacity = 0.9, lwd = 0.1, color = "#969696", 
          layer.name = "New Infections<br>per 10k people",
          label =  "lab_incidence_2wk_10k_long", 
-         popup = NULL
-         ) 
+         popup = NULL,
+         legend = F, 
+         alpha.regions = 0.7, alpha = 0.6,
+         highlight = leaflet::highlightOptions(stroke = TRUE, color = "black", weight = '3px', bringToFront = T, fillColor = 'white')
+  )
   
 
 ## Protection ----
 m2 <- mapview(us_adm2_sf, zcol = "protection_90",
+              map.types = "CartoDB.DarkMatter",
         col.regions = mapviewColors(us_adm2_sf, us_adm2_sf$protection_90,
-                                    colors = hcl.colors(5, palette = "Zissou 1", 
-                                                        rev = TRUE)),
-        legend.opacity = 0.9, lwd = 0.1, color = "black",
+                                    colors = hcl.colors(5, palette = "Spectral", rev = F)),
+        legend.opacity = 0.9, lwd = 1, color = "#969696", #RColorBrewer::brewer.pal(9, "Greys")
         layer.name = "Protection<br>Probability",
         label = "lab_protection_90", 
-        popup = NULL,
+        popup = NULL, 
+        legend = F, 
+        alpha.regions = 0.7, alpha = 0.6,
+        highlight = leaflet::highlightOptions(stroke = TRUE, color = "black", weight = '3px', bringToFront = T, fillColor = 'white'), # function not exist
         labFormat = leaflet::labelFormat(suffix = "%", digits = 3,
                                          transform = function(x) 100*x)
-        #at = c(0, 0.95, 0.98, 0.99, 1)
         ) 
 
 
@@ -83,9 +89,20 @@ cntr_crds <- c(mean(st_coordinates(us_adm2_sf)[ ,1]),
                mean(st_coordinates(us_adm2_sf)[ ,2]))
 
 # set zoom before sync
-map.a <- m1@map %>% setView(cntr_crds[1], cntr_crds[2], zoom = 4)
-map.b <- m2@map %>% setView(cntr_crds[1], cntr_crds[2], zoom = 4)
+map.a <- m1@map %>% setView(cntr_crds[1], cntr_crds[2], zoom = 4) %>%
+  addLegend(na.label = NULL, title = "<font size=3>New Infections<br>per 10k people</font>",
+            pal = colorBin(palette = "OrRd", domain = us_adm2_sf$incidence_2wk_10k, na.color = "#00000000",reverse = F),
+            values = us_adm2_sf$incidence_2wk_10k,
+            opacity = 0.4)
+map.b <- m2@map %>% setView(cntr_crds[1], cntr_crds[2], zoom = 4) %>%
+  addLegend(na.label = NULL, title = "<font size=3>Vaccinated<br>Protection<br>Probability</font>",
+            pal = colorNumeric(palette = "Spectral", domain = us_adm2_sf$protection_90, na.color = "#00000000", reverse = F),
+            values = us_adm2_sf$protection_90, 
+            opacity = 0.4,
+            labFormat = labelFormat(suffix = "%", digits = 3, transform = function(x) 100*x))
   
+map.a
+map.b
 # sync
 map <- sync(map.a, map.b, ncol = 1)
 
