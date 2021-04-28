@@ -24,7 +24,7 @@ download = FALSE
 ## note: "confirmed" is cumulative count of confirmed cases.
 if (import == TRUE) {
   x <- covid19(country = c("US"), level = 3,
-               start = "2021-04-01", end = Sys.Date()) # yay! has population
+               start = "2021-04-01", end = Sys.Date()) 
 } else { # else reload the previously saved data
   load("/Volumes/PROJECTS/vaccines/data/infection-data.Rdata")
 }
