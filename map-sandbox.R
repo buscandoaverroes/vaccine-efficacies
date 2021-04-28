@@ -95,6 +95,8 @@ map
 
 
 # tmap ===============================
+# This is fine for static things but not for interacitve, and the map probably needs to be
+# interactive.
 tm_shape(us_adm2_sf, projection = ) +
   tm_fill(col = "incidence_2wk_10k", title = "New Infections\nper 10k people",
           palette = "OrRd", style = 'pretty', showNA = FALSE, legend.show = FALSE) 
