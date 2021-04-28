@@ -92,23 +92,26 @@ infection_us <- select(data,
 
 
 ## load US shapefiles ----
-raw <- counties(state = NULL,
-                 cb = TRUE, # generalized?
-                 resolution = '500k', # default
-                 year = 2019,
-                 refresh = FALSE) # true = redownload
+if (download == TRUE) {
+  raw <- counties(state = NULL,
+                  cb = TRUE, # generalized?
+                  resolution = '500k', # default
+                  year = 2019,
+                  refresh = FALSE) # true = redownload
+  
+  raw2 <- counties(state = NULL,
+                   cb = TRUE, # generalized?
+                   resolution = '20m', # default
+                   year = 2019,
+                   refresh = FALSE) # true = redownload
+}
 
-raw2 <- counties(state = NULL,
-                 cb = TRUE, # generalized?
-                 resolution = '20m', # default
-                 year = 2019,
-                 refresh = FALSE) # true = redownload
 
 #me <- counties("Maine", cb = TRUE)
 #rappdirs::user_cache_dir("tigris")
 
 ## join with infection data ----
-us_adm2_sf <- raw2 %>%
+us_adm2_sf <- raw2 %>% # use lowest resolution data
   mutate(
     fips = as.numeric(GEOID)
   ) %>% 
@@ -134,4 +137,5 @@ assert_that(sum(is.na(us_adm2_sf$confirmed))/nrow(us_adm2_sf) <= 0.005)
 # export ----
 save(
   data, x, us_adm2_sf, raw, raw2,
-  file = "/Volumes/PROJECTS/vaccines/data/infection-data.Rdata")
+  file = "/Volumes/PROJECTS/vaccines/data/infection-data.Rdata"
+  )
