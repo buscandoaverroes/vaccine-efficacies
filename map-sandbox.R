@@ -119,3 +119,85 @@ tm_shape(us_adm2_sf, projection = ) +
           palette = "OrRd", style = 'pretty', showNA = FALSE, legend.show = FALSE) 
   tm_borders()
 
+
+  
+# raw leaflet ========================
+## functions ----
+pal.bin = colorBin(palette = "OrRd",
+                   bins = c(0, 10, 20, 50, 100, 300),
+                   domain = us_adm2_sf$incidence_2wk_10k,
+                   na.color = "#00000000",
+                   reverse = F)
+pal.num= colorNumeric(palette = "Spectral",
+                      domain = us_adm2_sf$protection_90,
+                      na.color = "#00000000",
+                      reverse = F)
+  
+
+labs.infections <- sprintf(
+  "<strong>%s, %s </strong><br>
+  %.1f per 10k", 
+  us_adm2_sf$administrative_area_level_3,
+  us_adm2_sf$administrative_area_level_2,
+  us_adm2_sf$incidence_2wk_10k
+)  %>%
+  lapply(htmltools::HTML)
+labs.protection <- sprintf(
+  "<strong>%s, %s </strong><br><b>%.1f</b> protection probability", 
+  us_adm2_sf$administrative_area_level_3,
+  us_adm2_sf$administrative_area_level_2,
+  us_adm2_sf$protection_90_pct
+)  %>%
+  lapply(htmltools::HTML)
+  
+
+## leaflet calls ----
+### infections
+l1 <- leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10)) %>%
+  addProviderTiles(providers$CartoDB.DarkMatter) %>%
+  setView(cntr_crds[1], cntr_crds[2], zoom = 4) %>%
+  addPolygons(
+      stroke = T, color = "#969696", weight = 0.2, opacity = 0.4,
+      fillColor = ~pal.bin(incidence_2wk_10k), fillOpacity = 0.9,
+      label = ~labs.infections, labelOptions = labelOptions(textsize = 20, sticky = F, 
+                                                            direction = "top",
+                                                            offset = c(0, -7),
+                                                            style = list(padding = "3px 3px")),
+      highlightOptions = highlightOptions(stroke = TRUE, color = "black", weight = 3, opacity = 1, 
+                                          fill = T, bringToFront = T
+                                          )
+    ) %>%
+  addLegend(
+    na.label = NULL, title = "<font size=3>New Infections<br>per 10k people</font>",
+    pal = colorBin(palette = "OrRd", domain = us_adm2_sf$incidence_2wk_10k, bins = c(0, 10, 20, 50, 100, 300), 
+                   na.color = "#00000000",reverse = F),
+    values = us_adm2_sf$incidence_2wk_10k,
+    opacity = 0.4) 
+
+### protection
+l2 <- leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10)) %>%
+  addProviderTiles(providers$CartoDB.DarkMatter) %>%
+  setView(cntr_crds[1], cntr_crds[2], zoom = 4) %>%
+  addPolygons(
+    stroke = T, color = "#969696", weight = 0.2, opacity = 0.4,
+    fillColor = ~pal.num(protection_90), fillOpacity = 0.9,
+    label = ~labs.protection, labelOptions = labelOptions(textsize = 20, sticky = F, 
+                                                          direction = "top",
+                                                          offset = c(0, -7),
+                                                          style = list(padding = "3px 3px")),
+    highlightOptions = highlightOptions(stroke = TRUE, color = "black", weight = 3, opacity = 1, 
+                                        fill = T, bringToFront = T
+    )
+  ) %>%
+  addLegend(
+    na.label = NULL, title = "<font size=3>Protection<br>Probability</font>",
+    pal = colorNumeric(palette = "Spectral",
+                       domain = us_adm2_sf$protection_90,
+                       na.color = "#00000000",
+                       reverse = F),
+    values = us_adm2_sf$protection_90, 
+    opacity = 0.4,
+    labFormat = labelFormat(suffix = "%", digits = 3, transform = function(x) 100*x))
+
+map <- sync(l1, l2, ncol = 1)
+map

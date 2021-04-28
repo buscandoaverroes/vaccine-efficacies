@@ -66,6 +66,7 @@ data <- x %>%
   mutate(
     incidence_cum = confirmed / population
   ) %>%
+  mutate(across(starts_with("protect"), ~round(100*.x, 1), .names = "{.col}_pct")) %>%
   select(date, id, vaccines, tests, ends_with("2wk"),
          incidence_cum, everything())
 

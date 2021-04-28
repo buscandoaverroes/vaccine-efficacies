@@ -82,7 +82,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
          align='center',
          width = '100%', height = '65px',
          top = 0, left = 0,
-         style= 'background: #ffffff; opacity: 1; z-index: 10; position: sticky;
+         style= 'background: #ffffff; opacity: 1; z-index: 100; position: sticky;
          padding: 0px; border-radius: 5px; border-color: #2c3e50; border-width: 1px',
          
          fixed = TRUE, 
