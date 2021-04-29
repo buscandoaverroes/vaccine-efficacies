@@ -173,10 +173,11 @@ l1 <- leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom =
                                           )
     ) %>%
   addLegend(
-    na.label = NULL, title = "<font size=3>New Infections<br>per 10k people</font>",
+    na.label = NULL, title = "<font size=2>New Cases<br>per 10k</font>",
     pal = colorBin(palette = "OrRd", domain = us_adm2_sf$incidence_2wk_10k, bins = c(0, 10, 20, 50, 100, 300), 
                    na.color = "#00000000",reverse = F),
-    values = us_adm2_sf$incidence_2wk_10k,
+    values = us_adm2_sf$incidence_2wk_10k, 
+    #labels = c("0-10", "10-20", "20-50", "50-100", "100+"), # this wont' generate
     opacity = 0.4) 
 
 ### protection
@@ -195,7 +196,7 @@ l2 <- leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom =
     )
   ) %>%
   addLegend(
-    na.label = NULL, title = "<font size=3>Protection<br>Chance if<br>Vaccinated</font>",
+    na.label = NULL, title = "<font size=2>Protection<br>Chance if<br>Vaccinated</font>",
     pal = colorNumeric(palette = "Spectral",
                        domain = us_adm2_sf$protection_90,
                        na.color = "#00000000",
@@ -204,6 +205,40 @@ l2 <- leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom =
     opacity = 0.4,
     labFormat = labelFormat(suffix = "%", digits = 3, transform = function(x) 100*x))
 
+# adjustments to legend
+l1 <- browsable(
+  tagList(
+    list(
+      tags$head(
+        tags$style( # i{} controls colored boxes
+          '.leaflet .legend {
+          line-height: 12px;
+          font-size: 12px;
+          }',
+          '.leaflet .legend i{ 
+          width: 12px;
+          height: 12px
+          }'
+        )
+      ),
+    l1)))
+
+l2 <- browsable(
+  tagList(
+    list(
+      tags$head(
+        tags$style( 
+          '.leaflet .legend {
+          line-height: 12px;
+          font-size: 12px;
+          }',
+          '.leaflet .legend i{ 
+          height: 12px
+          }'
+        )
+      ),
+      l2)))
+
 map <- sync(l1, l2, ncol = 1)
 map
-l2
+

@@ -156,7 +156,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 style = 'background:#00000000; padding: 5px; border-width: 0px; border-color: #fff;
                              margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
                              
-                             tags$h5(tags$b("Covid Cases"),
+                             tags$h6(tags$b("Population Infections"),
                                      icon("question-circle")) %>%
                                bs_embed_tooltip(title = "The rate of covid-infections in the general population",
                                                 placement = "top"),
@@ -194,7 +194,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                              margin-left: 0px; margin-right: 0px; 
                              padding:0em; width: 100%',
 
-                          tags$h5(tags$b("Efficacy Rate"), icon("question-circle")) %>%
+                          tags$h6(tags$b("Efficacy Rate"), icon("question-circle")) %>%
                                bs_embed_tooltip(title = "The vaccine's reduction of your risk from getting covid",
                                                 placement = "top"),
                              
@@ -242,7 +242,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                  htmlOutput("center_protectrate")
        ), # end wellpanel
        
-       HTML("<font size=4><b>Your protection chances depend on local infection rates</b></font>"), # pt2 ----
+       HTML("<font size=4><b>Your protection chances depend on local infection rates. But even in the 
+            worst hotspots, vaccinated people are very likely to remain protected.</b></font>"), # pt2 ----
        wellPanel(  ## map ----
          align = 'center',
          style = 'background: #FFFFFF00; padding: 0px; border-width: 1px; border-color: #41AB5D;
@@ -253,7 +254,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        ),
        
        br(),     
-       HTML("<font size=4><b>Frontline jobs put you at higher risk, but vaccines still provide excellent protection
+       HTML("<font size=4><b>Frontline jobs put you at higher risk, but data show that
+            vaccines still provide excellent protection
            </b></font>"), # pt3 ----
        wellPanel(align = 'center',
                  style = 'background: #FFFFFF00; padding: 0px; border-width: 1px; border-color: #41AB5D;
