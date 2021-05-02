@@ -245,7 +245,6 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        HTML("<font size=4><b>Your protection chances depend on local infection rates. But even in the 
             worst hotspots, vaccinated people are very likely to remain protected.</b></font>"), # pt2 ----
        wellPanel(  ## map ----
-         align = 'center',
          style = 'background: #FFFFFF00; padding: 0px; border-width: 1px; border-color: #41AB5D;
                              margin-left: 0px; margin-right: 0px; margin-bottom:20px; padding-top:0em;
                             width: 100%',

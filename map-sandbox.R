@@ -217,7 +217,8 @@ l1 <- browsable(
           }',
           '.leaflet .legend i{ 
           width: 12px;
-          height: 12px
+          height: 12px;
+          float: left
           }'
         )
       ),
@@ -241,4 +242,3 @@ l2 <- browsable(
 
 map <- sync(l1, l2, ncol = 1)
 map
-
