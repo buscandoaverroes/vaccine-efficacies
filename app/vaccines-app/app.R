@@ -33,10 +33,12 @@ theme <- bslib::bs_theme(
 
 # load data 
 load("data/app-data.Rdata")
+load("data/map-data.Rdata")
 
 # default input values 
 dflt_poprate = 100
 dflt_effrate = 0.7
+
 
 
 # UI =====================================================================================
@@ -248,7 +250,15 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
          style = 'background: #FFFFFF00; padding: 0px; border-width: 1px; border-color: #41AB5D;
                              margin-left: 0px; margin-right: 0px; margin-bottom:20px; padding-top:0em;
                             width: 100%',
-       
+         
+         radioGroupButtons(
+           'mapProtect', label = "Vaccine Efficacy", width = '100%',
+           choiceNames = c("66%", "90%", "95%"),
+           choiceValues = c("protection_66", "protection_90", "protection_95"),
+           status = 'primary',  selected = "protection_90",
+           size = "normal", direction = 'horizontal', individual = F
+           ),
+       verbatimTextOutput("see"),   
        uiOutput('map')
        ),
        
@@ -514,6 +524,21 @@ server <- function(input, output, session) {
   
   
   
+  ## map protection ----
+  mapProtectVar <- reactive({
+    if (input$mapProtect == "66%") {
+       us_adm2_sf$protection_66
+    }
+    else if (input$mapProtect == "90%") {
+      us_adm2_sf$protection_90
+    }
+    else if (input$mapProtect == "95%") {
+      us_adm2_sf$protection_95
+    }
+  })
+  
+  
+  
   # eff data for plot ----
   # for hypothetical point data
   eff_point <- reactive({
@@ -673,10 +698,22 @@ server <- function(input, output, session) {
   
   # map -------------------------------------------------------------------------------------
   
-  # here we would make the map in the server if necessary.
+  # make dynamic part of bottom half of map
+ 
+  
+  #combine map
+  map <- l3() #reactive({sync(l1, l2(), ncol = 1)})
+  
   
   # render map 
   output$map <- renderUI({map})
+  output$see <- renderPrint({str(input$mapProtect)})
+  
+  
+  
+  
+  
+  
   
   # graphs ----------------------------------------------------------------------------------
 
