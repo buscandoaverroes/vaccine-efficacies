@@ -698,11 +698,22 @@ server <- function(input, output, session) {
   
   # map -------------------------------------------------------------------------------------
   
-  # make dynamic part of bottom half of map
+  # determine bottom half of graph based on input
+  bottom <- reactive({
+    if (input$mapProtect == "protection_66") {
+      l2.66
+    } 
+    else if (input$mapProtect == "protection_90") {
+      l2.90
+    }
+    else if (input$mapProtect == "protection_95") {
+      l2.95
+    }
+  })
  
   
   #combine map
-  map <- l3() #reactive({sync(l1, l2(), ncol = 1)})
+  map <- reactive({sync(l1, bottom(), ncol = 1)})
   
   
   # render map 
