@@ -123,13 +123,14 @@ tm_shape(us_adm2_sf, projection = ) +
   
 # raw leaflet ========================
 ## functions ----
+num.dom = c(0.80, 1)
 pal.bin = colorBin(palette = "OrRd",
                    bins = c(0, 10, 20, 50, 100, 300),
                    domain = us_adm2_sf$incidence_2wk_10k,
                    na.color = "#00000000",
                    reverse = F)
 pal.num= colorNumeric(palette = "Spectral",
-                      domain = us_adm2_sf$protection_90,
+                      domain = num.dom, # us_adm2_sf$protection_90
                       na.color = "#00000000",
                       reverse = F)
   
@@ -198,7 +199,7 @@ l2 <- leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom =
   addLegend(
     na.label = NULL, title = "<font size=2>Protection<br>Chance if<br>Vaccinated</font>",
     pal = colorNumeric(palette = "Spectral",
-                       domain = us_adm2_sf$protection_90,
+                       domain = num.dom,
                        na.color = "#00000000",
                        reverse = F),
     values = us_adm2_sf$protection_90, 
@@ -241,4 +242,5 @@ l2 <- browsable(
       l2)))
 
 map <- sync(l1, l2, ncol = 1)
-map
+map 
+
