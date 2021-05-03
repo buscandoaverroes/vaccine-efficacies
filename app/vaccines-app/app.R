@@ -16,6 +16,7 @@ library(shinyBS)
 library(lubridate)
 library(mapview)
 library(leaflet)
+library(leafsync)
 
 
 reactlog_enable()
@@ -258,7 +259,6 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
            status = 'primary',  selected = "protection_90",
            size = "normal", direction = 'horizontal', individual = F
            ),
-       verbatimTextOutput("see"),   
        uiOutput('map')
        ),
        
@@ -700,26 +700,38 @@ server <- function(input, output, session) {
   
   # determine bottom half of graph based on input
   bottom <- reactive({
-    if (input$mapProtect == "protection_66") {
-      l2.66
-    } 
-    else if (input$mapProtect == "protection_90") {
-      l2.90
-    }
-    else if (input$mapProtect == "protection_95") {
-      l2.95
-    }
+    leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
+      addProviderTiles(providers$CartoDB.DarkMatter) %>%
+      setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
+      addPolygons(
+        stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
+        fillColor = ~pal.num(eval(as.symbol(input$mapProtect))), fillOpacity = 0.9,
+        label = ~labs.protection, labelOptions = labelOptions(textsize = 20, sticky = F, 
+                                                              direction = "top",
+                                                              offset = c(0, -7),
+                                                              style = list(padding = "3px 3px")),
+        highlightOptions = highlightOptions(stroke = TRUE, color = "black", weight = 2, opacity = 1, 
+                                            fill = T, bringToFront = T
+        )
+      ) %>%
+      addLegend(
+        na.label = NULL, title = "<font size=2>Protection<br>Chance if<br>Vaccinated</font>",
+        pal = colorNumeric(palette = "Spectral",
+                           domain = num.dom,
+                           na.color = "#00000000",
+                           reverse = F),
+        values = ~eval(as.symbol(input$mapProtect)), 
+        opacity = 0.4,
+        labFormat = labelFormat(suffix = "%", digits = 3, transform = function(x) 100*x))
   })
- 
   
   #combine map
   map <- reactive({sync(l1, bottom(), ncol = 1)})
   
   
   # render map 
-  output$map <- renderUI({map})
-  output$see <- renderPrint({str(input$mapProtect)})
-  
+  output$map <- renderUI({map()})
+
   
   
   
