@@ -66,6 +66,15 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                   font-size: 0.3rem;
                   font-align: center;
                 }")),
+              
+              tags$head(tags$style(
+                type = "text/css", 
+                "#controlPanel {background-color:
+                #F0F0F000;",
+                ".leaflet-top.leaflet-right
+                .leaflet-control {
+                    margin-right: 100px;
+                }")),
     
               HTML("
                    <font size=4><b>
