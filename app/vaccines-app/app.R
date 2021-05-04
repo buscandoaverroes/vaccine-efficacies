@@ -89,11 +89,11 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    "), 
      
            br(),br(),
-      HTML("<font size=4><b>All approved vaccines provide excellent average protection</b></font>"), # pt1 ----    
+      #HTML("<font size=4><b>All approved vaccines provide excellent average protection</b></font>"), # pt1 ----    
        absolutePanel(  
 
          align='center',
-         width = '100%', height = '65px',
+         width = '100%', height = '85px',
          top = 0, left = 0,
          style= 'background: #ffffff; opacity: 1; z-index: 100; position: static;
          padding: 0px; border-radius: 5px; border-color: #2c3e50; border-width: 1px',
@@ -101,9 +101,9 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
          fixed = TRUE, 
          
        wellPanel(align='center',
-                 style= 'background: #2c3e5075; height: 65px; border-color: #2c3e50; border-width: 1px;
-                        padding-top: 12px; padding-bottom: 0px',
-                 
+                 style= 'background: #2c3e5075; height: 85px; border-color: #2c3e50; border-width: 1px;
+                        padding-top:0px; padding-bottom: 0px',
+                 HTML("<font size=5><b>Clinical Data</b></font>"),
                  radioGroupButtons(
                    'presets', label = NULL, width = '100%',
                    choices = c("Explore", "Pfizer", "Moderna", "mRNA"),
@@ -258,34 +258,44 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                  htmlOutput("center_protectrate")
        ), # end wellpanel
        
-       HTML("<font size=4><b>Your protection chances depend on local infection rates. But even in the 
-            worst hotspots, vaccinated people are very likely to remain protected.</b></font>"), # pt2 ----
+                   # pt2 ----
        wellPanel(  ## map ----
-         style = 'background: #FFFFFF00; padding: 0px; border-width: 1px; border-color: #41AB5D;
+         align= 'center',
+         style = 'background: #2c3e5075; padding: 0px; border-width: 1px; border-color: #2c3e50;
                              margin-left: 0px; margin-right: 0px; margin-bottom:20px; padding-top:0em;
                             width: 100%',
-         
-         radioGroupButtons(
-           'mapProtect', label = "Vaccine Efficacy", width = '100%',
+         HTML("<font size=5><b>Geography</b></font>"),
+         radioGroupButtons( 
+           'mapProtect', label = "Vaccine Efficacy", width = '100%', 
            choiceNames = c("66%", "90%", "95%"),
            choiceValues = c("protection_66", "protection_90", "protection_95"),
            status = 'primary',  selected = "protection_90",
            size = "normal", direction = 'horizontal', individual = F
-           ),
-       uiOutput('map')
-       ),
+           )),
+       
+       HTML("<font size=3>Your protection chances depend on local infection rates. But even in the 
+            worst hotspots, vaccinated people are very likely to remain protected. The top map shows 14-day infection rates 
+            and the bottom displays corresponding chances of protection. </font>"),
+       
+       uiOutput('map'),
        
        br(),     
-       HTML("<font size=4><b>Frontline jobs put you at higher risk, but data show that
-            vaccines still provide excellent protection
-           </b></font>"), # pt3 ----
+                    # pt3 ----
+       wellPanel(  ## map ----
+                   align= 'center',
+                   style = 'background: #2c3e5075; padding: 0px; border-width: 1px; border-color: #2c3e50;
+                             margin-left: 0px; margin-right: 0px; margin-bottom:20px; padding-top:0em;
+                            width: 100%',
+                   HTML("<font size=5><b>Protection Comparison</b></font>")),
+       HTML("<font size=3>Frontline jobs put you at higher risk, but data show that
+            vaccines are still highly effective. Dots in green areas show efficacy/infection-rate combinations 
+            with better chances of protection</font>"),
        wellPanel(align = 'center',
                  style = 'background: #FFFFFF00; padding: 0px; border-width: 1px; border-color: #41AB5D;
                              margin-left: 0px; margin-right: 0px; padding-top:0em; width: 100%',
                  
                  
-            HTML("<font size=5><b>Protection Comparison</b></font>"),
-            #HTML("<br><font size=3>Better chances of protection are in green</font>"),
+            
             uiOutput( "dropdown"), 
               
               
