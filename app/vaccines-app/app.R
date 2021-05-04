@@ -68,13 +68,16 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 }")),
               
               tags$head(tags$style(
-                type = "text/css", 
-                "#controlPanel {background-color:
-                #F0F0F000;",
-                ".leaflet-top.leaflet-right
-                .leaflet-control {
-                    margin-right: 100px;
-                }")),
+                type = "text/css",
+                ".leaflet .legend {
+                  line-height: 11px;
+                  font-size: 11px;
+                }", # adjust the key boxes
+                '.leaflet .legend i{ 
+                  width: 12px;
+                  height: 12px;
+                  }'
+                )),
     
               HTML("
                    <font size=4><b>
@@ -731,31 +734,30 @@ server <- function(input, output, session) {
         pal = colorBin(palette = "OrRd", domain = us_adm2_sf$incidence_2wk_10k, bins = c(0, 10, 20, 50, 100, 300), 
                        na.color = "#00000000",reverse = F),
         values = us_adm2_sf$incidence_2wk_10k, 
-        #labels = c("0-10", "10-20", "20-50", "50-100", "100+"), # this wont' generate
         opacity = 0.4) 
   })
     
   
   # adjustments to legend
-  l1 <- reactive({
-    browsable(
-      tagList(
-        list(
-          tags$head(
-            tags$style( # i{} controls colored boxes
-              '.leaflet .legend {
-          line-height: 12px;
-          font-size: 12px;
-          }',
-          '.leaflet .legend i{ 
-          width: 12px;
-          height: 12px;
-          float: left
-          }'
-            )
-          ),
-          top())))
-  })
+  # l1 <- reactive({
+  #   browsable(
+  #     tagList(
+  #       list(
+  #         tags$head(
+  #           tags$style( # i{} controls colored boxes
+  #             '.leaflet .legend {
+  #         line-height: 12px;
+  #         font-size: 12px;
+  #         }',
+  #         '.leaflet .legend i{ 
+  #         width: 12px;
+  #         height: 12px;
+  #         float: left
+  #         }'
+  #           )
+  #         ),
+  #         top())))
+  # })
    
   
   
@@ -789,37 +791,34 @@ server <- function(input, output, session) {
   })
   
   # make adjustments to bottom 
-  l2 <- reactive({
-    browsable(
-      tagList(
-        list(
-          tags$head(
-            tags$style( # i{} controls colored boxes
-              '.leaflet .legend {
-          line-height: 12px;
-          font-size: 12px;
-          }',
-          '.leaflet .legend i{ 
-          width: 12px;
-          height: 12px;
-          float: left
-          }'
-            )
-          ),
-          bottom())))
-  })
+  # l2 <- reactive({
+  #   browsable(
+  #     tagList(
+  #       list(
+  #         tags$head(
+  #           tags$style( # i{} controls colored boxes
+  #             '.leaflet .legend {
+  #         line-height: 12px;
+  #         font-size: 12px;
+  #         }',
+  #         '.leaflet .legend i{ 
+  #         width: 12px;
+  #         height: 12px;
+  #         float: left
+  #         }'
+  #           )
+  #         ),
+  #         bottom())))
+  # })
     
   
   #combine map
-  map <- reactive({sync(top(), bottom(), ncol = 1)})
+  map <-reactive({sync(top(), bottom(), ncol = 1)})
   
   
   # render map 
   output$map <- renderUI({map()})
 
-  
-  
-  
   
   
   
