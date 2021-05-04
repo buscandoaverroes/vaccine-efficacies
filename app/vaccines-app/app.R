@@ -738,31 +738,6 @@ server <- function(input, output, session) {
   })
     
   
-  # adjustments to legend
-  # l1 <- reactive({
-  #   browsable(
-  #     tagList(
-  #       list(
-  #         tags$head(
-  #           tags$style( # i{} controls colored boxes
-  #             '.leaflet .legend {
-  #         line-height: 12px;
-  #         font-size: 12px;
-  #         }',
-  #         '.leaflet .legend i{ 
-  #         width: 12px;
-  #         height: 12px;
-  #         float: left
-  #         }'
-  #           )
-  #         ),
-  #         top())))
-  # })
-   
-  
-  
-  
-  
   ## protection ----
   bottom <- reactive({
     leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
@@ -790,27 +765,6 @@ server <- function(input, output, session) {
         labFormat = labelFormat(suffix = "%", digits = 3, transform = function(x) 100*x))
   })
   
-  # make adjustments to bottom 
-  # l2 <- reactive({
-  #   browsable(
-  #     tagList(
-  #       list(
-  #         tags$head(
-  #           tags$style( # i{} controls colored boxes
-  #             '.leaflet .legend {
-  #         line-height: 12px;
-  #         font-size: 12px;
-  #         }',
-  #         '.leaflet .legend i{ 
-  #         width: 12px;
-  #         height: 12px;
-  #         float: left
-  #         }'
-  #           )
-  #         ),
-  #         bottom())))
-  # })
-    
   
   #combine map
   map <-reactive({sync(top(), bottom(), ncol = 1)})
