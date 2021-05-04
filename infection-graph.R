@@ -96,7 +96,7 @@ l1 <- browsable(
 
 
 save(
-  l1,
+  #l1,
   cntr_crds,
   labs.infections, labs.protection,
   pal.num, pal.bin, num.dom, 

@@ -10,6 +10,7 @@ library(plotly)
 library(bslib)
 library(gghighlight)
 library(ggrepel)
+library(htmltools)
 library(htmlwidgets)
 library(bsplus)
 library(shinyBS)
@@ -698,7 +699,54 @@ server <- function(input, output, session) {
   
   # map -------------------------------------------------------------------------------------
   
-  # determine bottom half of graph based on input
+  ## infections ----
+  
+  ### infections
+  l1 <- leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
+    addProviderTiles(providers$CartoDB.DarkMatter) %>%
+    setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
+    addPolygons(
+      stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
+      fillColor = ~pal.bin(incidence_2wk_10k), fillOpacity = 0.9,
+      label = ~labs.infections, labelOptions = labelOptions(textsize = 20, sticky = F, 
+                                                            direction = "top",
+                                                            offset = c(0, -7),
+                                                            style = list(padding = "3px 3px")),
+      highlightOptions = highlightOptions(stroke = TRUE, color = "black", weight = 2, opacity = 1, 
+                                          fill = T, bringToFront = T
+      )
+    ) %>%
+    addLegend(
+      na.label = NULL, title = "<font size=2>New Cases<br>per 10k</font>",
+      pal = colorBin(palette = "OrRd", domain = us_adm2_sf$incidence_2wk_10k, bins = c(0, 10, 20, 50, 100, 300), 
+                     na.color = "#00000000",reverse = F),
+      values = us_adm2_sf$incidence_2wk_10k, 
+      #labels = c("0-10", "10-20", "20-50", "50-100", "100+"), # this wont' generate
+      opacity = 0.4) 
+  
+  # adjustments to legend
+  l1 <- browsable(
+    tagList(
+      list(
+        tags$head(
+          tags$style( # i{} controls colored boxes
+            '.leaflet .legend {
+          line-height: 12px;
+          font-size: 12px;
+          }',
+          '.leaflet .legend i{ 
+          width: 12px;
+          height: 12px;
+          float: left
+          }'
+          )
+        ),
+        l1)))
+  
+  
+  
+  
+  ## protection ----
   bottom <- reactive({
     leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
       addProviderTiles(providers$CartoDB.DarkMatter) %>%
@@ -725,8 +773,30 @@ server <- function(input, output, session) {
         labFormat = labelFormat(suffix = "%", digits = 3, transform = function(x) 100*x))
   })
   
+  # make adjustments to bottom 
+  l2 <- reactive({
+    browsable(
+      tagList(
+        list(
+          tags$head(
+            tags$style( # i{} controls colored boxes
+              '.leaflet .legend {
+          line-height: 12px;
+          font-size: 12px;
+          }',
+          '.leaflet .legend i{ 
+          width: 12px;
+          height: 12px;
+          float: left
+          }'
+            )
+          ),
+          bottom())))
+  })
+    
+  
   #combine map
-  map <- reactive({sync(l1, bottom(), ncol = 1)})
+  map <- reactive({l1}) #reactive({sync(l1, l2(), ncol = 1)})
   
   
   # render map 
