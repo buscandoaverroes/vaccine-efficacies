@@ -139,8 +139,8 @@ point_colors <- c(
 
 effplot <- plot_ly(eff_data, type = 'contour', 
                    x = ~eff, y = ~pop, z = ~p_safe,
-                   colorscale = "Viridis", zauto = F, zmin = 0.8, zmax = 1, #scaling doesn't seem to work.
-                   opacity = 0.8, reversescale = F,
+                   colorscale = "Blues", zauto = F, zmin = 0.8, zmax = 1, #scaling doesn't seem to work.
+                   opacity = 0.8, reversescale = T,
                    colorbar = list(
                      thicknessmode = 'fraction', thickness = 0.04,
                      lenmode = 'fraction', len = 0.5, xpad = 0,
@@ -157,7 +157,7 @@ effplot <- plot_ly(eff_data, type = 'contour',
                    line = list(color='black', width=0.5),
                    hovertemplate = paste0(
                      "<span style='color:white'><b>Protection: %{z:.1%}</b></span><br>",
-                     "<span style='color:lightgrey'>Covid: %{y} per 1000</span><br>",
+                     "<span style='color:lightgrey'>Infections: %{y} per 1000</span><br>",
                      "<span style='color:lightgrey'>Vaccine Efficacy: %{x:%}</span>",
                      "<extra></extra>"
                    ),
@@ -177,7 +177,7 @@ add_trace(data = eff_clinical_data, type = "scatter", mode = 'markers',
           ),
           text=paste0( 
             "<b>Protection: ", as.character(round(eff_clinical_data$p_safe*100,1)),"%</b><br>",
-            "<span style='color:#F0F0F0'>Covid: ", as.character(round(eff_clinical_data$pop)), " per 1000</span><br>",
+            "<span style='color:#F0F0F0'>Infections: ", as.character(round(eff_clinical_data$pop)), " per 1000</span><br>",
             "<span style='color:#F0F0F0'>Vaccine Efficacy: ",
             as.character(round(eff_clinical_data$eff*100,0)), "%</span>"),
           showlegend = FALSE, hoverinfo="text", 
@@ -207,7 +207,7 @@ layout(
   ),
   yaxis = list(
     title = list(
-      text = "Covid Cases per 1,000",
+      text = "Population Infections per 1,000",
       font = list(size=15),
       standoff = 4),
     showline = FALSE, showgrid = FALSE
@@ -219,7 +219,7 @@ layout(
            'default')}")
 
 
-
+effplot
 
 # export ----
 save(
