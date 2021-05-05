@@ -820,7 +820,7 @@ server <- function(input, output, session) {
             ),
             autocontour = F, contours = list(
               type = "levels",
-              start = 0.9, end = 1, size = 0.02,
+              start = 0.8, end = 1, size = 0.05,
               coloring = 'fill', showlabels = F, # fill or heatmap
               labelfont = list(size=12, color = 'black'),
               labelformat = '%'),
@@ -878,12 +878,12 @@ server <- function(input, output, session) {
         dragmode = FALSE, # disable click/drag
         uniformtext = list(mode='hide', minsize=8),
         title = list(
-          text = NULL
-          # font = list(size=14),
-          # pad = list(t=1,r=0,b=1,l=0)
+          text = "Protection Chances in<br>Fronline vs General Situations",
+           font = list(size=16),
+           pad = list(t=1,r=0,b=2,l=0)
         ),
         height = 400,
-        margin = list(t=0,r=2,b=20,l=10),
+        margin = list(t=60,r=2,b=20,l=10),
         paper_bgcolor = "", plot_bgcolor = "",
         xaxis = list(
           title = list(

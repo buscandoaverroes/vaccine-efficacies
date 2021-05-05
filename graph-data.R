@@ -105,7 +105,7 @@ eff_data <- expand_grid(
 
 # for actual clinical data ----
 eff_clinical_data <- tibble(
-  name = c("Pfizer", "Moderna", "Frontline<br>Workers"),
+  name = c("Everyone (Pfizer)", "Everyone (Moderna)", "Frontline Workers<br>(Pfizer/Moderna)"),
   name_abb = c("Pfz", "Mod", "mRNA"),
   pop  = c(vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"],
            vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"],
@@ -117,7 +117,7 @@ eff_clinical_data <- tibble(
 )
 
 # store key values
-breaks     <- c(0, seq(from = 0.90, to = 1.00, by = 0.02))
+breaks     <- c(0, seq(from = 0.80, to = 1.00, by = 0.05))
 break_labs <- c("0"="0", "0.9"="90", "0.92"="92", "0.94"="94", "0.96"="96", "0.98"="98", "1"="")
 break_lvls <- unique(base::cut(eff_data$p_safe,
                                breaks = breaks,
