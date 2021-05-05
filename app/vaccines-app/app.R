@@ -292,8 +292,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    
                    ),
        HTML("<font size=3>Frontline jobs put you at higher risk, but data show that
-            vaccines are still highly effective. Dots in green areas show efficacy/infection-rate combinations 
-            with better chances of protection</font>"),
+            vaccines are still highly effective. Dots in blue bands show indicate scenarios with
+            high chances of protection if you're vaccinated</font>"),
       
        plotlyOutput("effplot", height = "100%"), ## rainbow curve plot ----
       
@@ -845,10 +845,13 @@ server <- function(input, output, session) {
       radioGroupButtons(inputId = 'click', label = "Plot Click:", justified = TRUE, width = '300px',
                         choices = c("Shows hover info", "Moves point")),
       HTML("<font size=3>Info:</font><br>
-                   <font size=2>Points on the right side indicate better efficacy rates. Likewise, points that are lower show
-                   lower rates of covid among non-vaccinated people when the trial was conducted.
-                   Look for points in green/blue areas, as they 
-                   show vaccines with good average chances of protection considering both these dimensions. <font>")
+                   <font size=2> Good quality vaccines maintain high efficacy rates in both high- and low-
+                  risk situations, which means that all recipients can be assured that their chances of protection
+                  from covid remain high.<br>
+                  Points on the right side indicate better vacine efficacy rates and point that are lower show lower
+                  average risk. Points in blue bands of color indicate good chances of protection.<br>
+                  The clinical data show that mRNA vaccines provide users with very high chances of protection,
+                  even in high risk settings. <font>")
       
     )
   })
