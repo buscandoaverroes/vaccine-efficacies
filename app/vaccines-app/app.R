@@ -298,12 +298,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                  style = 'background: #FFFFFF00; padding: 0px; border-width: 1px; border-color: #41AB5D;
                              margin-left: 0px; margin-right: 0px; padding-top:0em; width: 100%',
                  
-                
-              
-               #bs_button(label = icon('question'), button_type = "default", button_size = "small") %>%
-            # bs_embed_popover(title = "title",
-            #                  content = ),
-
+       br(),         
        plotlyOutput("effplot", height = "100%"), br(), ## rainbow curve plot ----
       HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021), Polack, Fernando P et al. (2020), and 
            Thompson MG, Burgess JL, Naleway AL, et al (2021)</font>")),

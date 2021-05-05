@@ -105,7 +105,7 @@ eff_data <- expand_grid(
 
 # for actual clinical data ----
 eff_clinical_data <- tibble(
-  name = c("Pfizer", "Moderna", "CDC-mRNA"),
+  name = c("Pfizer", "Moderna", "Frontline<br>Workers"),
   name_abb = c("Pfz", "Mod", "mRNA"),
   pop  = c(vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"],
            vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"],

@@ -26,8 +26,8 @@ if (user == 1) {
 
 # scripts 
 
-s1  <- 0 # imports, calculates data
-s2  <- 0 # creates graph/app data
+s1  <- 1 # imports, calculates data
+s2  <- 1 # creates graph/app data
 s3  <- 0 # runs infection-data
 s4  <- 0 # map-sandbox
 
