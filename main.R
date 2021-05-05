@@ -26,12 +26,12 @@ if (user == 1) {
 
 # scripts 
 
-s1  <- 0 # imports, calculates data
-s2  <- 0 # creates graph/app data
+s1  <- 1 # imports, calculates data
+s2  <- 1 # creates graph/app data
 s3  <- 0 # runs infection-data
 s4  <- 0 # map-sandbox
 
-m1  <- 1 # about markdown
+m1  <- 0 # about markdown
 
 if (s1==1) {source(file.path(code, "clinical-data.R"))}
 if (s2==1) {source(file.path(code, "graph-data.R"))}
