@@ -172,8 +172,8 @@ effplot <- plot_ly(eff_data, type = 'contour',
 add_trace(data = eff_clinical_data, type = "scatter", mode = 'markers',
           uid = "clinical_data",
           x = ~eff, y = ~pop, color = ~name, opacity = 1,
-          texttemplate = paste0("<b>", as.character(eff_clinical_data$name), "</b>"),
-          textposition = 'top left', textfont = list(size = 12, color=point_colors),
+          #texttemplate = paste0("<b>", as.character(eff_clinical_data$name), "</b>"),
+          #textposition = 'top left', textfont = list(size = 12, color=point_colors),
           marker = list(
             size = 11, color = point_colors 
           ),
@@ -186,6 +186,13 @@ add_trace(data = eff_clinical_data, type = "scatter", mode = 'markers',
           hoverlabel=list(bgcolor=~name),
           hovertemplate = NULL
 ) %>%
+  add_annotations(
+    x = ~eff, y = ~pop,
+    text = ~name, 
+    xref = 'x', yref = 'y', xanchor = "right",
+    showarrow = T, arrowhead = 4, arrowsize = 0.5, ax = -20, ay = -20,
+    font = list( color = point_colors, size=13)
+  ) %>%
 layout( 
   font = list(family="Arial"),
   dragmode = FALSE, # disable click/drag
