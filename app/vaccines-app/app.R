@@ -118,7 +118,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      wellPanel( align='center', ## info panel ----
                 style = 'background:#F5F1F9; padding: 5px; border-width: 1px; border-color: #9954bb;
                              margin-left: 0px; margin-right: 0px; 
-                             padding:0px; width: 100%',
+                             width: 100%',
                 
      htmlOutput('summary'), ## summary ----
      
@@ -276,7 +276,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        HTML("<font size=3>Your protection chances depend on local infection rates. But even in the 
             worst hotspots, vaccinated people are very likely to remain protected. The top map shows 14-day infection rates 
             and the bottom displays corresponding chances of protection. </font>"),
-       
+       br(),
        uiOutput('map'),
        
        br(),     
@@ -285,8 +285,12 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    align= 'center',
                    style = 'background: #2c3e5075; padding: 0px; border-width: 1px; border-color: #2c3e50;
                              margin-left: 0px; margin-right: 0px; margin-bottom:20px; margin-top:50px;
-                            padding-top:0em; width: 100%',
-                   HTML("<font size=5><b>Protection Comparison</b></font>")),
+                            padding-top:0em; padding-bottom:10px; width: 100%',
+                   HTML("<font size=5><b>Protection Comparison</b></font>"),
+                   
+                   uiOutput( "dropdown") 
+                   
+                   ),
        HTML("<font size=3>Frontline jobs put you at higher risk, but data show that
             vaccines are still highly effective. Dots in green areas show efficacy/infection-rate combinations 
             with better chances of protection</font>"),
@@ -294,10 +298,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                  style = 'background: #FFFFFF00; padding: 0px; border-width: 1px; border-color: #41AB5D;
                              margin-left: 0px; margin-right: 0px; padding-top:0em; width: 100%',
                  
-                 
-            
-            uiOutput( "dropdown"), 
-              
+                
               
                #bs_button(label = icon('question'), button_type = "default", button_size = "small") %>%
             # bs_embed_popover(title = "title",
