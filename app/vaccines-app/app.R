@@ -296,8 +296,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
             with better chances of protection</font>"),
       
        plotlyOutput("effplot", height = "100%"), ## rainbow curve plot ----
-      HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021), Polack, Fernando P et al. (2020), and 
-           Thompson MG, Burgess JL, Naleway AL, et al (2021)</font>"),
+      
       br(), 
       
        
