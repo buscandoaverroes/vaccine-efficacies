@@ -6,7 +6,7 @@ library(plotly)
 library(scales)
 library(gghighlight)
 library(plotly)
-
+library(htmlwidgets)
 
 # import data
 vax_data <- readRDS(file.path(data, "vax_data.rda"))
@@ -106,7 +106,7 @@ eff_data <- expand_grid(
 
 # for actual clinical data ----
 eff_clinical_data <- tibble(
-  name = c("Average Person (Pfizer)", "Average Person (Moderna)", "Frontline Workers<br>(Pfizer/Moderna)"),
+  name = c("Average Person<br>(Pfizer)", "Average Person<br>(Moderna)", "Frontline Workers<br>(Pfizer/Moderna)"),
   name_abb = c("Pfz", "Mod", "mRNA"),
   pop  = c(vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"],
            vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"],
@@ -133,41 +133,48 @@ point_colors <- c(
   brewer.pal(3, "RdPu")[3]
 )
 
+bg_colors <- c(
+  paste0(brewer.pal(9, "Set1")[3],90),
+  paste0(brewer.pal(9, "Oranges")[6],90),
+  paste0(brewer.pal(3, "RdPu")[3],90)
+)
 
 
-# make plotly object ----
 
-effplot <- plot_ly(eff_data, type = 'contour', 
-                   x = ~eff, y = ~pop, z = ~p_safe,
-                   colorscale = "YlGnBu", zauto = F,
-                   zmin = 0.8, zmax = 0.9, #scaling doesn't seem to work.
-                   opacity = 0.8, reversescale = T,
-                   colorbar = list(
-                     thicknessmode = 'fraction', thickness = 0.04,
-                     lenmode = 'fraction', len = 0.5, xpad = 0,
-                     tickmode = 'array', tickvals = breaks,
-                     tickformat = '%', tickfont = list(size=10),
-                     title = list(text="Protection<br>Chance", font=list(size=10))
-                   ),
-                   autocontour = F,
-                   contours = list(
-                     type = "levels",
-                     start = 0.8, end = 1, size = 0.05,
-                     coloring = 'fill', showlabels = F, # fill or heatmap
-                     labelfont = list(size=20, color = 'white'),
-                     labelformat = '%'),
-                   line = list(color='black', width=0.5),
-                   hovertemplate = paste0(
-                     "<span style='color:white'><b>Protection: %{z:.1%}</b></span><br>",
-                     "<span style='color:lightgrey'>Infections: %{y} per 1000</span><br>",
-                     "<span style='color:lightgrey'>Vaccine Efficacy: %{x:%}</span>",
-                     "<extra></extra>"
-                   ),
-                   hoverlabel = list(
-                     bgcolor = RColorBrewer::brewer.pal(9, "Greys")[8],
-                     font = list(color='white'),
-                     align = 'left'
-                   )
+# plotly object ----
+
+effplot <- plot_ly(
+  eff_data, type = 'contour', 
+   x = ~eff, y = ~pop, z = ~p_safe,
+   colorscale = "YlGnBu", zauto = F,
+   zmin = 0, zmax = 0.9, #scaling doesn't seem to work.
+   opacity = 0.8, reversescale = T,
+   colorbar = list(
+     thicknessmode = 'fraction', thickness = 0.04,
+     lenmode = 'fraction', len = 0.5, xpad = 0,
+     tickmode = 'array', tickvals = breaks,
+     tickformat = '%', tickfont = list(size=10),
+     title = list(text="Protection<br>Chance", font=list(size=10))
+   ),
+   autocontour = F,
+   contours = list(
+     type = "levels",
+     start = 0.8, end = 1, size = 0.05,
+     coloring = 'fill', showlabels = F, # fill or heatmap
+     labelfont = list(size=20, color = 'white'),
+     labelformat = '%'),
+   line = list(color='black', width=0.5),
+   hovertemplate = paste0(
+     "<span style='color:white'><b>Protection: %{z:.1%}</b></span><br>",
+     "<span style='color:lightgrey'>Infections: %{y} per 1000</span><br>",
+     "<span style='color:lightgrey'>Vaccine Efficacy: %{x:%}</span>",
+     "<extra></extra>"
+   ),
+   hoverlabel = list(
+     bgcolor = RColorBrewer::brewer.pal(9, "Greys")[8],
+     font = list(color='white'),
+     align = 'left'
+   )
 ) %>% ### clinical data ----
 add_trace(data = eff_clinical_data, type = "scatter", mode = 'markers',
           uid = "clinical_data",
@@ -186,13 +193,6 @@ add_trace(data = eff_clinical_data, type = "scatter", mode = 'markers',
           hoverlabel=list(bgcolor=~name),
           hovertemplate = NULL
 ) %>%
-  add_annotations(
-    x = ~eff, y = ~pop,
-    text = ~name, 
-    xref = 'x', yref = 'y', xanchor = "right",
-    showarrow = T, arrowhead = 4, arrowsize = 0.5, ax = -20, ay = -20,
-    font = list( color = point_colors, size=13)
-  ) %>%
 layout( 
   font = list(family="Arial"),
   dragmode = FALSE, # disable click/drag
@@ -220,6 +220,17 @@ layout(
       font = list(size=15),
       standoff = 4),
     showline = FALSE, showgrid = FALSE
+  ),
+  annotations = list(
+    x = ~eff, y = ~pop,
+    text = ~name, 
+    xref = 'x', yref = 'y',
+    xanchor = list("center", "right", "right"), # 1: Pfizer, 2: Moderna, 3: Frontline
+    yanchor = list("bottom", "middle", "middle"),
+    yshift  = list(2, -5, 0 ), xshift = list(-7, -2, 0),
+    showarrow = T, arrowhead = 0, arrowsize = 0.5, ax = -20, ay = -20,
+    bgcolor = bg_colors, borderpad = '2px', 
+    standoff = list(0, 7, 7), startstandoff = 5
   )
 ) %>%
   config(displayModeBar = FALSE) %>%
