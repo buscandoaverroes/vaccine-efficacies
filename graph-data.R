@@ -106,7 +106,7 @@ eff_data <- expand_grid(
 
 # for actual clinical data ----
 eff_clinical_data <- tibble(
-  name = c("Everyone (Pfizer)", "Everyone (Moderna)", "Frontline Workers<br>(Pfizer/Moderna)"),
+  name = c("Average Person (Pfizer)", "Average Person (Moderna)", "Frontline Workers<br>(Pfizer/Moderna)"),
   name_abb = c("Pfz", "Mod", "mRNA"),
   pop  = c(vax_data$placebo_covid_incidence[vax_data$short_name %in% "Pfizer"],
            vax_data$placebo_covid_incidence[vax_data$short_name %in% "Moderna"],
@@ -129,7 +129,7 @@ break_lvls <- unique(base::cut(eff_data$p_safe,
 # colors
 point_colors <- c(
   brewer.pal(9, "Oranges")[6],
-  brewer.pal(5, "RdBu")[5],                
+  brewer.pal(9, "Set1")[3],                
   brewer.pal(3, "RdPu")[3]
 )
 
@@ -139,20 +139,22 @@ point_colors <- c(
 
 effplot <- plot_ly(eff_data, type = 'contour', 
                    x = ~eff, y = ~pop, z = ~p_safe,
-                   colorscale = "Blues", zauto = F, zmin = 0.8, zmax = 1, #scaling doesn't seem to work.
+                   colorscale = "YlGnBu", zauto = F,
+                   zmin = 0.8, zmax = 0.9, #scaling doesn't seem to work.
                    opacity = 0.8, reversescale = T,
                    colorbar = list(
                      thicknessmode = 'fraction', thickness = 0.04,
                      lenmode = 'fraction', len = 0.5, xpad = 0,
                      tickmode = 'array', tickvals = breaks,
                      tickformat = '%', tickfont = list(size=10),
-                     title = list(text="", font=list(size=14)) # for now, no title.
+                     title = list(text="Protection<br>Chance", font=list(size=10))
                    ),
-                   autocontour = F, contours = list(
+                   autocontour = F,
+                   contours = list(
                      type = "levels",
                      start = 0.8, end = 1, size = 0.05,
                      coloring = 'fill', showlabels = F, # fill or heatmap
-                     labelfont = list(size=12, color = 'black'),
+                     labelfont = list(size=20, color = 'white'),
                      labelformat = '%'),
                    line = list(color='black', width=0.5),
                    hovertemplate = paste0(
@@ -171,9 +173,9 @@ add_trace(data = eff_clinical_data, type = "scatter", mode = 'markers',
           uid = "clinical_data",
           x = ~eff, y = ~pop, color = ~name, opacity = 1,
           texttemplate = paste0("<b>", as.character(eff_clinical_data$name), "</b>"),
-          textposition = 'top left', textfont = list(size = 14, color=point_colors),
+          textposition = 'top left', textfont = list(size = 12, color=point_colors),
           marker = list(
-            size = 8, color = point_colors #c("#1F78B4", "#6A3D9A") 
+            size = 11, color = point_colors 
           ),
           text=paste0( 
             "<b>Protection: ", as.character(round(eff_clinical_data$p_safe*100,1)),"%</b><br>",
