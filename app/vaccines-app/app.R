@@ -102,7 +102,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
          
        wellPanel(align='center',
                  style= 'background: #2c3e5075; height: 85px; border-color: #2c3e50; border-width: 1px;
-                        padding-top:0px; padding-bottom: 0px',
+                        padding-top:0px; padding-bottom: 0px; margin-top:50px',
                  HTML("<font size=5><b>Clinical Data</b></font>"),
                  radioGroupButtons(
                    'presets', label = NULL, width = '100%',
@@ -114,8 +114,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        )),
        
        
-       br(), 
-     wellPanel( align='center', 
+       br(),                   # pt1 ----
+     wellPanel( align='center', ## info panel ----
                 style = 'background:#F5F1F9; padding: 5px; border-width: 1px; border-color: #9954bb;
                              margin-left: 0px; margin-right: 0px; 
                              padding:0px; width: 100%',
@@ -262,8 +262,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        wellPanel(  ## map ----
          align= 'center',
          style = 'background: #2c3e5075; padding: 0px; border-width: 1px; border-color: #2c3e50;
-                             margin-left: 0px; margin-right: 0px; margin-bottom:20px; padding-top:0em;
-                            width: 100%',
+                             margin-left: 0px; margin-right: 0px; margin-bottom:20px; margin-top:50px;
+                             padding-top:0em; width: 100%',
          HTML("<font size=5><b>Geography</b></font>"),
          radioGroupButtons( 
            'mapProtect', label = "Vaccine Efficacy", width = '100%', 
@@ -281,11 +281,11 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        
        br(),     
                     # pt3 ----
-       wellPanel(  ## map ----
+       wellPanel(  
                    align= 'center',
                    style = 'background: #2c3e5075; padding: 0px; border-width: 1px; border-color: #2c3e50;
-                             margin-left: 0px; margin-right: 0px; margin-bottom:20px; padding-top:0em;
-                            width: 100%',
+                             margin-left: 0px; margin-right: 0px; margin-bottom:20px; margin-top:50px;
+                            padding-top:0em; width: 100%',
                    HTML("<font size=5><b>Protection Comparison</b></font>")),
        HTML("<font size=3>Frontline jobs put you at higher risk, but data show that
             vaccines are still highly effective. Dots in green areas show efficacy/infection-rate combinations 
