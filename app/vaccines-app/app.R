@@ -294,14 +294,10 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        HTML("<font size=3>Frontline jobs put you at higher risk, but data show that
             vaccines are still highly effective. Dots in green areas show efficacy/infection-rate combinations 
             with better chances of protection</font>"),
-       wellPanel(align = 'center',
-                 style = 'background: #FFFFFF00; padding: 0px; border-width: 1px; border-color: #41AB5D;
-                             margin-left: 0px; margin-right: 0px; padding-top:0em; width: 100%',
-                 
-       br(),         
-       plotlyOutput("effplot", height = "100%"), br(), ## rainbow curve plot ----
+      
+       plotlyOutput("effplot", height = "100%"), ## rainbow curve plot ----
       HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021), Polack, Fernando P et al. (2020), and 
-           Thompson MG, Burgess JL, Naleway AL, et al (2021)</font>")),
+           Thompson MG, Burgess JL, Naleway AL, et al (2021)</font>"),
       br(), 
       
        
