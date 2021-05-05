@@ -186,7 +186,8 @@ add_trace(data = eff_clinical_data, type = "scatter", mode = 'markers',
           ),
           text=paste0( 
             "<b>Protection: ", as.character(round(eff_clinical_data$p_safe*100,1)),"%</b><br>",
-            "<span style='color:#F0F0F0'>Infections: ", as.character(round(eff_clinical_data$pop)), " per 1000</span><br>",
+            "<span style='color:#F0F0F0'>Non-Vax Infections: ", as.character(round(eff_clinical_data$pop)),
+            " per 1000</span><br>",
             "<span style='color:#F0F0F0'>Vaccine Efficacy: ",
             as.character(round(eff_clinical_data$eff*100,0)), "%</span>"),
           showlegend = FALSE, hoverinfo="text", 
@@ -216,7 +217,7 @@ layout(
   ),
   yaxis = list(
     title = list(
-      text = "Population Infections per 1,000",
+      text = "Non-Vaccinated Infections per 1,000",
       font = list(size=15),
       standoff = 4),
     showline = FALSE, showgrid = FALSE
