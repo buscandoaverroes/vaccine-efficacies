@@ -854,24 +854,25 @@ server <- function(input, output, session) {
                 showlegend = FALSE, hoverinfo="text", 
                 hoverlabel=list(bgcolor=~name),
                 hovertemplate = NULL
-      ) %>% ### user point ----
-      add_trace(data = eff_point(), type = "scatter", mode = 'markers',
-                uid = "user_point", visible = TRUE,
-                x = ~eff, y = ~pop, opacity = 1,
-                # texttemplate = "<b>My Point<b>", 
-                # textposition = 'top middle', textfont = list(size = 14, color = "black"),
-                marker = list(
-                  size = 12, color = "black", symbol = 'circle-open',
-                  line = list(width=4)), 
-                text=paste0(
-                  "<b>Protection: ", as.character(round(eff_point()$p_safe*100,1)), "%</b><br>",
-                  "<span style='color:lightgrey'>Covid: ", as.character(eff_point()$pop), " per 1000</span><br>",
-                  "<span style='color:lightgrey'>Vaccine Efficacy: ",
-                      as.character(round(eff_point()$eff*100,0)), "%</span>"),
-                showlegend = FALSE, hoverinfo="text", 
-                hoverlabel=list(bgcolor=RColorBrewer::brewer.pal(9, "Greys")[8]),
-                hovertemplate = NULL
-      ) %>% ### layout ----
+      ) %>%
+      # %>% ### user point ----
+      # add_trace(data = eff_point(), type = "scatter", mode = 'markers',
+      #           uid = "user_point", visible = TRUE,
+      #           x = ~eff, y = ~pop, opacity = 1,
+      #           # texttemplate = "<b>My Point<b>", 
+      #           # textposition = 'top middle', textfont = list(size = 14, color = "black"),
+      #           marker = list(
+      #             size = 12, color = "black", symbol = 'circle-open',
+      #             line = list(width=4)), 
+      #           text=paste0(
+      #             "<b>Protection: ", as.character(round(eff_point()$p_safe*100,1)), "%</b><br>",
+      #             "<span style='color:lightgrey'>Covid: ", as.character(eff_point()$pop), " per 1000</span><br>",
+      #             "<span style='color:lightgrey'>Vaccine Efficacy: ",
+      #                 as.character(round(eff_point()$eff*100,0)), "%</span>"),
+      #           showlegend = FALSE, hoverinfo="text", 
+      #           hoverlabel=list(bgcolor=RColorBrewer::brewer.pal(9, "Greys")[8]),
+      #           hovertemplate = NULL
+       ### layout ----
       layout( 
         font = list(family="Arial"),
         dragmode = FALSE, # disable click/drag
