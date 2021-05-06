@@ -285,15 +285,63 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    align= 'center',
                    style = 'background: #2c3e5075; padding: 0px; border-width: 1px; border-color: #2c3e50;
                              margin-left: 0px; margin-right: 0px; margin-bottom:20px; margin-top:50px;
-                            padding-top:0em; padding-bottom:10px; width: 100%',
+                            padding-top:15px; padding-bottom:25px; width: 100%',
                    HTML("<font size=5><b>Protection Comparison</b></font>"),
                    
-                   uiOutput( "dropdown") 
+                   #uiOutput( "dropdown") 
                    
                    ),
        HTML("<font size=3>Frontline jobs put you at higher risk, but data show that
             vaccines are still highly effective. Dots in blue bands show indicate scenarios with
-            high chances of protection if you're vaccinated</font>"),
+            high chances of protection if you're vaccinated.</font>"),
+       
+       
+      # buttons
+      span( align = 'center', style = 'padding: 0px',
+            h6( 
+       bs_button(label = "why?", button_type = 'default', button_size = 'small') %>%
+         bs_attach_collapse(id_collapse = 'el_explanation2'),
+       bs_button(label = "if I'm not vaccinated?", button_type = 'default', button_size = 'small') %>%
+         bs_attach_collapse(id_collapse = 'el_novax'),
+            )),
+      
+      # ui for inner buttons 
+      bs_collapse(id = 'el_explanation2', 
+                  wellPanel(align = 'left',
+                            style = 'background: #FFF; padding: 3px; border-color:#373a3c; border-width: 1px',
+                            HTML("<font size=2>
+                                 The CDC's study of frontline workers quantified the drastic disparities in risk
+                                 posed by healthcare and frontline professions compared to the average person. 
+                                 Pfizer's and Moderna's clinical trial data concluded that the average unvaccinated 
+                                 person tested positive for covid about <b>56</b> or <b>73 per 1000</b> person-years.
+                                 However, according to the CDC, the rate for frontline workers was nearly 10 times
+                                 higher: <b>504 per 1000</b> person-years. In other words, in over the course of the
+                                 time equivalent of one year, 1 in every 2 frontline workers got infected with
+                                 Covid-19. <br><br>
+                                 
+                                 However, The CDC data also concluded that the Pfizer and Moderna vaccines maintain 
+                                 very high levels of efficacy (90%) even in frontline situtaions. This finding is
+                                 represented graphically by the purple (Frontline) dot's high vertical position -- which
+                                 indicates high levels of non-vaccinated infections -- and its  horitzonal alignment with
+                                 the Pfizer and Moderna points, which show the vaccines maintain high efficacies in 
+                                 high-infection scenarios.
+                                 
+                                 </font>")
+                            
+                            )),
+      bs_collapse(id = 'el_novax', 
+                  wellPanel(align = 'left',
+                            style = 'background: #FFF; padding: 3px; border-color:#373a3c; border-width: 1px',
+                            
+                            HTML("<font size=2>
+                                 
+                                 animate this part?
+                                 
+                                 </font>")
+                            
+                            )),
+      
+      
       
        plotlyOutput("effplot", height = "100%"), ## rainbow curve plot ----
       
@@ -691,6 +739,10 @@ server <- function(input, output, session) {
   output$variants <- renderText({
     variant_text()
   })
+  
+
+  
+  
   
   
   # html styles ----
