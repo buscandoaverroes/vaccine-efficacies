@@ -303,7 +303,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
          bs_attach_collapse(id_collapse = 'el_explanation2'),
        bs_button(label = "if I'm not vaccinated?", button_type = 'default', button_size = 'small') %>%
          bs_attach_collapse(id_collapse = 'el_novax'),
-            )),
+            )), br(),
       
       # ui for inner buttons 
       bs_collapse(id = 'el_explanation2', 
@@ -311,7 +311,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                             style = 'background: #FFF; padding: 3px; border-color:#373a3c; border-width: 1px',
                             HTML("<font size=2>
                                  
-                                 Pfizer's and Moderna's clinical trial data concluded that the average unvaccinated 
+                                 Moderna's and Pfizer's clinical trial data concluded that the average unvaccinated 
                                  person tested positive for covid about <b>56</b> or <b>73 per 1000</b> person-years.
                                  However, the rate for frontline workers was nearly 10 times
                                  higher: <b>504 per 1000</b> person-years. In other words, in over the course of the
@@ -335,7 +335,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                             
                             HTML("<font size=2>
                                  
-                                 animate this part?
+                                 (new feature coming soon!)
                                  
                                  </font>")
                             
