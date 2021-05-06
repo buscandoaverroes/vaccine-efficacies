@@ -310,21 +310,21 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                   wellPanel(align = 'left',
                             style = 'background: #FFF; padding: 3px; border-color:#373a3c; border-width: 1px',
                             HTML("<font size=2>
-                                 The CDC's study of frontline workers quantified the drastic disparities in risk
-                                 posed by healthcare and frontline professions compared to the average person. 
+                                 
                                  Pfizer's and Moderna's clinical trial data concluded that the average unvaccinated 
                                  person tested positive for covid about <b>56</b> or <b>73 per 1000</b> person-years.
-                                 However, according to the CDC, the rate for frontline workers was nearly 10 times
+                                 However, the rate for frontline workers was nearly 10 times
                                  higher: <b>504 per 1000</b> person-years. In other words, in over the course of the
-                                 time equivalent of one year, 1 in every 2 frontline workers got infected with
+                                 time equivalent of one year, half of frontline workers got infected with
                                  Covid-19. <br><br>
                                  
-                                 However, The CDC data also concluded that the Pfizer and Moderna vaccines maintain 
-                                 very high levels of efficacy (90%) even in frontline situtaions. This finding is
-                                 represented graphically by the purple (Frontline) dot's high vertical position -- which
-                                 indicates high levels of non-vaccinated infections -- and its  horitzonal alignment with
-                                 the Pfizer and Moderna points, which show the vaccines maintain high efficacies in 
-                                 high-infection scenarios.
+                                 However, The CDC data concluded that the Pfizer and Moderna vaccines maintain 
+                                 very high levels of efficacy (<font color=\"#2171B5\"><b>90%</b></font>)
+                                 in frontline situtations. Graphically, we see
+                                 that the purple or Frontline dot is still in the blue:
+                                 it doesn't move far to the left even though the 
+                                 non-vaccinated infection rate is higher than the Average Person 
+                                 dots by an order of magnitude.
                                  
                                  </font>")
                             

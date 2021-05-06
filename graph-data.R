@@ -115,7 +115,13 @@ eff_clinical_data <- tibble(
            vax_data$covid_efficacy[vax_data$short_name %in% "Moderna"],
            vax_data$covid_efficacy[vax_data$short_name %in% "Pfizer or Moderna"]),
   p_safe = 1-((pop/1000)*(1-eff))
-)
+) %>% 
+  # create no-vaccine equivalent variables ## no, if you gonna animate it has to be long not wide.
+  mutate(
+    pop_novax = pop, # population infection is the same 
+    eff_novax = 0,   # there's no efficacy since no vaccine 
+    p_safe_novax = 1-((pop/1000)*(1-eff_novax))
+  )
 
 # store key values
 breaks     <- c(0, seq(from = 0.80, to = 1.00, by = 0.05))
@@ -179,8 +185,6 @@ effplot <- plot_ly(
 add_trace(data = eff_clinical_data, type = "scatter", mode = 'markers',
           uid = "clinical_data",
           x = ~eff, y = ~pop, color = ~name, opacity = 1,
-          #texttemplate = paste0("<b>", as.character(eff_clinical_data$name), "</b>"),
-          #textposition = 'top left', textfont = list(size = 12, color=point_colors),
           marker = list(
             size = 11, color = point_colors 
           ),
