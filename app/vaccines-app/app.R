@@ -57,9 +57,11 @@ ui = navbarPage(title = "Covid-19 Vaccine Explorer",
 tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------------------------------------------
      fluidPage( title = "Covid-19 Vaccine Data Explorer",
                
-              bsAlert("disclaimer"),
-              #HTML("<h1><b>Covid-19 Vaccine Explorer</b></h1>"), 
-              br(),
+              # import css file 
+              tags$head(
+                tags$link(rel = "stylesheet", type = "text/css", href = "app_css.css")
+              ), 
+              
               
               tags$style(HTML("
                 .MathJax {
@@ -78,13 +80,23 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                   height: 12px;
                   }'
                 )),
-    
+              
+              # custom 
+              tags$style(HTML("
+                .btn-myclass {
+                  color: #9ECAE1;
+                  
+                }")),
+              
+              
+              bsAlert("disclaimer"),
+              HTML("<h1><b>Covid-19 Vaccine Explorer</b></h1>"), 
+              br(),
+              
               HTML("
-                   <font size=4><b>
+                   <font size=5>
                    The efficacy rate is not the chance you'll be protected from covid. Estimate
                    your chances below.
-                   </b></font>
-                   <font size=4>
                    </font>
                    "), 
      
@@ -269,7 +281,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
            'mapProtect', label = "Vaccine Efficacy", width = '100%', 
            choiceNames = c("66%", "90%", "95%"),
            choiceValues = c("protection_66", "protection_90", "protection_95"),
-           status = 'primary',  selected = "protection_90",
+           status = 'myclass',  selected = "protection_90",
            size = "normal", direction = 'horizontal', individual = F
            )),
        
