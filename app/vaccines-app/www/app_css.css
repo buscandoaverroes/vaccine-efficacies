@@ -19,6 +19,17 @@
 
 /*Custom button colors*/ 
 .btn-myclass {
-  color: #9ECAE1;
-
+  color: #FFFFFF;
+  background-color: #4292C6;
+  border-color: #2171B5;
+}
+.btn-myclass:hover {
+  color: #FFFFFF;
+  background-color: #08519C;
+  border-color: #08306B;
+}
+.btn-myclass:active {
+  color: #FFFFFF;
+  background-color: #08519C;
+  border-color: #08306B;
 }

@@ -49,9 +49,6 @@ ui = navbarPage(title = "Covid-19 Vaccine Explorer",
                 collapsible = TRUE,
                 theme = theme,
 
-               # tags$style(type='text/css', "body{padding-top: 70px;}"),
-
-
           
   
 tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------------------------------------------
@@ -63,30 +60,6 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
               ), 
               
               
-              tags$style(HTML("
-                .MathJax {
-                  font-size: 0.3rem;
-                  font-align: center;
-                }")),
-              
-              tags$head(tags$style(
-                type = "text/css",
-                ".leaflet .legend {
-                  line-height: 11px;
-                  font-size: 11px;
-                }", # adjust the key boxes
-                '.leaflet .legend i{ 
-                  width: 12px;
-                  height: 12px;
-                  }'
-                )),
-              
-              # custom 
-              tags$style(HTML("
-                .btn-myclass {
-                  color: #9ECAE1;
-                  
-                }")),
               
               
               bsAlert("disclaimer"),
