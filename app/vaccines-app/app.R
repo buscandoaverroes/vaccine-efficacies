@@ -10,11 +10,14 @@ library(plotly)
 library(bslib)
 library(gghighlight)
 library(ggrepel)
+library(htmltools)
 library(htmlwidgets)
 library(bsplus)
 library(shinyBS)
 library(lubridate)
-
+library(mapview)
+library(leaflet)
+library(leafsync)
 
 
 reactlog_enable()
@@ -32,10 +35,12 @@ theme <- bslib::bs_theme(
 
 # load data 
 load("data/app-data.Rdata")
+load("data/map-data.Rdata")
 
 # default input values 
 dflt_poprate = 100
 dflt_effrate = 0.7
+
 
 
 # UI =====================================================================================
@@ -44,52 +49,46 @@ ui = navbarPage(title = "Covid-19 Vaccine Explorer",
                 collapsible = TRUE,
                 theme = theme,
 
-               # tags$style(type='text/css', "body{padding-top: 70px;}"),
-
-
           
   
 tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------------------------------------------
      fluidPage( title = "Covid-19 Vaccine Data Explorer",
                
+              # import css file 
+              tags$head(
+                tags$link(rel = "stylesheet", type = "text/css", href = "app_css.css")
+              ), 
+              
+              
+              
+              
               bsAlert("disclaimer"),
-              HTML("<h2><b>Covid-19 Vaccine Explorer</b></h2>"), 
+              HTML("<h1><b>Covid-19 Vaccine Explorer</b></h1>"), 
               br(),
               
-              tags$style(HTML("
-                .MathJax {
-                  font-size: 0.3rem;
-                  font-align: center;
-                }")),
-    
               HTML("
-                   <font size=4>
-                   The efficacy rate is not the chance you'll be protected. Use
-                   the tool below to estimate an average person's chances of protection
-                   from Covid-19 based on actual clinical data.
+                   <font size=5>
+                   The efficacy rate is not the chance you'll be protected from covid. Estimate
+                   your chances below.
                    </font>
                    "), 
-              # wellPanel(align = 'left', 
-              #           style = 'background:#FFF; padding: 5px',
-              # HTML(markdown::markdownToHTML(file = 'md/page1-intro.md',
-              #                               fragment.only = TRUE)),
      
-           br(),br(),br(),     
-       
+           br(),br(),
+      #HTML("<font size=4><b>All approved vaccines provide excellent average protection</b></font>"), # pt1 ----    
        absolutePanel(  
 
          align='center',
-         width = '100%', height = '65px',
+         width = '100%', height = '85px',
          top = 0, left = 0,
-         style= 'background: #ffffff; opacity: 1; z-index: 10; position: sticky;
+         style= 'background: #ffffff; opacity: 1; z-index: 100; position: static;
          padding: 0px; border-radius: 5px; border-color: #2c3e50; border-width: 1px',
          
          fixed = TRUE, 
          
        wellPanel(align='center',
-                 style= 'background: #2c3e5075; height: 65px; border-color: #2c3e50; border-width: 1px;
-                        padding-top: 12px; padding-bottom: 0px',
-                 
+                 style= 'background: #2c3e5075; height: 85px; border-color: #2c3e50; border-width: 1px;
+                        padding-top:0px; padding-bottom: 0px; margin-top:50px',
+                 HTML("<font size=5><b>Clinical Data</b></font>"),
                  radioGroupButtons(
                    'presets', label = NULL, width = '100%',
                    choices = c("Explore", "Pfizer", "Moderna", "mRNA"),
@@ -100,8 +99,12 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        )),
        
        
-       br(), 
-     
+       br(),                   # pt1 ----
+     wellPanel( align='center', ## info panel ----
+                style = 'background:#F5F1F9; padding: 5px; border-width: 1px; border-color: #9954bb;
+                             margin-left: 0px; margin-right: 0px; 
+                             width: 100%',
+                
      htmlOutput('summary'), ## summary ----
      
      ### aux buttons and els ------
@@ -142,11 +145,9 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                            
                            htmlOutput('math', container = tags$b)
                  )
-     )),
+     ))), # end 1st panel, well panel
      
-     br(),
-     
-          ##  main input panels ----------------------------------------
+       ##  main input panels ----------------------------------------
            wellPanel( align='center', 
                        style = 'background:#F5F1F9; padding: 5px; border-width: 1px; border-color: #9954bb;
                              margin-left: 0px; margin-right: 0px; 
@@ -156,7 +157,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 style = 'background:#00000000; padding: 5px; border-width: 0px; border-color: #fff;
                              margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
                              
-                             tags$h5(tags$b("Covid Cases"),
+                             tags$h6(tags$b("Population Infections"),
                                      icon("question-circle")) %>%
                                bs_embed_tooltip(title = "The rate of covid-infections in the general population",
                                                 placement = "top"),
@@ -194,7 +195,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                              margin-left: 0px; margin-right: 0px; 
                              padding:0em; width: 100%',
 
-                          tags$h5(tags$b("Efficacy Rate"), icon("question-circle")) %>%
+                          tags$h6(tags$b("Efficacy Rate"), icon("question-circle")) %>%
                                bs_embed_tooltip(title = "The vaccine's reduction of your risk from getting covid",
                                                 placement = "top"),
                              
@@ -232,7 +233,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      
      verticalLayout( ### Protection ----
        wellPanel(align='center',
-                 style= 'background: #D9F9E5; padding: 0px; border-width: 1px; border-color: #41AB5D;
+                 style= 'background: #6BAED650; padding: 0px; border-width: 1px; border-color: #4292C6;
                          margin-bottom: 20px',
                  
                  
@@ -242,25 +243,93 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                  htmlOutput("center_protectrate")
        ), # end wellpanel
        
+                   # pt2 ----
+       wellPanel(  ## map ----
+         align= 'center',
+         style = 'background: #2c3e5075; padding: 0px; border-width: 1px; border-color: #2c3e50;
+                             margin-left: 0px; margin-right: 0px; margin-bottom:20px; margin-top:50px;
+                             padding-top:0em; width: 100%',
+         HTML("<font size=5><b>Geography</b></font>"),
+         radioGroupButtons( 
+           'mapProtect', label = "Vaccine Efficacy", width = '100%', 
+           choiceNames = c("66%", "90%", "95%"),
+           choiceValues = c("protection_66", "protection_90", "protection_95"),
+           status = 'myclass',  selected = "protection_90",
+           size = "normal", direction = 'horizontal', individual = F
+           )),
        
-       wellPanel(align = 'center',
-                 style = 'background: #FFFFFF00; padding: 0px; border-width: 1px; border-color: #41AB5D;
-                             margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
-                 
-                 
-            HTML("<font size=5><b>Protection Comparison</b></font>"),
-            #HTML("<br><font size=3>Better chances of protection are in green</font>"),
-            uiOutput( "dropdown"), 
-              
-              
-               #bs_button(label = icon('question'), button_type = "default", button_size = "small") %>%
-            # bs_embed_popover(title = "title",
-            #                  content = ),
-            
+       HTML("<font size=3>Your protection chances depend on local infection rates. But even in the 
+            worst hotspots, vaccinated people are very likely to remain protected. The top map shows 14-day infection rates 
+            and the bottom displays corresponding chances of protection. </font>"),
+       br(),
+       uiOutput('map'),
        
-       plotlyOutput("effplot", height = "100%"), br(), ## rainbow curve plot ----
-      HTML("<font size=2>Data Sources: Baden, Lindsey R et al. (2021), Polack, Fernando P et al. (2020), and 
-           Thompson MG, Burgess JL, Naleway AL, et al (2021)</font>")),
+       br(),     
+                    # pt3 ----
+       wellPanel(  
+                   align= 'center',
+                   style = 'background: #2c3e5075; padding: 0px; border-width: 1px; border-color: #2c3e50;
+                             margin-left: 0px; margin-right: 0px; margin-bottom:20px; margin-top:50px;
+                            padding-top:15px; padding-bottom:25px; width: 100%',
+                   HTML("<font size=5><b>Protection Comparison</b></font>"),
+                   
+                   #uiOutput( "dropdown") 
+                   
+                   ),
+       HTML("<font size=3>Frontline jobs put you at higher risk, but data show that
+            vaccines are still highly effective. Dots in blue bands show indicate scenarios with
+            high chances of protection if you're vaccinated.</font>"),
+       
+       
+      # buttons
+      span( align = 'center', style = 'padding: 0px',
+            h6( 
+       bs_button(label = "why?", button_type = 'default', button_size = 'small') %>%
+         bs_attach_collapse(id_collapse = 'el_explanation2'),
+       bs_button(label = "if I'm not vaccinated?", button_type = 'default', button_size = 'small') %>%
+         bs_attach_collapse(id_collapse = 'el_novax'),
+            )), br(),
+      
+      # ui for inner buttons 
+      bs_collapse(id = 'el_explanation2', 
+                  wellPanel(align = 'left',
+                            style = 'background: #FFF; padding: 3px; border-color:#373a3c; border-width: 1px',
+                            HTML("<font size=2>
+                                 
+                                 Moderna's and Pfizer's clinical trial data concluded that the average unvaccinated 
+                                 person tested positive for covid about <b>56</b> or <b>73 per 1000</b> person-years.
+                                 However, the rate for frontline workers was nearly 10 times
+                                 higher: <b>504 per 1000</b> person-years. In other words, in over the course of the
+                                 time equivalent of one year, half of frontline workers got infected with
+                                 Covid-19. <br><br>
+                                 
+                                 However, The CDC data concluded that the Pfizer and Moderna vaccines maintain 
+                                 very high levels of efficacy (<font color=\"#2171B5\"><b>90%</b></font>)
+                                 in frontline situtations. Graphically, we see
+                                 that the purple or Frontline dot is still in the blue:
+                                 it doesn't move far to the left even though the 
+                                 non-vaccinated infection rate is higher than the Average Person 
+                                 dots by an order of magnitude.
+                                 
+                                 </font>")
+                            
+                            )),
+      bs_collapse(id = 'el_novax', 
+                  wellPanel(align = 'left',
+                            style = 'background: #FFF; padding: 3px; border-color:#373a3c; border-width: 1px',
+                            
+                            HTML("<font size=2>
+                                 
+                                 (new feature coming soon!)
+                                 
+                                 </font>")
+                            
+                            )),
+      
+      
+      
+       plotlyOutput("effplot", height = "100%"), ## rainbow curve plot ----
+      
       br(), 
       
        
@@ -502,6 +571,21 @@ server <- function(input, output, session) {
   
   
   
+  ## map protection ----
+  mapProtectVar <- reactive({
+    if (input$mapProtect == "66%") {
+       us_adm2_sf$protection_66
+    }
+    else if (input$mapProtect == "90%") {
+      us_adm2_sf$protection_90
+    }
+    else if (input$mapProtect == "95%") {
+      us_adm2_sf$protection_95
+    }
+  })
+  
+  
+  
   # eff data for plot ----
   # for hypothetical point data
   eff_point <- reactive({
@@ -544,7 +628,7 @@ server <- function(input, output, session) {
   
   output$right_effrate <- renderText({
     paste0(
-      "<b><font color=\"#2171B5\" size=5>",
+      "<b><font color=\"#41AB5D\" size=5>",  
       effrate_B_pct(), "%",
       "</b></font>"
     )
@@ -552,7 +636,7 @@ server <- function(input, output, session) {
   
   output$center_protectrate <- renderText({
     paste0(
-      "<b><font color=\"#41AB5D\" size=6>",
+      "<b><font color=\"#2171B5\" size=6>",
       protectrate_pct(), "%",
       "</b></font>"
     )
@@ -574,24 +658,24 @@ server <- function(input, output, session) {
   sum <- reactive({if (input$presets == "Explore") {
     paste0(
       "<font size=4>The <b><font color= \"#54278F\">", as.character(selected_vax_name()), "</font></b>",
-      " vaccine would protect people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
+      " vaccine would protect people from Covid-19 infections about ", "<b><font color=\"#2171B5\">", 
       protectrate_pct1(), "%", "</font></b> of the time given the selected infection rate and efficacy rate
       below.<br><br>"
-    )
+    ) 
   } else if (input$presets == "mRNA") {
     paste0(
       "<font size=4>The CDC conducted a trial of only <b>frontline and essential workers</b>. Vaccinated 
-      participants received either the Pfizer or the Moderna vaccine.
-      Since both companies' vaccines use mRNA technology, the results were reported together. <br><br>
+      participants received either the Pfizer or the Moderna mRNA vaccine 
+      and the results were reported together. <br><br>
       In the CDC's trial, the <b><font color= \"#54278F\"> mRNA vaccines </font></b>",
-      " protected fully-vaccinated people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
+      " protected fully-vaccinated people from Covid-19 infections about ", "<b><font color=\"#2171B5\">", 
       protectrate_pct1(), "%", "</font></b> of the time, even in frontline situations.<br><br>"
     )
   }
     else {
       paste0(
         "<font size=4>During clinical trials, the <b><font color= \"#54278F\">", as.character(selected_vax_name()), "</font></b>",
-        " vaccine protected people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
+        " vaccine protected people from Covid-19 infections about ", "<b><font color=\"#2171B5\">", 
         protectrate_pct1(), "%", "</font></b> of the time.<br><br>"
       )
     }
@@ -611,8 +695,8 @@ server <- function(input, output, session) {
       "<b><font color=\"#000000\">",
       as.character(round(vax_data$treatment_covid_incidence[vax_data$short_name %in% selected_vax_name()],1)),
       "</font>", " per ", "1,000", "</b>", ", a rate that was ",
-      "<font color=\"#2171B5\"><b>", round(effrate_B_pct(),1), "%", "</b></font>",
-      " lower. About ", "<b><font color=\"#41AB5D\">", 
+      "<font color=\"#41AB5D\"><b>", round(effrate_B_pct(),1), "%", "</b></font>",
+      " lower. About ", "<b><font color=\"#2171B5\">", 
       protectrate_pct1(), "%", "</font></b>", " of the time, participants with the ",selected_vax_name(), 
       " vaccine did not test positive for covid."
     )
@@ -641,6 +725,10 @@ server <- function(input, output, session) {
     variant_text()
   })
   
+
+  
+  
+  
   
   # html styles ----
   style_infectionrate <- reactive({
@@ -659,6 +747,70 @@ server <- function(input, output, session) {
     )
   })
   
+  # map -------------------------------------------------------------------------------------
+  
+  ## infections ----
+  
+  ### infections
+  top <- reactive({
+    leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
+      addProviderTiles(providers$CartoDB.DarkMatter) %>%
+      setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
+      addPolygons(
+        stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
+        fillColor = ~pal.bin(incidence_2wk_10k), fillOpacity = 0.9,
+        label = ~labs.infections, labelOptions = labelOptions(textsize = 20, sticky = F, 
+                                                              direction = "top",
+                                                              offset = c(0, -7),
+                                                              style = list(padding = "3px 3px")),
+        highlightOptions = highlightOptions(stroke = TRUE, color = "black", weight = 2, opacity = 1, 
+                                            fill = T, bringToFront = T
+        )
+      ) %>%
+      addLegend(
+        na.label = NULL, title = "<font size=2>New Cases<br>per 10k</font>",
+        pal = colorBin(palette = "OrRd", domain = us_adm2_sf$incidence_2wk_10k, bins = c(0, 10, 20, 50, 100, 300), 
+                       na.color = "#00000000",reverse = F),
+        values = us_adm2_sf$incidence_2wk_10k, 
+        opacity = 0.4) 
+  })
+    
+  
+  ## protection ----
+  bottom <- reactive({
+    leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
+      addProviderTiles(providers$CartoDB.DarkMatter) %>%
+      setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
+      addPolygons(
+        stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
+        fillColor = ~pal.num(eval(as.symbol(input$mapProtect))), fillOpacity = 0.9,
+        label = ~labs.protection, labelOptions = labelOptions(textsize = 20, sticky = F, 
+                                                              direction = "top",
+                                                              offset = c(0, -7),
+                                                              style = list(padding = "3px 3px")),
+        highlightOptions = highlightOptions(stroke = TRUE, color = "black", weight = 2, opacity = 1, 
+                                            fill = T, bringToFront = T
+        )
+      ) %>%
+      addLegend(
+        na.label = NULL, title = "<font size=2>Protection<br>Chance if<br>Vaccinated</font>",
+        pal = colorNumeric(palette = "Spectral",
+                           domain = num.dom,
+                           na.color = "#00000000",
+                           reverse = F),
+        values = ~eval(as.symbol(input$mapProtect)), 
+        opacity = 0.4,
+        labFormat = labelFormat(suffix = "%", digits = 3, transform = function(x) 100*x))
+  })
+  
+  
+  #combine map
+  map <-reactive({sync(top(), bottom(), ncol = 1)})
+  
+  
+  # render map 
+  output$map <- renderUI({map()})
+
   
   
   
@@ -685,110 +837,9 @@ server <- function(input, output, session) {
     brewer.pal(3, "RdPu")[3]
   )
   ## rainbow curve graph ---- 
-  p2 <- reactive({
-    ### main data ----
-    plot_ly(eff_data, type = 'contour', 
-            x = ~eff, y = ~pop, z = ~p_safe,
-            colorscale = "Viridis", zauto = F, zmin = 0.8, zmax = 1, #scaling doesn't seem to work.
-            opacity = 0.8, reversescale = F,
-            colorbar = list(
-              thicknessmode = 'fraction', thickness = 0.04,
-              lenmode = 'fraction', len = 0.5, xpad = 0,
-              tickmode = 'array', tickvals = breaks,
-              tickformat = '%', tickfont = list(size=10),
-              title = list(text="", font=list(size=14)) # for now, no title.
-            ),
-            autocontour = F, contours = list(
-              type = "levels",
-              start = 0.9, end = 1, size = 0.02,
-              coloring = 'fill', showlabels = F, # fill or heatmap
-              labelfont = list(size=12, color = 'black'),
-              labelformat = '%'),
-            line = list(color='black', width=0.5),
-            hovertemplate = paste0(
-              "<span style='color:white'><b>Protection: %{z:.1%}</b></span><br>",
-              "<span style='color:lightgrey'>Covid: %{y} per 1000</span><br>",
-              "<span style='color:lightgrey'>Vaccine Efficacy: %{x:%}</span>",
-              "<extra></extra>"
-            ),
-            hoverlabel = list(
-              bgcolor = RColorBrewer::brewer.pal(9, "Greys")[8],
-              font = list(color='white'),
-              align = 'left'
-            )
-    ) %>% ### clinical data ----
-      add_trace(data = eff_clinical_data, type = "scatter", mode = 'markers',
-                uid = "clinical_data",
-                x = ~eff, y = ~pop, color = ~name, opacity = 1,
-                texttemplate = paste0("<b>", as.character(eff_clinical_data$name), "</b>"),
-                textposition = 'top left', textfont = list(size = 14, color=point_colors),
-                marker = list(
-                  size = 8, color = point_colors #c("#1F78B4", "#6A3D9A") 
-                ),
-                text=paste0( 
-                  #"<span style='white'><b>", as.character(eff_clinical_data$name), "</span></b><br>",
-                  "<b>Protection: ", as.character(round(eff_clinical_data$p_safe*100,1)),"%</b><br>",
-                  "<span style='color:#F0F0F0'>Covid: ", as.character(round(eff_clinical_data$pop)), " per 1000</span><br>",
-                  "<span style='color:#F0F0F0'>Vaccine Efficacy: ",
-                      as.character(round(eff_clinical_data$eff*100,0)), "%</span>"),
-                showlegend = FALSE, hoverinfo="text", 
-                hoverlabel=list(bgcolor=~name),
-                hovertemplate = NULL
-      ) %>% ### user point ----
-      add_trace(data = eff_point(), type = "scatter", mode = 'markers',
-                uid = "user_point", visible = TRUE,
-                x = ~eff, y = ~pop, opacity = 1,
-                # texttemplate = "<b>My Point<b>", 
-                # textposition = 'top middle', textfont = list(size = 14, color = "black"),
-                marker = list(
-                  size = 12, color = "black", symbol = 'circle-open',
-                  line = list(width=4)), 
-                text=paste0(
-                  "<b>Protection: ", as.character(round(eff_point()$p_safe*100,1)), "%</b><br>",
-                  "<span style='color:lightgrey'>Covid: ", as.character(eff_point()$pop), " per 1000</span><br>",
-                  "<span style='color:lightgrey'>Vaccine Efficacy: ",
-                      as.character(round(eff_point()$eff*100,0)), "%</span>"),
-                showlegend = FALSE, hoverinfo="text", 
-                hoverlabel=list(bgcolor=RColorBrewer::brewer.pal(9, "Greys")[8]),
-                hovertemplate = NULL
-      ) %>% ### layout ----
-      layout( 
-        font = list(family="Arial"),
-        dragmode = FALSE, # disable click/drag
-        uniformtext = list(mode='hide', minsize=8),
-        title = list(
-          text = NULL
-          # font = list(size=14),
-          # pad = list(t=1,r=0,b=1,l=0)
-        ),
-        height = 400,
-        margin = list(t=0,r=2,b=20,l=10),
-        paper_bgcolor = "", plot_bgcolor = "",
-        xaxis = list(
-          title = list(
-            text = "Vaccine Efficacy",
-            font = list(size=15),
-            standoff = 12),
-          tickmode = 'linear', tick0 = 0, dtick = 0.2,
-          tickformat = "%",
-          showline = FALSE, showgrid = FALSE
-        ),
-        yaxis = list(
-          title = list(
-            text = "Covid Cases per 1,000",
-            font = list(size=15),
-            standoff = 4),
-          showline = FALSE, showgrid = FALSE
-        )
-      ) %>%
-      config(displayModeBar = FALSE) %>%
-      onRender("function(el, x)
-           {Plotly.d3.select('.cursor-crosshair').style('cursor',
-           'default')}")
+  
     
-  })
-    
-  output$effplot <- renderPlotly({p2()})
+  output$effplot <- renderPlotly({effplot})
 
   
   
@@ -831,10 +882,13 @@ server <- function(input, output, session) {
       radioGroupButtons(inputId = 'click', label = "Plot Click:", justified = TRUE, width = '300px',
                         choices = c("Shows hover info", "Moves point")),
       HTML("<font size=3>Info:</font><br>
-                   <font size=2>Points on the right side indicate better efficacy rates. Likewise, points that are lower show
-                   lower rates of covid among non-vaccinated people when the trial was conducted.
-                   Look for points in green/blue areas, as they 
-                   show vaccines with good average chances of protection considering both these dimensions. <font>")
+                   <font size=2> Good quality vaccines maintain high efficacy rates in both high- and low-
+                  risk situations, which means that all recipients can be assured that their chances of protection
+                  from covid remain high.<br>
+                  Points on the right side indicate better vacine efficacy rates and point that are lower show lower
+                  average risk. Points in blue bands of color indicate good chances of protection.<br>
+                  The clinical data show that mRNA vaccines provide users with very high chances of protection,
+                  even in high risk settings. <font>")
       
     )
   })

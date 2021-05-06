@@ -1,0 +1,35 @@
+/*css for vaccine app*/
+
+
+.MathJax {
+  font-size: 0.3rem;
+  font-align: center;
+}
+
+.leaflet .legend {
+  line-height: 11px;
+  font-size: 11px;
+}
+
+/* adjust the key boxes*/
+.leaflet .legend i{ 
+  width: 12px;
+  height: 12px;
+  }
+
+/*Custom button colors*/ 
+.btn-myclass {
+  color: #FFFFFF;
+  background-color: #41AB5D;
+  border-color: #238B45;
+}
+.btn-myclass:hover, btn-myclass:active {
+  color: #FFFFFF;
+  background-color: #006D2C;
+  border-color: #00441B;
+}
+/*.btn-myclass:active {
+  color: #FFFFFF;
+  background-color: #006D2C;
+  border-color: #00441B;
+} */
