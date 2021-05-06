@@ -233,7 +233,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
      
      verticalLayout( ### Protection ----
        wellPanel(align='center',
-                 style= 'background: #D9F9E5; padding: 0px; border-width: 1px; border-color: #41AB5D;
+                 style= 'background: #6BAED650; padding: 0px; border-width: 1px; border-color: #4292C6;
                          margin-bottom: 20px',
                  
                  
@@ -628,7 +628,7 @@ server <- function(input, output, session) {
   
   output$right_effrate <- renderText({
     paste0(
-      "<b><font color=\"#2171B5\" size=5>",
+      "<b><font color=\"#41AB5D\" size=5>",  
       effrate_B_pct(), "%",
       "</b></font>"
     )
@@ -636,7 +636,7 @@ server <- function(input, output, session) {
   
   output$center_protectrate <- renderText({
     paste0(
-      "<b><font color=\"#41AB5D\" size=6>",
+      "<b><font color=\"#2171B5\" size=6>",
       protectrate_pct(), "%",
       "</b></font>"
     )
@@ -658,24 +658,24 @@ server <- function(input, output, session) {
   sum <- reactive({if (input$presets == "Explore") {
     paste0(
       "<font size=4>The <b><font color= \"#54278F\">", as.character(selected_vax_name()), "</font></b>",
-      " vaccine would protect people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
+      " vaccine would protect people from Covid-19 infections about ", "<b><font color=\"#2171B5\">", 
       protectrate_pct1(), "%", "</font></b> of the time given the selected infection rate and efficacy rate
       below.<br><br>"
-    )
+    ) 
   } else if (input$presets == "mRNA") {
     paste0(
       "<font size=4>The CDC conducted a trial of only <b>frontline and essential workers</b>. Vaccinated 
       participants received either the Pfizer or the Moderna mRNA vaccine 
       and the results were reported together. <br><br>
       In the CDC's trial, the <b><font color= \"#54278F\"> mRNA vaccines </font></b>",
-      " protected fully-vaccinated people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
+      " protected fully-vaccinated people from Covid-19 infections about ", "<b><font color=\"#2171B5\">", 
       protectrate_pct1(), "%", "</font></b> of the time, even in frontline situations.<br><br>"
     )
   }
     else {
       paste0(
         "<font size=4>During clinical trials, the <b><font color= \"#54278F\">", as.character(selected_vax_name()), "</font></b>",
-        " vaccine protected people from Covid-19 infections about ", "<b><font color=\"#41AB5D\">", 
+        " vaccine protected people from Covid-19 infections about ", "<b><font color=\"#2171B5\">", 
         protectrate_pct1(), "%", "</font></b> of the time.<br><br>"
       )
     }
@@ -695,8 +695,8 @@ server <- function(input, output, session) {
       "<b><font color=\"#000000\">",
       as.character(round(vax_data$treatment_covid_incidence[vax_data$short_name %in% selected_vax_name()],1)),
       "</font>", " per ", "1,000", "</b>", ", a rate that was ",
-      "<font color=\"#2171B5\"><b>", round(effrate_B_pct(),1), "%", "</b></font>",
-      " lower. About ", "<b><font color=\"#41AB5D\">", 
+      "<font color=\"#41AB5D\"><b>", round(effrate_B_pct(),1), "%", "</b></font>",
+      " lower. About ", "<b><font color=\"#2171B5\">", 
       protectrate_pct1(), "%", "</font></b>", " of the time, participants with the ",selected_vax_name(), 
       " vaccine did not test positive for covid."
     )

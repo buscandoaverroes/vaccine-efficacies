@@ -20,16 +20,16 @@
 /*Custom button colors*/ 
 .btn-myclass {
   color: #FFFFFF;
-  background-color: #4292C6;
-  border-color: #2171B5;
+  background-color: #41AB5D;
+  border-color: #238B45;
 }
-.btn-myclass:hover {
+.btn-myclass:hover, btn-myclass:active {
   color: #FFFFFF;
-  background-color: #08519C;
-  border-color: #08306B;
+  background-color: #006D2C;
+  border-color: #00441B;
 }
-.btn-myclass:active {
+/*.btn-myclass:active {
   color: #FFFFFF;
-  background-color: #08519C;
-  border-color: #08306B;
-}
+  background-color: #006D2C;
+  border-color: #00441B;
+} */
