@@ -259,10 +259,10 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
            )),
        
        HTML("<font size=3>Your protection chances depend on local infection rates. But even in the 
-            worst hotspots, vaccinated people are very likely to remain protected. The top map shows 14-day infection rates 
-            and the bottom displays corresponding chances of protection. </font>"),
+            worst hotspots, vaccinated people are very likely to remain protected. </font>"),
        br(),
        uiOutput('map'),
+       leafletOutput("see"),
        htmlOutput('mapupdate'),
        HTML("<font size =3>
             Sources: John's Hopkins, New York Times, Oxford, World Bank 
@@ -664,6 +664,15 @@ server <- function(input, output, session) {
            '</b></font>')
   })
   
+  output$mapPrefix <- renderText({
+    paste0("<font size=5 color=\"#F16913\">
+           Recent Infections</b></font> and<br>
+           <font size=5 color=\"#2171B5\"><b>Protection Chances if Vaccinated</b><font><br>
+           
+           
+           ")
+  })
+  
   
   ## summary + expl ----
   sum <- reactive({if (input$presets == "Explore") {
@@ -760,9 +769,44 @@ server <- function(input, output, session) {
   
   # map -------------------------------------------------------------------------------------
   
-  ## infections ----
+  # title panels 
   
-  ### infections
+  # make css
+  tag.map.title <- tags$style(HTML("
+         .leaflet-control.map-title {
+          transform: translate(-50%,20%);
+          position: fixed;
+          left: 50%;
+          text-align: center;
+          padding-left: 5px;
+          padding-right: 5px;
+          margin: 3px;
+          background-color: #F0F0F080;
+          border-radius: 5px;
+          font-weight: bold;
+          font-size: 14px;
+          z-index: 100;
+        } "))
+  
+  title.infections <- tags$div(
+    tag.map.title, HTML(paste0("Recent Infections:<br>",
+                              day(ago2wk), " ", month(ago2wk, label = T), " - ",
+                              day(now), " ", month(now, label = T), " - "
+                               ))
+  )
+  
+  title.protection <- reactive({
+    tags$div(
+      tag.map.title, HTML(paste0("Protection Chance with<br>",
+                                 case_when(input$mapProtect == "protection_66" ~ "66%",
+                                           input$mapProtect == "protection_90" ~ "90%",
+                                           input$mapProtect == "protection_95" ~ "95%"),
+                                 " Effective Vaccine"))
+    )
+  })
+    
+  
+  ## infections ----
   top <- reactive({
     leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
       addProviderTiles(providers$CartoDB.DarkMatter) %>%
@@ -780,10 +824,10 @@ server <- function(input, output, session) {
       ) %>%
       addLegend(
         na.label = NULL, title = "<font size=2>New Cases<br>per 10k</font>",
-        pal = colorBin(palette = "OrRd", domain = us_adm2_sf$incidence_2wk_10k, bins = c(0, 10, 20, 50, 100, 300), 
-                       na.color = "#00000000",reverse = F),
+        pal = pal.bin, 
         values = us_adm2_sf$incidence_2wk_10k, 
-        opacity = 0.4) 
+        opacity = 0.4) %>%
+      addControl(title.infections, position = "topleft", className = 'map-title')
   })
     
   
@@ -804,23 +848,23 @@ server <- function(input, output, session) {
         )
       ) %>%
       addLegend(
-        na.label = NULL, title = "<font size=2>Protection<br>Chance if<br>Vaccinated</font>",
-        pal = colorNumeric(palette = "Spectral",
-                           domain = num.dom,
-                           na.color = "#00000000",
-                           reverse = F),
-        values = ~eval(as.symbol(input$mapProtect)), 
+        na.label = NULL, 
+        title = "<font size=2>Protection<br>Chance",
+        pal = pal.num,
+        values = c(0.90, 1),  
         opacity = 0.4,
-        labFormat = labelFormat(suffix = "%", digits = 3, transform = function(x) 100*x))
+        labFormat = labelFormat(suffix = "%", digits = 3, transform = function(x) 100*x)) %>%
+      addControl(title.protection(), position = "topleft", className = 'map-title')
   })
   
   
   #combine map
-  map <-reactive({sync(top(), bottom(), ncol = 1)})
+  map <- reactive({sync(top(), bottom(), ncol = 1)})
   
   
   # render map 
   output$map <- renderUI({map()})
+  output$see <- renderLeaflet({top()})
 
   
   

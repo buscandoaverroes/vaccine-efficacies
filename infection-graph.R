@@ -23,6 +23,12 @@ pal.num= colorNumeric(palette = "Spectral",
                       domain = num.dom, # us_adm2_sf$protection_90
                       na.color = "#00000000",
                       reverse = F)
+pal.quant= colorQuantile(palette = "Spectral",
+                         domain = num.dom,
+                         na.color = "#00000000",
+                         reverse = F)
+
+
 
 
 labs.infections <- sprintf(
