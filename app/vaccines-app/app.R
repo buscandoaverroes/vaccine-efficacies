@@ -656,9 +656,9 @@ server <- function(input, output, session) {
   
   output$mapupdate <- renderText({
     paste0('<font size=3>
-           Data: 2-week period ending on: ',
+           Data: 2-week period ending on ',
            "<b>",
-           recent_date, 
+           day(recent_date), " ", month(recent_date, label = T), " ", year(recent_date),
            '</b></font>')
   })
   
