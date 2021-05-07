@@ -264,6 +264,9 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        br(),
        uiOutput('map'),
        htmlOutput('mapupdate'),
+       HTML("<font size =3>
+            Sources: John's Hopkins, New York Times, Oxford, World Bank 
+            </font>"),
        
        br(),     
                     # pt3 ----
@@ -274,8 +277,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                             padding-top:15px; padding-bottom:25px; width: 100%',
                    HTML("<font size=5><b>Protection Comparison</b></font>"),
                    
-                   #uiOutput( "dropdown") 
-                   
+
                    ),
        HTML("<font size=3>Frontline jobs put you at higher risk, but data show that
             vaccines are still highly effective. Dots in blue bands show indicate scenarios with
