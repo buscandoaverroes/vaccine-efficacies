@@ -125,8 +125,8 @@ us_adm2_sf <- raw2 %>% # use lowest resolution data
   select(fips, geometry) %>%
   left_join(infection_us,
             by = c("fips" = "key_numeric")
-  )
-
+  ) %>%
+  st_transform(crs = st_crs(., 4326)) # set crs
 
 
 # save the most recent date object

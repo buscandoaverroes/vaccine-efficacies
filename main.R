@@ -29,11 +29,11 @@ if (user == 1) {
 s1  <- 1 # imports, calculates data
 s2  <- 1 # creates graph/app data
 s3  <- 1 # runs infection-data
-s4  <- 0 # map-sandbox
+s4  <- 1 # runs infection-graph; makes graph objects
 
 m1  <- 0 # about markdown
 
 if (s1==1) {source(file.path(code, "clinical-data.R"))}
 if (s2==1) {source(file.path(code, "graph-data.R"))}
 if (s3==1) {source(file.path(code, "infection-data.R"))}
-if (s4==1) {source(file.path(code, "map-sandbox.R"))}
+if (s4==1) {source(file.path(code, "infections-graph.R"))}
