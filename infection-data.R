@@ -134,6 +134,10 @@ recent_date <-
   range(x$date)[2]
 
 
+# create citation objects
+x.cite <- covid19cite(x = x)
+
+
 ## check ----
 
 ### duplicates 
@@ -149,6 +153,6 @@ assert_that(sum(is.na(us_adm2_sf$confirmed))/nrow(us_adm2_sf) <= 0.005)
 
 # export ----
 save(
-  data, x, us_adm2_sf, raw, raw2, recent_date,
-  file = "/Volumes/PROJECTS/vaccines/data/infection-data.Rdata"
+  data, x, us_adm2_sf, raw, raw2, recent_date, x.cite,
+  file = file.path(data, "infection-data.Rdata")
   )

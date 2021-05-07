@@ -18,4 +18,8 @@ I encourage you to go to the [CDC's website](https://www.cdc.gov/coronavirus/201
 
 ### Data Sources
 
-Baden, Lindsey R et al. (2021), Polack, Fernando P et al. (2020), and Thompson MG, Burgess JL, Naleway AL, et al (2021)
+Clinical Data: Baden, Lindsey R et al. (2021), Polack, Fernando P et al. (2020), and Thompson MG, Burgess JL, Naleway AL, et al (2021)
+
+Map and Infection Data: Thomas, Webster, Petherick, Phillips, Kira (2020), John's Hopkins Center for Systems Science and Engineering (2020), The New York Times (2020), World Bank Open Data (2018)
+
+See About page for full citation

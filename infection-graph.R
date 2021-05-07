@@ -97,6 +97,6 @@ save(
   cntr_crds,
   labs.infections, labs.protection,
   pal.num, pal.bin, num.dom, 
-  us_adm2_sf, recent_date,
+  us_adm2_sf, recent_date, x.cite,
   file = file.path(app, "data/map-data.Rdata")
 )
