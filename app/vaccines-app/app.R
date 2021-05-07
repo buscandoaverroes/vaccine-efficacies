@@ -259,7 +259,8 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
            )),
        
        HTML("<font size=3>Your protection chances depend on local infection rates. But even in the 
-            worst hotspots, vaccinated people are very likely to remain protected. </font>"),
+            worst hotspots, vaccinated people are very likely to remain protected. Note that protection
+            chances are given in year-equivalent times.</font>"),
        br(),
        uiOutput('map'),
        htmlOutput('mapupdate'),
