@@ -28,7 +28,7 @@ if (user == 1) {
 
 s1  <- 1 # imports, calculates data
 s2  <- 1 # creates graph/app data
-s3  <- 0 # runs infection-data
+s3  <- 1 # runs infection-data
 s4  <- 0 # map-sandbox
 
 m1  <- 0 # about markdown

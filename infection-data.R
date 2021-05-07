@@ -16,15 +16,20 @@ library(tigris)
 
 options(tigris_use_cache = TRUE) # set to redownload if FALSE
 
-import   = FALSE 
+import   = TRUE 
 download = FALSE
 
 # 1. import infection data ----
 ## import ----
 ## note: "confirmed" is cumulative count of confirmed cases.
+
+# create now and 2 weeks ago time variable
+now    <- Sys.Date()  
+ago2wk <- ymd(now) - weeks(2)
+
 if (import == TRUE) {
   x <- covid19(country = c("US"), level = 3,
-               start = "2021-04-01", end = Sys.Date()) 
+               start = ago2wk, end = now) 
 } else { # else reload the previously saved data
   load("/Volumes/PROJECTS/vaccines/data/infection-data.Rdata")
 }
