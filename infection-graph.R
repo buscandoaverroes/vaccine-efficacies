@@ -40,11 +40,27 @@ labs.infections <- sprintf(
 )  %>%
   lapply(htmltools::HTML)
 
-labs.protection <- sprintf(
+labs.protection66 <- sprintf(
+  "<strong>%s, %s </strong><br><b>%.1f%%</b> protection probability", 
+  us_adm2_sf$administrative_area_level_3,
+  us_adm2_sf$administrative_area_level_2,
+  us_adm2_sf$protection_66_pct
+)  %>%
+  lapply(htmltools::HTML)
+
+labs.protection90 <- sprintf(
   "<strong>%s, %s </strong><br><b>%.1f%%</b> protection probability", 
   us_adm2_sf$administrative_area_level_3,
   us_adm2_sf$administrative_area_level_2,
   us_adm2_sf$protection_90_pct
+)  %>%
+  lapply(htmltools::HTML)
+
+labs.protection95 <- sprintf(
+  "<strong>%s, %s </strong><br><b>%.1f%%</b> protection probability", 
+  us_adm2_sf$administrative_area_level_3,
+  us_adm2_sf$administrative_area_level_2,
+  us_adm2_sf$protection_95_pct
 )  %>%
   lapply(htmltools::HTML)
 
@@ -101,7 +117,7 @@ l1 <- browsable(
 save(
   #l1,
   cntr_crds,
-  labs.infections, labs.protection,
+  labs.infections, labs.protection66, labs.protection90, labs.protection95,
   pal.num, pal.bin, num.dom, 
   us_adm2_sf, recent_date, x.cite,
   file = file.path(app, "data/map-data.Rdata")

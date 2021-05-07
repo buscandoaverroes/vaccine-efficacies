@@ -262,7 +262,6 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
             worst hotspots, vaccinated people are very likely to remain protected. </font>"),
        br(),
        uiOutput('map'),
-       leafletOutput("see"),
        htmlOutput('mapupdate'),
        HTML("<font size =3>
             Sources: John's Hopkins, New York Times, Oxford, World Bank 
@@ -839,10 +838,13 @@ server <- function(input, output, session) {
       addPolygons(
         stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
         fillColor = ~pal.num(eval(as.symbol(input$mapProtect))), fillOpacity = 0.9,
-        label = ~labs.protection, labelOptions = labelOptions(textsize = 20, sticky = F, 
-                                                              direction = "top",
-                                                              offset = c(0, -7),
-                                                              style = list(padding = "3px 3px")),
+        label = ~case_when(input$mapProtect == "protection_66" ~ labs.protection66,
+                            input$mapProtect == "protection_90" ~ labs.protection90,
+                            input$mapProtect == "protection_95" ~ labs.protection95),
+        labelOptions = labelOptions(textsize = 20, sticky = F, 
+                                    direction = "top",
+                                    offset = c(0, -7),
+                                    style = list(padding = "3px 3px")),
         highlightOptions = highlightOptions(stroke = TRUE, color = "black", weight = 2, opacity = 1, 
                                             fill = T, bringToFront = T
         )
