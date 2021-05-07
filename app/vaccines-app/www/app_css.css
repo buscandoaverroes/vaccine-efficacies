@@ -23,12 +23,7 @@
   background-color: #41AB5D;
   border-color: #238B45;
 }
-.btn-myclass:hover {
-  color: #FFFFFF;
-  background-color: #006D2C;
-  border-color: #00441B;
-}
-.btn-myclass, .btn-default.active, .open > .dropdown-toggle.btn-default, btn-myclass:selected {
+.btn-myclass:hover, .btn-myclass:focus, .btn-myclass:checked {
   color: #FFFFFF;
   background-color: #006D2C;
   border-color: #00441B;
