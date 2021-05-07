@@ -7,6 +7,7 @@ library(tigris)
 library(leaflet)
 library(leafsync)
 library(htmltools)
+library(lubridate)
 
 
 load("/Volumes/PROJECTS/vaccines/data/infection-data.Rdata")
@@ -91,15 +92,11 @@ l1 <- browsable(
       l1)))
 
 
-
-
-
-
 save(
   #l1,
   cntr_crds,
   labs.infections, labs.protection,
   pal.num, pal.bin, num.dom, 
-  us_adm2_sf,
+  us_adm2_sf, recent_date,
   file = file.path(app, "data/map-data.Rdata")
 )

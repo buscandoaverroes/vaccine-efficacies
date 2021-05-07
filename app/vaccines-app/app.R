@@ -263,6 +263,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
             and the bottom displays corresponding chances of protection. </font>"),
        br(),
        uiOutput('map'),
+       htmlOutput('mapupdate'),
        
        br(),     
                     # pt3 ----
@@ -651,6 +652,14 @@ server <- function(input, output, session) {
   })
   output$math <- renderUI({
     withMathJax(helpText(math_eq()))
+  })
+  
+  output$mapupdate <- renderText({
+    paste0('<font size=3>
+           Data: 2-week period ending on: ',
+           "<b>",
+           recent_date, 
+           '</b></font>')
   })
   
   

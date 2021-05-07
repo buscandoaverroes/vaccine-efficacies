@@ -16,7 +16,7 @@ library(tigris)
 
 options(tigris_use_cache = TRUE) # set to redownload if FALSE
 
-import   = TRUE 
+import   = FALSE 
 download = FALSE
 
 # 1. import infection data ----
@@ -29,8 +29,9 @@ ago2wk <- ymd(now) - weeks(2)
 
 if (import == TRUE) {
   x <- covid19(country = c("US"), level = 3,
-               start = ago2wk, end = now) 
-} else { # else reload the previously saved data
+               start = ago2wk, end = now, cache = FALSE) # don't use cache to download
+} 
+if (import == FALSE) { # else reload the previously saved data
   load("/Volumes/PROJECTS/vaccines/data/infection-data.Rdata")
 }
 
@@ -127,6 +128,12 @@ us_adm2_sf <- raw2 %>% # use lowest resolution data
   )
 
 
+
+# save the most recent date object
+recent_date <-
+  range(x$date)[2]
+
+
 ## check ----
 
 ### duplicates 
@@ -142,6 +149,6 @@ assert_that(sum(is.na(us_adm2_sf$confirmed))/nrow(us_adm2_sf) <= 0.005)
 
 # export ----
 save(
-  data, x, us_adm2_sf, raw, raw2,
+  data, x, us_adm2_sf, raw, raw2, recent_date,
   file = "/Volumes/PROJECTS/vaccines/data/infection-data.Rdata"
   )
