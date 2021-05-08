@@ -15,3 +15,11 @@ Regardless of vaccination status, it's very important to continue to follow CDC 
 ### Still have Questions?
 
 I encourage you to go to the [CDC's website](https://www.cdc.gov/coronavirus/2019-nCoV/index.html) on Covid-19 with general questions, or contact your physician. You can also take a look at the [Pfizer](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7745181/), [Moderna](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7787219/), or [CDC](https://www.cdc.gov/mmwr/volumes/70/wr/mm7013e3.htm) papers themselves if you're curious. Finally, my About and Q+A pages have a few in-progress notes about the project.
+
+### Data Sources
+
+Clinical Data: Baden, Lindsey R et al. (2021), Polack, Fernando P et al. (2020), and Thompson MG, Burgess JL, Naleway AL, et al (2021)
+
+Map and Infection Data: Thomas, Webster, Petherick, Phillips, Kira (2020), John's Hopkins Center for Systems Science and Engineering (2020), The New York Times (2020), World Bank Open Data (2018)
+
+See About page for full citation

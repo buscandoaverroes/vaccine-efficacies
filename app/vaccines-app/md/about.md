@@ -10,23 +10,11 @@ In that spirit, please consider this app as my attempt to communicate the scienc
 
 I'm a data scientist and educator, somewhat fresh out of graduate school, and I've worked for non-profits large and small. I'm not affiliated with any of the vaccine research personally or professionally. This project is entirely my own independent initiative.
 
-A bit about key terms and methodology is below in [Notes on the Data] and [Can I look at your code?]. While I'm confident in the product, there are surely places to improve -- please let me know!
-
-## Inspiration
-
-Our professor's strategy of mental Jiu-Jitsu proved quite fortuitous:. Read 20 pages of theoretical math, code it, stay up all night, and then:
-
-"Tell me the units".
-
-"HUuUuUh?" we forgot the single most important word in the whole paper. His point was simple: we, as future storytellers of data and empirics, will invariably tell our story to people -- and no matter how conceptual or math-y our methodology gets, we need a firm grasp on what our final results mean in practicality. Always know what the units mean.
-
-Fast forward to December 2020, and numbers start popping up on the news: 95, 94, then later, 66. People start noticing differences, and of course we want the best quality medicine available, and of course discussions ensue of vaccine equity, as they should.
-
-But I noticed that one very essential line was missing: the unit.
+A bit about key terms and methodology is below in [Notes on the Data] and [Can I look at your code?]. While I'm confident in the product, there are surely places to improve -- please let me know.
 
 ## Data Sources
 
-All of the data come directly from each of the relevant COVID-19 Vaccine Clinical Studies published via the National Institute of Health and the New England journal of medicine. As of the time of app production, these studies were published as open-access articles. Individual publication citation details are below.
+All of the data come directly from each of the relevant COVID-19 Vaccine Clinical Studies published via the National Institute of Health and the New England journal of medicine. As of the time of app production, these studies were published as open-access articles. Individual publication citation details are below. Data on daily infections come from the CDC, John's Hopkins University, and other sources, which I access via the `covid19` r package. Full citations below.
 
 ## License and Citing
 
@@ -58,10 +46,6 @@ The two calculation methods are equivalent -- but in hypothetical data, since we
 
 ## Assumptions
 
-### Time
-
-Explanation forthcoming.
-
 ### Cross-Study Comparability
 
 The clinical trials occurred over different times and places during the pandemic. And while this raises valid questions on comparability, the reality is that everyone in the world is comparing the final numbers. I recognize the problems in comparing the data from studies that are not identical in design, and I've done the following to steer users toward more constructive interaction with the data:
@@ -82,8 +66,16 @@ Baden, Lindsey R et al. "Efficacy and Safety of the mRNA-1273 SARS-CoV-2 Vaccine
 
 Centers for Disease Control and Prevention. "Covid-19 Vaccines Work." Updated on 7 April, 2021. URL: <https://www.cdc.gov/coronavirus/2019-ncov/vaccines/effectiveness/work.html>
 
+Johns Hopkins Center for Systems Science and Engineering (2020), <https://github.com/CSSEGISandData/COVID-19>
+
+The New York Times (2020), <https://github.com/nytimes/covid-19-data>
+
 Polack, Fernando P et al. "Safety and Efficacy of the BNT162b2 mRNA Covid-19 Vaccine." The New England journal of medicine vol. 383,27 (2020): 2603-2615. <doi:10.1056/NEJMoa2034577>
 
 Sadoff, Jerald et al. "Interim Results of a Phase 1-2a Trial of Ad26.COV2.S Covid-19 Vaccine." The New England journal of medicine, NEJMoa2034201. 13 Jan. 2021, <doi:10.1056/NEJMoa2034201>
 
+Hale Thomas, Sam Webster, Anna Petherick, Toby Phillips, and Beatriz Kira (2020). Oxford COVID-19 Government Response Tracker, Blavatnik School of Government.
+
 Thompson MG, Burgess JL, Naleway AL, et al. Interim Estimates of Vaccine Effectiveness of BNT162b2 and mRNA-1273 COVID-19 Vaccines in Preventing SARS-CoV-2 Infection Among Health Care Personnel, First Responders, and Other Essential and Frontline Workers --- Eight U.S. Locations, December 2020--March 2021. MMWR Morb Mortal Wkly Rep 2021;70:495--500. DOI: <http://dx.doi.org/10.15585/mmwr.mm7013e3>
+
+World Bank Open Data (2018), <https://data.worldbank.org/indicator/SP.POP.TOTL>
