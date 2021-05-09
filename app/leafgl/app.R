@@ -4,9 +4,13 @@ library(leaflet)
 library(htmlwidgets)
 library(htmltools)
 library(sf)
+library(mapview)
 
 # cast geometry from multipolygon to polygon 
 us <- st_cast(us_adm2_sf, "POLYGON", warn = T, do_split = T)
+
+# mapviewOptions(platform = "leafgl")
+# mapview(us, zcol = "protection_90")
 
 ui <- fluidPage(
 
