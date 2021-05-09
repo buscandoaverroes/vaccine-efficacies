@@ -134,6 +134,7 @@ server <- function(input, output) {
     
     output$map <- renderUI({map()})
     #output$map <- renderLeaflet({bottom()}) # fine but hover and polylines won't generate.
+    #that's because label isn't supported, only popup, see ?addGlPolygons
     
     
 }
