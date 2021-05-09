@@ -3,8 +3,13 @@ library(leafgl)
 library(leaflet)
 library(htmlwidgets)
 library(htmltools)
+library(sf)
+
+# cast geometry from multipolygon to polygon 
+us <- st_cast(us_adm2_sf, "POLYGON", warn = T, do_split = T)
 
 
+st_cast(us_adm2_sf$geometry, "POLYGON")
 
 ui <- fluidPage(
 
@@ -72,10 +77,10 @@ server <- function(input, output) {
     
     ## infections ----
     top <- reactive({
-        leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
+        leaflet(data = us, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
             addProviderTiles(providers$CartoDB.DarkMatter) %>%
             setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
-            addPolygons(
+            addGlPolygons( data = us,
                 stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
                 fillColor = ~pal.bin(incidence_2wk_10k), fillOpacity = 0.9,
                 label = ~labs.infections, labelOptions = labelOptions(textsize = 20, sticky = F, 
@@ -89,7 +94,7 @@ server <- function(input, output) {
             addLegend(
                 na.label = NULL, title = "<font size=2>New Cases<br>per 10k</font>",
                 pal = pal.bin, 
-                values = us_adm2_sf$incidence_2wk_10k, 
+                values = us$incidence_2wk_10k, 
                 opacity = 0.4) %>%
             addControl(title.infections, position = "topleft", className = 'map-title')
     })
@@ -97,10 +102,10 @@ server <- function(input, output) {
     
     ## protection ----
     bottom <- reactive({
-        leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
+        leaflet(data = us, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
             addProviderTiles(providers$CartoDB.DarkMatter) %>%
             setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
-            addPolygons(
+            addGlPolygons( data = us,
                 stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
                 fillColor = ~pal.num(eval(as.symbol(input$mapProtect))), fillOpacity = 0.9,
                 label = ~case_when(input$mapProtect == "protection_66" ~ labs.protection66,
@@ -125,6 +130,9 @@ server <- function(input, output) {
     })
     
    
+   output$map <- renderLeaflet({top()}) 
+    
+    
 }
 
 shinyApp(ui = ui, server = server)
