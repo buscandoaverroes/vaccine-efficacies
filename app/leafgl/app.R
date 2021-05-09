@@ -8,9 +8,6 @@ library(sf)
 # cast geometry from multipolygon to polygon 
 us <- st_cast(us_adm2_sf, "POLYGON", warn = T, do_split = T)
 
-
-st_cast(us_adm2_sf$geometry, "POLYGON")
-
 ui <- fluidPage(
 
     wellPanel(  
@@ -28,7 +25,7 @@ ui <- fluidPage(
                 )),
     
         
-    leafglOutput('map')
+    uiOutput('map')
    
 )
 
@@ -43,9 +40,9 @@ server <- function(input, output) {
     # make css
     tag.map.title <- tags$style(HTML("
          .leaflet-control.map-title {
-          transform: translate(-50%,20%);
-          position: fixed;
-          left: 50%;
+          transform: translate(0%,-140%);
+          position: float;
+          left: 80%;
           text-align: center;
           padding-left: 5px;
           padding-right: 5px;
@@ -129,8 +126,10 @@ server <- function(input, output) {
             addControl(title.protection(), position = "topleft", className = 'map-title')
     })
     
-   
-   output$map <- renderLeaflet({top()}) 
+    map <- reactive({sync(top(), bottom(), ncol = 1)})
+    
+    output$map <- renderUI({map()})
+    #output$map <- renderLeaflet({bottom()}) # fine but hover and polylines won't generate.
     
     
 }
