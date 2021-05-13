@@ -19,6 +19,10 @@ options(tigris_use_cache = TRUE) # set to redownload if FALSE
 import   = TRUE 
 download = FALSE
 
+us       = TRUE 
+world2   = FALSE 
+world1   = FALSE 
+
 # 1. import infection data ----
 ## import ----
 ## note: "confirmed" is cumulative count of confirmed cases.
@@ -27,24 +31,32 @@ download = FALSE
 now    <- Sys.Date()  
 ago2wk <- ymd(now) - weeks(2)
 
+# load old data
+load("/Volumes/PROJECTS/vaccines/data/xy.Rdata")
+
+
+# update data according to settings
 if (import == TRUE) {
-  x <- covid19(country = c("US"), level = 3,
-               start = ago2wk, end = now, cache = FALSE) # don't use cache to download
-  y <- covid19(country = NULL, level = 2,
-               start = ago2wk, end = now, cache = FALSE) # don't use cache to download
-  z <- covid19(country = NULL, level = 1,
-               start = ago2wk, end = now, cache = FALSE) # don't use cache to download
-  
+  if (us) {
+    x <- covid19(country = c("US"), level = 3,
+                 start = ago2wk, end = now, cache = FALSE) # don't use cache to download    
+  }
+  if (world2) {
+    y <- covid19(country = NULL, level = 2,
+                 start = ago2wk, end = now, cache = FALSE) # don't use cache to download
+  }
+  if (world1) {
+    z <- covid19(country = NULL, level = 1,
+                 start = ago2wk, end = now, cache = FALSE) # don't use cache to download
+  }
+
 } 
 if (import == FALSE) { # else reload the previously saved data
   load("/Volumes/PROJECTS/vaccines/data/infection-data.Rdata")
 }
 
+# save data
 save(x, y, z, file = file.path("/Volumes/PROJECTS/vaccines/data/xy.Rdata"))
-
-# wb shapefiles
-library(osmdata)
-WDIsearch(string = "gdp")
 
 
 
