@@ -66,6 +66,8 @@ Baden, Lindsey R et al. "Efficacy and Safety of the mRNA-1273 SARS-CoV-2 Vaccine
 
 Centers for Disease Control and Prevention. "Covid-19 Vaccines Work." Updated on 7 April, 2021. URL: <https://www.cdc.gov/coronavirus/2019-ncov/vaccines/effectiveness/work.html>
 
+Guidotti, E., Ardia, D., (2020), "COVID-19 Data Hub", Journal of Open Source Software 5(51):2376, doi: 10.21105/joss.02376.\@guidotti2020
+
 Johns Hopkins Center for Systems Science and Engineering (2020), <https://github.com/CSSEGISandData/COVID-19>
 
 The New York Times (2020), <https://github.com/nytimes/covid-19-data>
