@@ -18,6 +18,7 @@ library(lubridate)
 library(mapview)
 library(leaflet)
 library(leafsync)
+library(leafgl)
 
 
 reactlog_enable()
@@ -36,6 +37,7 @@ theme <- bslib::bs_theme(
 # load data 
 load("data/app-data.Rdata")
 load("data/map-data.Rdata")
+
 
 # default input values 
 dflt_poprate = 100
@@ -807,10 +809,10 @@ server <- function(input, output, session) {
   
   ## infections ----
   top <- reactive({
-    leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
+    leaflet(data = us, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
       addProviderTiles(providers$CartoDB.DarkMatter) %>%
       setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
-      addPolygons(
+      addGlPolygons( data = us,
         stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
         fillColor = ~pal.bin(incidence_2wk_10k), fillOpacity = 0.9,
         label = ~labs.infections, labelOptions = labelOptions(textsize = 20, sticky = F, 
@@ -824,7 +826,7 @@ server <- function(input, output, session) {
       addLegend(
         na.label = NULL, title = "<font size=2>New Cases<br>per 10k</font>",
         pal = pal.bin, 
-        values = us_adm2_sf$incidence_2wk_10k, 
+        values = us$incidence_2wk_10k, 
         opacity = 0.4) %>%
       addControl(title.infections, position = "topleft", className = 'map-title')
   })
@@ -832,10 +834,10 @@ server <- function(input, output, session) {
   
   ## protection ----
   bottom <- reactive({
-    leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
+    leaflet(data = us, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
       addProviderTiles(providers$CartoDB.DarkMatter) %>%
       setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
-      addPolygons(
+      addGlPolygons( data = us,
         stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
         fillColor = ~pal.num(eval(as.symbol(input$mapProtect))), fillOpacity = 0.9,
         label = ~case_when(input$mapProtect == "protection_66" ~ labs.protection66,
