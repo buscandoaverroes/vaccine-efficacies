@@ -266,7 +266,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        uiOutput('map'),
        htmlOutput('mapupdate'),
        HTML("<font size =3>
-            Sources: John's Hopkins, New York Times, Oxford, World Bank 
+            Sources: COVID-19 Data Hub, John's Hopkins, New York Times, Oxford, World Bank 
             </font>"),
        
        br(),     
