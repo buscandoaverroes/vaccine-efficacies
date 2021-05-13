@@ -2,7 +2,6 @@ library(shiny)
 library(htmltools)
 library(bslib)
 library(leaflet)
-library(shinyWidgets)
 
 theme <- bslib::bs_theme(
     version = "4",
@@ -37,8 +36,7 @@ map.title <- tags$div(tag.map.title, HTML("Map Title"))
 
 ui <- fluidPage(
 
-    # make useless button
-    
+
     leafletOutput("map")
 )
 

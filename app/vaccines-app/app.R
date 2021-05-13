@@ -780,7 +780,7 @@ server <- function(input, output, session) {
           padding-left: 5px;
           padding-right: 5px;
           margin: 3px;
-          background-color: #F0F0F080;
+          background-color: #F0F0F090;
           border-radius: 5px;
           font-weight: bold;
           font-size: 14px;
