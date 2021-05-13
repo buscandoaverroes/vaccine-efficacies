@@ -47,7 +47,7 @@ dflt_effrate = 0.7
 ui = navbarPage(title = "Covid-19 Vaccine Explorer", 
                 position = "static-top", selected = "Data Explorer", windowTitle = "Vaccine Explorer",
                 collapsible = TRUE,
-                theme = theme,
+                #theme = theme,
 
           
   
