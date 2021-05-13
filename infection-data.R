@@ -14,10 +14,14 @@ library(janitor)
 library(mapview)
 library(tigris)
 
-options(tigris_use_cache = TRUE) # set to redownload if FALSE
+options(tigris_use_cache = FALSE) # set to redownload if FALSE
 
-import   = FALSE 
-download = FALSE
+import   = TRUE 
+download = FALSE # downloads tiger files from census
+
+us       = TRUE 
+world2   = FALSE 
+world1   = FALSE 
 
 # 1. import infection data ----
 ## import ----
@@ -27,13 +31,33 @@ download = FALSE
 now    <- Sys.Date()  
 ago2wk <- ymd(now) - weeks(2)
 
+# load old data
+load("/Volumes/PROJECTS/vaccines/data/xy.Rdata")
+
+
+# update data according to settings
 if (import == TRUE) {
-  x <- covid19(country = c("US"), level = 3,
-               start = ago2wk, end = now, cache = FALSE) # don't use cache to download
+  if (us == TRUE) {
+    x <- covid19(country = c("US"), level = 3,
+                 start = ago2wk, end = now, cache = FALSE) # don't use cache to download    
+  }
+  if (world2 == TRUE) {
+    y <- covid19(country = NULL, level = 2,
+                 start = ago2wk, end = now, cache = FALSE) # don't use cache to download
+  }
+  if (world1 == TRUE) {
+    z <- covid19(country = NULL, level = 1,
+                 start = ago2wk, end = now, cache = FALSE) # don't use cache to download
+  }
+
 } 
 if (import == FALSE) { # else reload the previously saved data
   load("/Volumes/PROJECTS/vaccines/data/infection-data.Rdata")
 }
+
+# save data
+save(x, y, z, file = file.path("/Volumes/PROJECTS/vaccines/data/xy.Rdata"))
+
 
 
 ## create cumulative incidence ----
@@ -101,16 +125,10 @@ infection_us <- select(data,
 ## load US shapefiles ----
 if (download == TRUE) {
   raw <- counties(state = NULL,
-                  cb = TRUE, # generalized?
-                  resolution = '500k', # default
+                  cb = TRUE, 
+                  resolution = '20m', 
                   year = 2019,
-                  refresh = FALSE) # true = redownload
-  
-  raw2 <- counties(state = NULL,
-                   cb = TRUE, # generalized?
-                   resolution = '20m', # default
-                   year = 2019,
-                   refresh = FALSE) # true = redownload
+                  refresh = TRUE) # true = redownload
 }
 
 
@@ -118,7 +136,7 @@ if (download == TRUE) {
 #rappdirs::user_cache_dir("tigris")
 
 ## join with infection data ----
-us_adm2_sf <- raw2 %>% # use lowest resolution data
+us_adm2_sf <- raw %>% # use lowest resolution data
   mutate(
     fips = as.numeric(GEOID)
   ) %>% 
@@ -141,7 +159,7 @@ x.cite <- covid19cite(x = x)
 ## check ----
 
 ### duplicates 
-assert_that( nrow(raw2) == nrow(us_adm2_sf)) # no dups from shape files
+assert_that( nrow(raw) == nrow(us_adm2_sf)) # no dups from shape files
 assert_that( anyDuplicated(us_adm2_sf$fips) == 0) # no extras from infection_us
 
 ### missings \
@@ -153,6 +171,6 @@ assert_that(sum(is.na(us_adm2_sf$confirmed))/nrow(us_adm2_sf) <= 0.005)
 
 # export ----
 save(
-  data, x, us_adm2_sf, raw, raw2, recent_date, x.cite, now, ago2wk, 
+  data, x, us_adm2_sf, raw, recent_date, x.cite, now, ago2wk, 
   file = file.path(root, "data/infection-data.Rdata")
   )
