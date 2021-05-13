@@ -25,11 +25,11 @@ use_bs_tooltip() # must call once
 use_bs_popover()
 
 theme <- bslib::bs_theme(
-  version = "4", bootswatch = "cosmo", 
+  version = "4",
+  bootswatch = "cosmo", 
   spacer = '0.5rem',
   enable_rounded = TRUE,
   primary = "#7C36B0"
-   
   )
 
 
@@ -47,7 +47,7 @@ dflt_effrate = 0.7
 ui = navbarPage(title = "Covid-19 Vaccine Explorer", 
                 position = "static-top", selected = "Data Explorer", windowTitle = "Vaccine Explorer",
                 collapsible = TRUE,
-                #theme = theme,
+                theme = theme,
 
           
   
