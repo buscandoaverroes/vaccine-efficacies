@@ -17,7 +17,7 @@ library(tigris)
 options(tigris_use_cache = FALSE) # set to redownload if FALSE
 
 import   = TRUE 
-download = TRUE # downloads tiger files from census
+download = FALSE # downloads tiger files from census
 
 us       = TRUE 
 world2   = FALSE 
