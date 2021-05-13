@@ -771,26 +771,26 @@ server <- function(input, output, session) {
   # title panels 
   
   # make css
-  # tag.map.title <- tags$style(HTML("
-  #        .leaflet-control.map-title {
-  #         transform: translate(0%,-140%);
-  #         position: float;
-  #         left: 80%;
-  #         text-align: center;
-  #         padding-left: 5px;
-  #         padding-right: 5px;
-  #         margin: 3px;
-  #         background-color: #F0F0F080;
-  #         border-radius: 5px;
-  #         font-weight: bold;
-  #         font-size: 14px;
-  #         z-index: 100;
-  #       } "))
+   tag.map.title <- tags$style(HTML("
+          .leaflet-control.map-title {
+          transform: translate(0%,-150%);
+          left: 90px;
+          text-align: center;
+          position: relative;
+          padding-left: 5px;
+          padding-right: 5px;
+          margin: 3px;
+          background-color: #F0F0F080;
+          border-radius: 5px;
+          font-weight: bold;
+          font-size: 14px;
+          z-index: 100;
+        }"))
   
   title.infections <- tags$div(
     tag.map.title, HTML(paste0("Recent Infections:<br>",
                               day(ago2wk), " ", month(ago2wk, label = T), " - ",
-                              day(now), " ", month(now, label = T), " - "
+                              day(now), " ", month(now, label = T)
                                ))
   )
   

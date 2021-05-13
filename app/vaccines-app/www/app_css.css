@@ -29,12 +29,12 @@
   border-color: #00441B;
 }
 
-/*Leaflet map titles*/
+/*Leaflet map titles ## note, moved to in-line shiny app for object assignment*/
 .leaflet-control.map-title {
-          transform: translate(0%,-140%);
-          position: fixed;
-          left: 80%;
+          transform: translate(0%,-150%);
+          left: 90px;
           text-align: center;
+          position: relative;
           padding-left: 5px;
           padding-right: 5px;
           margin: 3px;
