@@ -23,7 +23,13 @@
   background-color: #41AB5D;
   border-color: #238B45;
 }
-.btn-myclass:hover, .btn-myclass:focus, .btn-myclass:checked {
+.btn-myclass:hover {
+  color: #FFFFFF;
+  background-color: #006D2C;
+  border-color: #00441B;
+}
+
+.btn-myclass.active {
   color: #FFFFFF;
   background-color: #006D2C;
   border-color: #00441B;
