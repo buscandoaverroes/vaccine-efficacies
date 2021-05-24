@@ -1,7 +1,6 @@
 # infection-data.R
 # imports historical/recent covid-19 infection data
 
-library(tidyverse)
 library(COVID19)
 
 library(mapview)
@@ -16,8 +15,8 @@ library(tigris)
 
 options(tigris_use_cache = FALSE) # set to redownload if FALSE
 
-import   = TRUE 
-download = FALSE # downloads tiger files from census
+import   = FALSE  # reimports daily covid data. TRUE = redownload
+download = FALSE # downloads tiger files from census. TRUE = redownload
 
 us       = TRUE 
 world2   = FALSE 
