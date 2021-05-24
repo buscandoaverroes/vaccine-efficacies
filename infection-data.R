@@ -16,7 +16,7 @@ library(tigris)
 options(tigris_use_cache = FALSE) # set to redownload if FALSE
 
 import   = FALSE  # reimports daily covid data. TRUE = redownload
-download = FALSE # downloads tiger files from census. TRUE = redownload
+download = TRUE # downloads tiger files from census. TRUE = redownload
 
 us       = TRUE 
 world2   = FALSE 
@@ -121,11 +121,14 @@ infection_us <- select(data,
 
 ## load US shapefiles ----
 if (download == TRUE) {
-  raw <- counties(state = NULL,
+  us2_raw <- counties(state = NULL,
                   cb = TRUE, 
                   resolution = '20m', 
-                  year = 2019,
-                  refresh = TRUE) # true = redownload
+                  year = 2019) # true = redownload
+  
+  saveRDS(us2_raw, "/Volumes/PROJECTS/vaccines/data/tigris-us2.Rda")
+} else {
+  load("/Volumes/PROJECTS/vaccines/data/tigris-us2.Rda")
 }
 
 
@@ -133,10 +136,9 @@ if (download == TRUE) {
 #rappdirs::user_cache_dir("tigris")
 
 ## join with infection data ----
-us_adm2_sf <- raw %>% # use lowest resolution data
+us_adm2_sf <- us2_raw %>% # use lowest resolution data
   mutate(
-    test = "hi"
-    #fips = as.numeric(GEOID)
+    fips = as.numeric(GEOID)
   ) 
   select(fips, geometry) %>%
   left_join(infection_us,
@@ -169,6 +171,6 @@ assert_that(sum(is.na(us_adm2_sf$confirmed))/nrow(us_adm2_sf) <= 0.005)
 
 # export ----
 save(
-  data, x, us_adm2_sf, raw, recent_date, x.cite, now, ago2wk, 
+  data, x, us_adm2_sf, us2_raw, recent_date, x.cite, now, ago2wk, 
   file = file.path(root, "data/infection-data.Rdata")
   )
