@@ -1,4 +1,4 @@
-# vaccine-efficacies
+# Vaccine Efficacies
 
 Visualizes vaccine efficacy rates from clinical trial data.
 
