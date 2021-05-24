@@ -139,7 +139,7 @@ if (download == TRUE) {
 us_adm2_sf <- us2_raw %>% # use lowest resolution data
   mutate(
     fips = as.numeric(GEOID)
-  ) 
+  ) %>%
   select(fips, geometry) %>%
   left_join(infection_us,
             by = c("fips" = "key_numeric")
@@ -159,7 +159,7 @@ x.cite <- covid19cite(x = x)
 ## check ----
 
 ### duplicates 
-assert_that( nrow(raw) == nrow(us_adm2_sf)) # no dups from shape files
+assert_that( nrow(us2_raw) == nrow(us_adm2_sf)) # no dups from shape files
 assert_that( anyDuplicated(us_adm2_sf$fips) == 0) # no extras from infection_us
 
 ### missings \
@@ -171,6 +171,8 @@ assert_that(sum(is.na(us_adm2_sf$confirmed))/nrow(us_adm2_sf) <= 0.005)
 
 # export ----
 save(
-  data, x, us_adm2_sf, us2_raw, recent_date, x.cite, now, ago2wk, 
+  #data, x, # not needed?
+  us_adm2_sf, recent_date, x.cite, now, ago2wk, 
   file = file.path(root, "data/infection-data.Rdata")
   )
+
