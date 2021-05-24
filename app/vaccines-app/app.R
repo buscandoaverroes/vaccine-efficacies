@@ -281,7 +281,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
 
                    ),
        HTML("<font size=3>Frontline jobs put you at higher risk, but data show that
-            vaccines are still highly effective. Dots in blue bands show indicate scenarios with
+            vaccines are still highly effective. Dots in blue bands show scenarios with
             high chances of protection if you're vaccinated.</font>"),
        
        
@@ -304,12 +304,13 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                                  person tested positive for covid about <b>56</b> or <b>73 per 1000</b> person-years.
                                  However, the rate for frontline workers was nearly 10 times
                                  higher: <b>504 per 1000</b> person-years. In other words, in over the course of the
-                                 time equivalent of one year, half of frontline workers got infected with
-                                 Covid-19. <br><br>
+                                 time equivalent of one year, the risk of unvaccinated frontline workers getting Covid-19
+                                 was measured at 50%, or a 1 in 2 chance. <br><br>
                                  
                                  However, The CDC data concluded that the Pfizer and Moderna vaccines maintain 
-                                 very high levels of efficacy (<font color=\"#2171B5\"><b>90%</b></font>)
-                                 in frontline situtations. Graphically, we see
+                                 very high levels of efficacy. An efficacy rate of (<font color=\"#2171B5\"><b>90%</b></font>)
+                                 for frontline workers means that these vaccines reduce frontline workers' chances of getting covid
+                                 by <font color=\"#2171B5\"><b>90%</b></font> on average. Graphically, we see
                                  that the purple or Frontline dot is still in the blue:
                                  it doesn't move far to the left even though the 
                                  non-vaccinated infection rate is higher than the Average Person 
