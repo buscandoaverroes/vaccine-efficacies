@@ -30,9 +30,6 @@ world1   = FALSE
 now    <- Sys.Date()  
 ago2wk <- ymd(now) - weeks(2)
 
-# load old data
-load("/Volumes/PROJECTS/vaccines/data/xy.Rdata")
-
 
 # update data according to settings
 if (import == TRUE) {
@@ -51,7 +48,8 @@ if (import == TRUE) {
 
 } 
 if (import == FALSE) { # else reload the previously saved data
-  load("/Volumes/PROJECTS/vaccines/data/infection-data.Rdata")
+  # load old data
+  load("/Volumes/PROJECTS/vaccines/data/xy.Rdata")
 }
 
 # save data
@@ -137,8 +135,9 @@ if (download == TRUE) {
 ## join with infection data ----
 us_adm2_sf <- raw %>% # use lowest resolution data
   mutate(
-    fips = as.numeric(GEOID)
-  ) %>% 
+    test = "hi"
+    #fips = as.numeric(GEOID)
+  ) 
   select(fips, geometry) %>%
   left_join(infection_us,
             by = c("fips" = "key_numeric")
