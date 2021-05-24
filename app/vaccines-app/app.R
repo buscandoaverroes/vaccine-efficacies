@@ -159,7 +159,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 style = 'background:#00000000; padding: 5px; border-width: 0px; border-color: #fff;
                              margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
                              
-                             tags$h6(tags$b("Population Infections"),
+                             tags$h6(tags$b("Non-Vax Infections"),
                                      icon("question-circle")) %>%
                                bs_embed_tooltip(title = "The rate of covid-infections in the general population",
                                                 placement = "top"),
@@ -819,10 +819,8 @@ server <- function(input, output, session) {
                                                               direction = "top",
                                                               offset = c(0, -7),
                                                               style = list(padding = "3px 3px")),
-        highlightOptions = highlightOptions(stroke = TRUE, color = "black", weight = 2, opacity = 1, 
                                             fill = T, bringToFront = T
-        )
-      ) %>%
+        ) %>%
       addLegend(
         na.label = NULL, title = "<font size=2>New Cases<br>per 10k</font>",
         pal = pal.bin, 
