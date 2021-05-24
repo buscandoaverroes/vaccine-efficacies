@@ -18,6 +18,7 @@ library(lubridate)
 library(mapview)
 library(leaflet)
 library(leafsync)
+library(leafgl)
 
 
 reactlog_enable()
@@ -25,17 +26,18 @@ use_bs_tooltip() # must call once
 use_bs_popover()
 
 theme <- bslib::bs_theme(
-  version = "4", bootswatch = "cosmo", 
+  version = "4",
+  bootswatch = "cosmo", 
   spacer = '0.5rem',
   enable_rounded = TRUE,
   primary = "#7C36B0"
-   
   )
 
 
 # load data 
 load("data/app-data.Rdata")
 load("data/map-data.Rdata")
+
 
 # default input values 
 dflt_poprate = 100
@@ -157,7 +159,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 style = 'background:#00000000; padding: 5px; border-width: 0px; border-color: #fff;
                              margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
                              
-                             tags$h6(tags$b("Population Infections"),
+                             tags$h6(tags$b("Non-Vax Infections"),
                                      icon("question-circle")) %>%
                                bs_embed_tooltip(title = "The rate of covid-infections in the general population",
                                                 placement = "top"),
@@ -264,7 +266,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        uiOutput('map'),
        htmlOutput('mapupdate'),
        HTML("<font size =3>
-            Sources: John's Hopkins, New York Times, Oxford, World Bank 
+            Sources: COVID-19 Data Hub, John's Hopkins, New York Times, Oxford, World Bank 
             </font>"),
        
        br(),     
@@ -279,7 +281,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
 
                    ),
        HTML("<font size=3>Frontline jobs put you at higher risk, but data show that
-            vaccines are still highly effective. Dots in blue bands show indicate scenarios with
+            vaccines are still highly effective. Dots in blue bands show scenarios with
             high chances of protection if you're vaccinated.</font>"),
        
        
@@ -302,12 +304,13 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                                  person tested positive for covid about <b>56</b> or <b>73 per 1000</b> person-years.
                                  However, the rate for frontline workers was nearly 10 times
                                  higher: <b>504 per 1000</b> person-years. In other words, in over the course of the
-                                 time equivalent of one year, half of frontline workers got infected with
-                                 Covid-19. <br><br>
+                                 time equivalent of one year, the risk of unvaccinated frontline workers getting Covid-19
+                                 was measured at 50%, or a 1 in 2 chance. <br><br>
                                  
                                  However, The CDC data concluded that the Pfizer and Moderna vaccines maintain 
-                                 very high levels of efficacy (<font color=\"#2171B5\"><b>90%</b></font>)
-                                 in frontline situtations. Graphically, we see
+                                 very high levels of efficacy. An efficacy rate of (<font color=\"#2171B5\"><b>90%</b></font>)
+                                 for frontline workers means that these vaccines reduce frontline workers' chances of getting covid
+                                 by <font color=\"#2171B5\"><b>90%</b></font> on average. Graphically, we see
                                  that the purple or Frontline dot is still in the blue:
                                  it doesn't move far to the left even though the 
                                  non-vaccinated infection rate is higher than the Average Person 
@@ -771,26 +774,26 @@ server <- function(input, output, session) {
   # title panels 
   
   # make css
-  tag.map.title <- tags$style(HTML("
-         .leaflet-control.map-title {
-          transform: translate(-50%,20%);
-          position: fixed;
-          left: 50%;
+   tag.map.title <- tags$style(HTML("
+          .leaflet-control.map-title {
+          transform: translate(0%,-150%);
+          left: 90px;
           text-align: center;
+          position: relative;
           padding-left: 5px;
           padding-right: 5px;
           margin: 3px;
-          background-color: #F0F0F080;
+          background-color: #FFFFFF98;
           border-radius: 5px;
           font-weight: bold;
           font-size: 14px;
           z-index: 100;
-        } "))
+        }"))
   
   title.infections <- tags$div(
     tag.map.title, HTML(paste0("Recent Infections:<br>",
                               day(ago2wk), " ", month(ago2wk, label = T), " - ",
-                              day(now), " ", month(now, label = T), " - "
+                              day(recent_date), " ", month(now, label = T)
                                ))
   )
   
@@ -807,24 +810,22 @@ server <- function(input, output, session) {
   
   ## infections ----
   top <- reactive({
-    leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
+    leaflet(data = us, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
       addProviderTiles(providers$CartoDB.DarkMatter) %>%
       setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
-      addPolygons(
+      addGlPolygons( data = us,
         stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
         fillColor = ~pal.bin(incidence_2wk_10k), fillOpacity = 0.9,
         label = ~labs.infections, labelOptions = labelOptions(textsize = 20, sticky = F, 
                                                               direction = "top",
                                                               offset = c(0, -7),
                                                               style = list(padding = "3px 3px")),
-        highlightOptions = highlightOptions(stroke = TRUE, color = "black", weight = 2, opacity = 1, 
                                             fill = T, bringToFront = T
-        )
-      ) %>%
+        ) %>%
       addLegend(
         na.label = NULL, title = "<font size=2>New Cases<br>per 10k</font>",
         pal = pal.bin, 
-        values = us_adm2_sf$incidence_2wk_10k, 
+        values = us$incidence_2wk_10k, 
         opacity = 0.4) %>%
       addControl(title.infections, position = "topleft", className = 'map-title')
   })
@@ -832,10 +833,10 @@ server <- function(input, output, session) {
   
   ## protection ----
   bottom <- reactive({
-    leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
+    leaflet(data = us, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
       addProviderTiles(providers$CartoDB.DarkMatter) %>%
       setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
-      addPolygons(
+      addGlPolygons( data = us,
         stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
         fillColor = ~pal.num(eval(as.symbol(input$mapProtect))), fillOpacity = 0.9,
         label = ~case_when(input$mapProtect == "protection_66" ~ labs.protection66,

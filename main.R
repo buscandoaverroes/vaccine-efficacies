@@ -31,7 +31,6 @@ s2  <- 1 # creates graph/app data
 s3  <- 1 # runs infection-data
 s4  <- 1 # runs infection-graph; makes graph objects
 
-m1  <- 0 # about markdown
 
 if (s1==1) {source(file.path(code, "clinical-data.R"))}
 if (s2==1) {source(file.path(code, "graph-data.R"))}

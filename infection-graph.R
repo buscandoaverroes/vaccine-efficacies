@@ -114,11 +114,19 @@ l1 <- browsable(
       l1)))
 
 
+# st cast for leafGL
+# cast geometry from multipolygon to polygon 
+us <- st_cast(us_adm2_sf, "POLYGON", warn = T, do_split = T)
+
+
+
+
 save(
   #l1,
   cntr_crds,
   labs.infections, labs.protection66, labs.protection90, labs.protection95,
   pal.num, pal.bin, num.dom, 
-  us_adm2_sf, recent_date, x.cite,
+  us_adm2_sf, us,
+  recent_date, x.cite, now, ago2wk, 
   file = file.path(app, "data/map-data.Rdata")
 )
