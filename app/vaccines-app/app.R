@@ -76,7 +76,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    "), 
      
            br(),br(),
-      #HTML("<font size=4><b>All approved vaccines provide excellent average protection</b></font>"), # pt1 ----    
+      # pt1 ----    
        absolutePanel(  
 
          align='center',
