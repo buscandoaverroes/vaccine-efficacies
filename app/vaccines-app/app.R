@@ -76,8 +76,19 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    "), 
      
            br(),br(),
-      # pt1 ----    
-       absolutePanel(  
+         
+           wellPanel( # intro ----
+             align= 'center',
+             style = 'background: #2c3e5075; padding: 0px; border-width: 1px; border-color: #2c3e50;
+                             margin-left: 0px; margin-right: 0px; margin-bottom:20px; margin-top:50px;
+                            padding-top:15px; padding-bottom:25px; width: 100%',
+             HTML("<font size=5><b>Protection Chances</b></font>"),
+             
+             
+           ),  
+           
+           
+       absolutePanel(  # pt1 ----
 
          align='center',
          width = '100%', height = '85px',
@@ -101,7 +112,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        )),
        
        
-       br(),                   # pt1 ----
+       br(),                   
      wellPanel( align='center', ## info panel ----
                 style = 'background:#F5F1F9; padding: 5px; border-width: 1px; border-color: #9954bb;
                              margin-left: 0px; margin-right: 0px; 
