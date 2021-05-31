@@ -19,6 +19,7 @@ library(mapview)
 library(leaflet)
 library(leafsync)
 library(leafgl)
+library(emo)
 
 
 reactlog_enable()
@@ -82,10 +83,16 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
              style = 'background: #2c3e5075; padding: 0px; border-width: 1px; border-color: #2c3e50;
                              margin-left: 0px; margin-right: 0px; margin-bottom:20px; margin-top:50px;
                             padding-top:15px; padding-bottom:25px; width: 100%',
-             HTML("<font size=5><b>Protection Chances</b></font>"),
-             
-             
+             HTML("<font size=5><b>Protection Chances</b></font>")
            ),  
+           
+           
+           HTML("<font size=10>",
+                "Your average protection chances depend on:<br>",
+              "<font size=10>",  
+            emo::ji("microbe"), "1. The baseline risk: how many people around you are infected with covid.<br>",
+            emo::ji("shield"),  "2. Vaccine Efficacy, which reduces your chances of infection." ,
+             "</font>"),
            
            
        absolutePanel(  # pt1 ----
