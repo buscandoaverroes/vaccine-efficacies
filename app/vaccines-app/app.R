@@ -86,13 +86,16 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
              HTML("<font size=5><b>Protection Chances</b></font>")
            ),  
            
+           tags$head(
+             tags$link(rel = "stylesheet", type = "text/css", href = "intro.html")
+           ), 
            
-           HTML("<font size=4>",
-                "Your average protection chances depend on:<br>",
-              "<font size=10>",  
-            emo::ji("microbe"), "1. The baseline risk: how many people around you are infected with covid.<br>",
-            emo::ji("shield"),  "2. Vaccine Efficacy, which reduces your chances of infection." ,
-             "</font>"),
+           # HTML("<font size=4>",
+           #      "Your average protection chances depend on:<br>",
+           #    "<font size=10>",  
+           #  emo::ji("microbe"), "1. The baseline risk: how many people around you are infected with covid.<br>",
+           #  emo::ji("shield"),  "2. Vaccine Efficacy, which reduces your chances of infection." ,
+           #   "</font>"),
            
            
        absolutePanel(  # pt1 ----
