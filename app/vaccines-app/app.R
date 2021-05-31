@@ -87,7 +87,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
            ),  
            
            
-           HTML("<font size=10>",
+           HTML("<font size=4>",
                 "Your average protection chances depend on:<br>",
               "<font size=10>",  
             emo::ji("microbe"), "1. The baseline risk: how many people around you are infected with covid.<br>",
