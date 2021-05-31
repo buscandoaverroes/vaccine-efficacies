@@ -70,4 +70,6 @@
 
 # css
 !/**/*.css
-.Rproj.user
+
+# html, only in www folder
+!/**/www/**/*.html
