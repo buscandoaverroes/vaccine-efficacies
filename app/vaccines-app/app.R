@@ -91,7 +91,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
            HTML(paste0("
 
                 <body>
-                  <font size=4>Your average protection chances depend on:</font>
+                  <font size=4>Average protection chances depend on:</font>
               
                   <div class='container'>
                       <div>", "<font size=30>",emo::ji("microbe"),"</font>", "</div>
@@ -190,7 +190,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 style = 'background:#00000000; padding: 5px; border-width: 0px; border-color: #fff;
                              margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
                              
-                             tags$h6(tags$b("Non-Vax Infections"),
+                             tags$h6(tags$b("Baseline Risk"),
                                      icon("question-circle")) %>%
                                bs_embed_tooltip(title = "The rate of covid-infections in the general population",
                                                 placement = "top"),
