@@ -2,7 +2,6 @@
 # imports historical/recent covid-19 infection data
 
 library(COVID19)
-
 library(mapview)
 library(sf)
 library(tigris)
@@ -15,8 +14,8 @@ library(tigris)
 
 options(tigris_use_cache = FALSE) # set to redownload if FALSE
 
-import   = FALSE  # reimports daily covid data. TRUE = redownload
-download = TRUE # downloads tiger files from census. TRUE = redownload
+import   = TRUE  # reimports daily covid data. TRUE = redownload
+download = FALSE # downloads tiger files from census. TRUE = redownload
 
 us       = TRUE 
 world2   = FALSE 
@@ -51,9 +50,6 @@ if (import == FALSE) { # else reload the previously saved data
   # load old data
   load("/Volumes/PROJECTS/vaccines/data/xy.Rdata")
 }
-
-# save data
-save(x, y, z, file = file.path("/Volumes/PROJECTS/vaccines/data/xy.Rdata"))
 
 
 
@@ -128,7 +124,7 @@ if (download == TRUE) {
   
   saveRDS(us2_raw, "/Volumes/PROJECTS/vaccines/data/tigris-us2.Rda")
 } else {
-  load("/Volumes/PROJECTS/vaccines/data/tigris-us2.Rda")
+  us2_raw <- readRDS("/Volumes/PROJECTS/vaccines/data/tigris-us2.Rda")
 }
 
 
@@ -175,4 +171,9 @@ save(
   us_adm2_sf, recent_date, x.cite, now, ago2wk, 
   file = file.path(root, "data/infection-data.Rdata")
   )
+
+# save data
+save(x, file = file.path("/Volumes/PROJECTS/vaccines/data/covid-raw.Rdata"))
+
+
 

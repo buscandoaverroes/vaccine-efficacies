@@ -19,6 +19,7 @@ library(mapview)
 library(leaflet)
 library(leafsync)
 library(leafgl)
+library(emo)
 
 
 reactlog_enable()
@@ -76,8 +77,38 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    "), 
      
            br(),br(),
-      #HTML("<font size=4><b>All approved vaccines provide excellent average protection</b></font>"), # pt1 ----    
-       absolutePanel(  
+         
+           wellPanel( # intro ----
+             align= 'center',
+             style = 'background: #2c3e5075; padding: 0px; border-width: 1px; border-color: #2c3e50;
+                             margin-left: 0px; margin-right: 0px; margin-bottom:20px; margin-top:50px;
+                            padding-top:15px; padding-bottom:25px; width: 100%',
+             HTML("<font size=5><b>Protection Chances</b></font>")
+           ),  
+           
+           includeHTML("www/intro.html"),
+           
+           HTML(paste0("
+
+                <body>
+                  <font size=4>Average protection chances depend on:</font>
+              
+                  <div class='container'>
+                      <div>", "<font size=30>",emo::ji("microbe"),"</font>", "</div>
+                      <div><b><h3>Baseline Risk:</b></h3><br>how many people around you are infected </div>",
+                      "<div>", "<font size=30>", emo::ji("shield"),"</font>", "</div>
+                      <div><b><h3>Vaccine Efficacy:</b></h3><br>or the reduction in baseline risk</div>",
+                  "</div>
+              
+              </body>
+                
+                
+                
+                ")), 
+           
+           
+           
+       absolutePanel(  # pt1 ----
 
          align='center',
          width = '100%', height = '85px',
@@ -101,7 +132,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        )),
        
        
-       br(),                   # pt1 ----
+       br(),                   
      wellPanel( align='center', ## info panel ----
                 style = 'background:#F5F1F9; padding: 5px; border-width: 1px; border-color: #9954bb;
                              margin-left: 0px; margin-right: 0px; 
@@ -159,7 +190,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 style = 'background:#00000000; padding: 5px; border-width: 0px; border-color: #fff;
                              margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
                              
-                             tags$h6(tags$b("Non-Vax Infections"),
+                             tags$h6(tags$b("Baseline Risk"),
                                      icon("question-circle")) %>%
                                bs_embed_tooltip(title = "The rate of covid-infections in the general population",
                                                 placement = "top"),
