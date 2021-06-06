@@ -144,8 +144,7 @@ us_adm2_sf <- us2_raw %>% # use lowest resolution data
 
 
 # save the most recent date object
-recent_date <-
-  range(x$date)[2]
+recent_date <- range(x$date)[2]
 
 
 # create citation objects

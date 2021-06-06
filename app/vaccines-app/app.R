@@ -824,7 +824,7 @@ server <- function(input, output, session) {
   title.infections <- tags$div(
     tag.map.title, HTML(paste0("Recent Infections:<br>",
                               day(ago2wk), " ", month(ago2wk, label = T), " - ",
-                              day(recent_date), " ", month(now, label = T)
+                              day(recent_date), " ", month(recent_date, label = T)
                                ))
   )
   
