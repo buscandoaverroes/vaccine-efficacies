@@ -62,7 +62,7 @@ data <- x %>%
   mutate(
     confirmed_2wk = max(confirmed) - min(confirmed), # new cases in last 2 weeks
     incidence_2wk = confirmed_2wk / population,
-    incidence_2wk_10k    = incidence_2wk * 10000,
+    incidence_2wk_100k    = incidence_2wk * 100000,
     incidence_2wk_1000py = ((incidence_2wk) * 1000 * (365/14)),
     protection_66    = 1-((incidence_2wk_1000py/1000)*(1-0.66)),
     protection_90    = 1-((incidence_2wk_1000py/1000)*(1-0.90)),
