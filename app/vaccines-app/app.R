@@ -846,7 +846,7 @@ server <- function(input, output, session) {
       setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
       addGlPolygons( data = us,
         stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
-        fillColor = ~pal.bin(incidence_2wk_10k), fillOpacity = 0.9,
+        fillColor = ~pal.bin(incidence_2wk_100k), fillOpacity = 0.9,
         label = ~labs.infections, labelOptions = labelOptions(textsize = 20, sticky = F, 
                                                               direction = "top",
                                                               offset = c(0, -7),
@@ -856,7 +856,7 @@ server <- function(input, output, session) {
       addLegend(
         na.label = NULL, title = "<font size=2>New Cases<br>per 100,000</font>",
         pal = pal.bin, 
-        values = us$incidence_2wk_10k, 
+        values = us$incidence_2wk_100k, 
         opacity = 0.4) %>%
       addControl(title.infections, position = "topleft", className = 'map-title')
   })
