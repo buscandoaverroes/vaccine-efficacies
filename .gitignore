@@ -72,3 +72,4 @@
 
 # html, only in www folder
 !/**/www/**/*.html
+.Rproj.user

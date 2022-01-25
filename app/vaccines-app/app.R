@@ -854,7 +854,7 @@ server <- function(input, output, session) {
                                             fill = T, bringToFront = T
         ) %>%
       addLegend(
-        na.label = NULL, title = "<font size=2>New Cases<br>per 10k</font>",
+        na.label = NULL, title = "<font size=2>New Cases<br>per 100,000</font>",
         pal = pal.bin, 
         values = us$incidence_2wk_10k, 
         opacity = 0.4) %>%
