@@ -112,7 +112,7 @@ assert_that(n_missing_county_USA <= 2)
 infection_us <- select(data, 
              date, id, vaccines, tests, population, confirmed, recovered, deaths, hosp, vent, icu,
              starts_with("incidence"), starts_with("admin"), starts_with("prote"), starts_with("lab"),
-             key_numeric)
+             key_local)
 
 
 ## load US shapefiles ----
@@ -134,11 +134,11 @@ if (download == TRUE) {
 ## join with infection data ----
 us_adm2_sf <- us2_raw %>% # use lowest resolution data
   mutate(
-    fips = as.numeric(GEOID)
+    fips = GEOID
   ) %>%
   select(fips, geometry) %>%
   left_join(infection_us,
-            by = c("fips" = "key_numeric")
+            by = c("fips" = "key_local")
   ) %>%
   st_transform(crs = st_crs(., 4326)) # set crs
 
