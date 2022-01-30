@@ -148,7 +148,7 @@ recent_date <- range(x$date)[2]
 
 
 # create citation objects
-x.cite <- covid19cite(x = x)
+x.cite <- "Guidotti and Ardia (2020)"
 
 
 ## check ----
