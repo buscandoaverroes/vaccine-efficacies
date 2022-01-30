@@ -295,7 +295,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        HTML("<font size=3>Your protection chances depend on local infection rates. But even in the 
             worst hotspots, vaccinated people are very likely to remain protected.</font>"),
        br(),
-       leafglOutput('see'),
+       uiOutput('map'),
        htmlOutput('mapupdate'),
        HTML("<font size =3>
             Sources: COVID-19 Data Hub, John's Hopkins, New York Times, Oxford, World Bank 
