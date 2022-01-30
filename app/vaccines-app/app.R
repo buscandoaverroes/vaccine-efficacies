@@ -20,6 +20,7 @@ library(leaflet)
 library(leafsync)
 library(leafgl)
 library(emo)
+library(colourvalues)
 
 
 reactlog_enable()
@@ -294,7 +295,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        HTML("<font size=3>Your protection chances depend on local infection rates. But even in the 
             worst hotspots, vaccinated people are very likely to remain protected.</font>"),
        br(),
-       uiOutput('map'),
+       leafglOutput('see'),
        htmlOutput('mapupdate'),
        HTML("<font size =3>
             Sources: COVID-19 Data Hub, John's Hopkins, New York Times, Oxford, World Bank 
@@ -620,6 +621,18 @@ server <- function(input, output, session) {
     }
   })
   
+  mapProtectVar2 <- reactive({
+    if (input$mapProtect == "66%") {
+      us$protection_66
+    }
+    else if (input$mapProtect == "90%") {
+      us$protection_90
+    }
+    else if (input$mapProtect == "95%") {
+      us$protection_95
+    }
+  })
+  
   
   
   # eff data for plot ----
@@ -840,23 +853,30 @@ server <- function(input, output, session) {
     
   
   ## infections ----
+  mycols.top <- colour_values(us$incidence_2wk_100k, palette = "inferno", n_summaries = 5, digits = 0)
+  mycols.bottom <- reactive({
+    colour_values(us$protection_90, palette = "rdylbu", n_summaries = 5, digits = 2)
+  })
+    
+
   top <- reactive({
     leaflet(data = us, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
       addProviderTiles(providers$CartoDB.DarkMatter) %>%
       setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
       addGlPolygons( data = us,
         stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
-        fillColor = ~pal.bin(incidence_2wk_100k), fillOpacity = 0.9,
-        label = ~labs.infections, labelOptions = labelOptions(textsize = 20, sticky = F, 
-                                                              direction = "top",
-                                                              offset = c(0, -7),
-                                                              style = list(padding = "3px 3px")),
+        fillColor = mycols.top$colours, fillOpacity = 0.9,
+        label = ~labs.infections, 
+        labelOptions = labelOptions(textsize = 20, sticky = F, 
+                                    direction = "top",
+                                    offset = c(0, -7),
+                                    style = list(padding = "3px 3px")),
                                             fill = T, bringToFront = T
         ) %>%
-      addLegend(
+       addLegend(
         na.label = NULL, title = "<font size=2>New Cases<br>per 100,000</font>",
-        pal = pal.bin, 
-        values = us$incidence_2wk_100k, 
+        colors = mycols.top$summary_colours,
+        labels = mycols.top$summary_values,
         opacity = 0.4) %>%
       addControl(title.infections, position = "topleft", className = 'map-title')
   })
@@ -869,7 +889,8 @@ server <- function(input, output, session) {
       setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
       addGlPolygons( data = us,
         stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
-        fillColor = ~pal.num(eval(as.symbol(input$mapProtect))), fillOpacity = 0.9,
+        fillColor = mycols.bottom()$colours, 
+        fillOpacity = 0.9,
         label = ~case_when(input$mapProtect == "protection_66" ~ labs.protection66,
                             input$mapProtect == "protection_90" ~ labs.protection90,
                             input$mapProtect == "protection_95" ~ labs.protection95),
@@ -882,10 +903,10 @@ server <- function(input, output, session) {
         )
       ) %>%
       addLegend(
-        na.label = NULL, 
+        na.label = NULL,
         title = "<font size=2>1-Year<br>Protection<br>Chance",
-        pal = pal.num,
-        values = c(0.90, 1),  
+        colors = mycols.bottom()$summary_colours,
+        labels = mycols.bottom()$summary_values,
         opacity = 0.4,
         labFormat = labelFormat(suffix = "%", digits = 3, transform = function(x) 100*x)) %>%
       addControl(title.protection(), position = "topleft", className = 'map-title')
@@ -898,7 +919,7 @@ server <- function(input, output, session) {
   
   # render map 
   output$map <- renderUI({map()})
-  output$see <- renderLeaflet({top()})
+  output$see <- renderLeaflet({bottom()})
 
   
   
