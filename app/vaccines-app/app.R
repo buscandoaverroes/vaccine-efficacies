@@ -287,10 +287,12 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
          radioGroupButtons( 
            'mapProtect', label = "Vaccine Efficacy", width = '100%', 
            choiceNames = c("66%", "90%", "95%"),
-           choiceValues = c("protection_66", "protection_90", "protection_95"),
-           status = 'myclass',  selected = "protection_90",
+           choiceValues = c(66, 90, 95),
+           status = 'myclass',  selected = 90,
            size = "normal", direction = 'horizontal', individual = F
-           )),
+           ),
+         actionBttn("simulate", label = "simulate!", size = "sm")
+         ), # end well panel
        
        HTML("<font size=3>Your protection chances depend on local infection rates. But even in the 
             worst hotspots, vaccinated people are very likely to remain protected.</font>"),
@@ -609,29 +611,7 @@ server <- function(input, output, session) {
   
   
   ## map protection ----
-  mapProtectVar <- reactive({
-    if (input$mapProtect == "66%") {
-       us_adm2_sf$protection_66
-    }
-    else if (input$mapProtect == "90%") {
-      us_adm2_sf$protection_90
-    }
-    else if (input$mapProtect == "95%") {
-      us_adm2_sf$protection_95
-    }
-  })
-  
-  mapProtectVar2 <- reactive({
-    if (input$mapProtect == "66%") {
-      us$protection_66
-    }
-    else if (input$mapProtect == "90%") {
-      us$protection_90
-    }
-    else if (input$mapProtect == "95%") {
-      us$protection_95
-    }
-  })
+  mapProtectVar <- reactive({input$mapProtect})
   
   
   
@@ -844,9 +824,9 @@ server <- function(input, output, session) {
   title.protection <- reactive({
     tags$div(
       tag.map.title, HTML(paste0("Protection Chance with<br>",
-                                 case_when(input$mapProtect == "protection_66" ~ "66%",
-                                           input$mapProtect == "protection_90" ~ "90%",
-                                           input$mapProtect == "protection_95" ~ "95%"),
+                                 case_when(input$mapProtect == 60 ~ "66%",
+                                           input$mapProtect == 90 ~ "90%",
+                                           input$mapProtect == 95 ~ "95%"),
                                  " Effective Vaccine"))
     )
   })
@@ -854,9 +834,8 @@ server <- function(input, output, session) {
   
   ## infections ----
   mycols.top <- colour_values(us$incidence_2wk_100k, palette = "inferno", n_summaries = 5, digits = 0)
-  mycols.bottom <- reactive({
-    colour_values(us$protection_90, palette = "rdylbu", n_summaries = 5, digits = 2)
-  })
+  mycols.bottom <- colour_values(us$protection_90, palette = "rdylbu", n_summaries = 5, digits = 2)
+  
     
 
   top <- reactive({
@@ -889,11 +868,11 @@ server <- function(input, output, session) {
       setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
       addGlPolygons( data = us,
         stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
-        fillColor = mycols.bottom()$colours, 
+        fillColor = mycols.bottom$colours, 
         fillOpacity = 0.9,
-        label = ~case_when(input$mapProtect == "protection_66" ~ labs.protection66,
-                            input$mapProtect == "protection_90" ~ labs.protection90,
-                            input$mapProtect == "protection_95" ~ labs.protection95),
+        label = ~case_when(input$mapProtect == 66 ~ labs.protection66,
+                            input$mapProtect == 90 ~ labs.protection90,
+                            input$mapProtect == 95 ~ labs.protection95),
         labelOptions = labelOptions(textsize = 20, sticky = F, 
                                     direction = "top",
                                     offset = c(0, -7),
@@ -905,19 +884,21 @@ server <- function(input, output, session) {
       addLegend(
         na.label = NULL,
         title = "<font size=2>1-Year<br>Protection<br>Chance",
-        colors = mycols.bottom()$summary_colours,
-        labels = mycols.bottom()$summary_values,
+        colors = mycols.bottom$summary_colours,
+        labels = mycols.bottom$summary_values,
         opacity = 0.4,
         labFormat = labelFormat(suffix = "%", digits = 3, transform = function(x) 100*x)) %>%
       addControl(title.protection(), position = "topleft", className = 'map-title')
   })
   
   
-  #combine map
-  map <- reactive({sync(top(), bottom(), ncol = 1)})
+  ## combine map ----
+  map <- eventReactive(input$simulate, {
+    sync(top(), bottom(), ncol = 1)},
+    ignoreNULL=FALSE, ignoreInit = FALSE, label = 'double-map')
   
   
-  # render map 
+  ## render map 
   output$map <- renderUI({map()})
   output$see <- renderLeaflet({bottom()})
 
