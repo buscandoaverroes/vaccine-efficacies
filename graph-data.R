@@ -159,7 +159,7 @@ effplot <- plot_ly(
      thicknessmode = 'fraction', thickness = 0.04,
      lenmode = 'fraction', len = 0.5, xpad = 0,
      tickmode = 'array', tickvals = breaks,
-     tickformat = '%', tickfont = list(size=10),
+     tickformat = '.0%', tickfont = list(size=10),
      title = list(text="Protection<br>Chance", font=list(size=10))
    ),
    autocontour = F,
@@ -168,7 +168,7 @@ effplot <- plot_ly(
      start = 0.8, end = 1, size = 0.05,
      coloring = 'fill', showlabels = F, # fill or heatmap
      labelfont = list(size=20, color = 'white'),
-     labelformat = '%'),
+     labelformat = '.0%'),
    line = list(color='black', width=0.5),
    hovertemplate = paste0(
      "<span style='color:white'><b>Protection: %{z:.1%}</b></span><br>",
