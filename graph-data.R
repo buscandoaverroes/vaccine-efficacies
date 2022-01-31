@@ -216,7 +216,7 @@ layout(
       font = list(size=15),
       standoff = 12),
     tickmode = 'linear', tick0 = 0, dtick = 0.2,
-    tickformat = "%",
+    tickformat = ".0%",
     showline = FALSE, showgrid = FALSE
   ),
   yaxis = list(
@@ -243,8 +243,6 @@ layout(
            {Plotly.d3.select('.cursor-crosshair').style('cursor',
            'default')}")
 
-
-effplot
 
 # export ----
 save(
