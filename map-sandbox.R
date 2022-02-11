@@ -14,7 +14,7 @@ load("/Volumes/PROJECTS/vaccines/data/infection-data.Rdata")
 
 # leaflet =========================================
 leaflet(us_adm2_sf) %>% 
-  addPolygons(fillColor = ~incidence_2wk_10k)
+  addPolygons(fillColor = ~incidence_2wk_100k)
 
 # mapview =========================================
 # mapping recent infection rates in person years
@@ -24,7 +24,7 @@ mapview(us_adm2_sf, zcol = "incidence_2wk_1000py"
 )
 
 # same scale, in new infections per 10k, most easily interpretable
-m1 <- mapview(us_adm2_sf, zcol = "incidence_2wk_10k",
+m1 <- mapview(us_adm2_sf, zcol = "incidence_2wk_100k",
               at = c(0, 10, 20, 50, 100, 500))
 
 
@@ -37,7 +37,7 @@ m2 <- mapview(us_adm2_sf, zcol = "protection_66",
  
 
 # overlay 
-m3 <- mapview(us_adm2_sf, zcol = "incidence_2wk_10k",
+m3 <- mapview(us_adm2_sf, zcol = "incidence_2wk_100k",
               at = c(0, 10, 20, 50, 100, 500)) +
   mapview(us_adm2_sf, zcol = "protection_66", 
           at = c(0, 0.95, 0.98, 0.99, 1)
@@ -51,15 +51,15 @@ mapviewOptions(
   fgb = TRUE, viewer.suppress = FALSE, na.color = '#00000000'
   )
 
-m1 <- mapview(us_adm2_sf, zcol = "incidence_2wk_10k",
+m1 <- mapview(us_adm2_sf, zcol = "incidence_2wk_100k",
               map.types = "CartoDB.DarkMatter",
-         col.regions = mapviewColors(us_adm2_sf, us_adm2_sf$incidence_2wk_10k,
+         col.regions = mapviewColors(us_adm2_sf, us_adm2_sf$incidence_2wk_100k,
                                      colors = hcl.colors(5, palette = "OrRd", 
                                                          rev = TRUE)),
          at = c(0, 10, 20, 50, 100, 500),
          legend.opacity = 0.9, lwd = 0.1, color = "#969696", 
          layer.name = "New Infections<br>per 10k people",
-         label =  "lab_incidence_2wk_10k_long", 
+         label =  "lab_incidence_2wk_100k_long", 
          popup = NULL,
          legend = F, 
          alpha.regions = 0.7, alpha = 0.6,
@@ -91,8 +91,8 @@ cntr_crds <- c(mean(st_coordinates(us_adm2_sf)[ ,1]),
 # set zoom before sync
 map.a <- m1@map %>% setView(cntr_crds[1], cntr_crds[2], zoom = 4) %>%
   addLegend(na.label = NULL, title = "<font size=3>New Infections<br>per 10k people</font>",
-            pal = colorBin(palette = "OrRd", domain = us_adm2_sf$incidence_2wk_10k, na.color = "#00000000",reverse = F),
-            values = us_adm2_sf$incidence_2wk_10k,
+            pal = colorBin(palette = "OrRd", domain = us_adm2_sf$incidence_2wk_100k, na.color = "#00000000",reverse = F),
+            values = us_adm2_sf$incidence_2wk_100k,
             opacity = 0.4)
 map.b <- m2@map %>% setView(cntr_crds[1], cntr_crds[2], zoom = 4) %>%
   addLegend(na.label = NULL, title = "<font size=3>Vaccinated<br>Protection<br>Probability</font>",
@@ -115,7 +115,7 @@ map
 # This is fine for static things but not for interacitve, and the map probably needs to be
 # interactive.
 tm_shape(us_adm2_sf, projection = ) +
-  tm_fill(col = "incidence_2wk_10k", title = "New Infections\nper 10k people",
+  tm_fill(col = "incidence_2wk_100k", title = "New Infections\nper 10k people",
           palette = "OrRd", style = 'pretty', showNA = FALSE, legend.show = FALSE) 
   tm_borders()
 
@@ -126,7 +126,7 @@ tm_shape(us_adm2_sf, projection = ) +
 num.dom = c(0.80, 1)
 pal.bin = colorBin(palette = "OrRd",
                    bins = c(0, 10, 20, 50, 100, 300),
-                   domain = us_adm2_sf$incidence_2wk_10k,
+                   domain = us_adm2_sf$incidence_2wk_100k,
                    na.color = "#00000000",
                    reverse = F)
 pal.num= colorNumeric(palette = "Spectral",
@@ -140,7 +140,7 @@ labs.infections <- sprintf(
   %.1f per 10k", 
   us_adm2_sf$administrative_area_level_3,
   us_adm2_sf$administrative_area_level_2,
-  us_adm2_sf$incidence_2wk_10k
+  us_adm2_sf$incidence_2wk_100k
 )  %>%
   lapply(htmltools::HTML)
 labs.protection <- sprintf(
@@ -164,7 +164,7 @@ l1 <- leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom =
   setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
   addPolygons(
       stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
-      fillColor = ~pal.bin(incidence_2wk_10k), fillOpacity = 0.9,
+      fillColor = ~pal.bin(incidence_2wk_100k), fillOpacity = 0.9,
       label = ~labs.infections, labelOptions = labelOptions(textsize = 20, sticky = F, 
                                                             direction = "top",
                                                             offset = c(0, -7),
@@ -175,9 +175,9 @@ l1 <- leaflet(data = us_adm2_sf, options = leafletOptions(minZoom = 2, maxZoom =
     ) %>%
   addLegend(
     na.label = NULL, title = "<font size=2>New Cases<br>per 10k</font>",
-    pal = colorBin(palette = "OrRd", domain = us_adm2_sf$incidence_2wk_10k, bins = c(0, 10, 20, 50, 100, 300), 
+    pal = colorBin(palette = "OrRd", domain = us_adm2_sf$incidence_2wk_100k, bins = c(0, 10, 20, 50, 100, 300), 
                    na.color = "#00000000",reverse = F),
-    values = us_adm2_sf$incidence_2wk_10k, 
+    values = us_adm2_sf$incidence_2wk_100k, 
     #labels = c("0-10", "10-20", "20-50", "50-100", "100+"), # this wont' generate
     opacity = 0.4) 
 

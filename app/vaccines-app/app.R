@@ -19,6 +19,8 @@ library(mapview)
 library(leaflet)
 library(leafsync)
 library(leafgl)
+library(emo)
+library(colourvalues)
 
 
 reactlog_enable()
@@ -76,8 +78,38 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                    "), 
      
            br(),br(),
-      #HTML("<font size=4><b>All approved vaccines provide excellent average protection</b></font>"), # pt1 ----    
-       absolutePanel(  
+         
+           wellPanel( # intro ----
+             align= 'center',
+             style = 'background: #2c3e5075; padding: 0px; border-width: 1px; border-color: #2c3e50;
+                             margin-left: 0px; margin-right: 0px; margin-bottom:20px; margin-top:50px;
+                            padding-top:15px; padding-bottom:25px; width: 100%',
+             HTML("<font size=5><b>Protection Chances</b></font>")
+           ),  
+           
+           includeHTML("www/intro.html"),
+           
+           HTML(paste0("
+
+                <body>
+                  <font size=4>Average protection chances depend on:</font>
+              
+                  <div class='container'>
+                      <div>", "<font size=30>",emo::ji("microbe"),"</font>", "</div>
+                      <div><b><h3>Baseline Risk:</b></h3><br>how many people around you are infected </div>",
+                      "<div>", "<font size=30>", emo::ji("shield"),"</font>", "</div>
+                      <div><b><h3>Vaccine Efficacy:</b></h3><br>or the reduction in baseline risk</div>",
+                  "</div>
+              
+              </body>
+                
+                
+                
+                ")), 
+           
+           
+           
+       absolutePanel(  # pt1 ----
 
          align='center',
          width = '100%', height = '85px',
@@ -101,7 +133,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        )),
        
        
-       br(),                   # pt1 ----
+       br(),                   
      wellPanel( align='center', ## info panel ----
                 style = 'background:#F5F1F9; padding: 5px; border-width: 1px; border-color: #9954bb;
                              margin-left: 0px; margin-right: 0px; 
@@ -159,7 +191,7 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
                 style = 'background:#00000000; padding: 5px; border-width: 0px; border-color: #fff;
                              margin-left: 0px; margin-right: 0px; padding:0em; width: 100%',
                              
-                             tags$h6(tags$b("Non-Vax Infections"),
+                             tags$h6(tags$b("Baseline Risk"),
                                      icon("question-circle")) %>%
                                bs_embed_tooltip(title = "The rate of covid-infections in the general population",
                                                 placement = "top"),
@@ -249,16 +281,19 @@ tabPanel("Data Explorer", # PAGE1: efficacies ----------------------------------
        wellPanel(  ## map ----
          align= 'center',
          style = 'background: #2c3e5075; padding: 0px; border-width: 1px; border-color: #2c3e50;
-                             margin-left: 0px; margin-right: 0px; margin-bottom:20px; margin-top:50px;
-                             padding-top:0em; width: 100%',
+                             margin-left: 0px; margin-right: 0px; margin-bottom:0px; margin-top:50px;
+                             padding-top:0em; padding-bottom: 1em; width: 100%',
          HTML("<font size=5><b>Geography</b></font>"),
          radioGroupButtons( 
            'mapProtect', label = "Vaccine Efficacy", width = '100%', 
            choiceNames = c("66%", "90%", "95%"),
-           choiceValues = c("protection_66", "protection_90", "protection_95"),
-           status = 'myclass',  selected = "protection_90",
+           choiceValues = c(66, 90, 95),
+           status = 'myclass',  selected = 90,
            size = "normal", direction = 'horizontal', individual = F
-           )),
+           ),
+         actionBttn("simulate", label = "simulate!", size = "sm", style = "fill", color = "default")
+         ), # end well panel
+      
        
        HTML("<font size=3>Your protection chances depend on local infection rates. But even in the 
             worst hotspots, vaccinated people are very likely to remain protected.</font>"),
@@ -578,18 +613,10 @@ server <- function(input, output, session) {
   
   ## map protection ----
   mapProtectVar <- reactive({
-    if (input$mapProtect == "66%") {
-       us_adm2_sf$protection_66
-    }
-    else if (input$mapProtect == "90%") {
-      us_adm2_sf$protection_90
-    }
-    else if (input$mapProtect == "95%") {
-      us_adm2_sf$protection_95
-    }
-  })
+    paste("protection", input$mapProtect, sep = "_")
+    })
   
-  
+
   
   # eff data for plot ----
   # for hypothetical point data
@@ -793,39 +820,45 @@ server <- function(input, output, session) {
   title.infections <- tags$div(
     tag.map.title, HTML(paste0("Recent Infections:<br>",
                               day(ago2wk), " ", month(ago2wk, label = T), " - ",
-                              day(recent_date), " ", month(now, label = T)
+                              day(recent_date), " ", month(recent_date, label = T)
                                ))
   )
   
   title.protection <- reactive({
     tags$div(
       tag.map.title, HTML(paste0("Protection Chance with<br>",
-                                 case_when(input$mapProtect == "protection_66" ~ "66%",
-                                           input$mapProtect == "protection_90" ~ "90%",
-                                           input$mapProtect == "protection_95" ~ "95%"),
+                                 case_when(input$mapProtect == 66 ~ "66%",
+                                           input$mapProtect == 90 ~ "90%",
+                                           input$mapProtect == 95 ~ "95%"),
                                  " Effective Vaccine"))
     )
   })
     
   
   ## infections ----
+  mycols.top <- colour_values(us$incidence_2wk_100k, palette = "inferno", n_summaries = 5, digits = 0)
+  mycols.bottom <- reactive({colour_values(us[[mapProtectVar()]], palette = "rdylbu", n_summaries = 5, digits = 2)})
+  
+    
+
   top <- reactive({
     leaflet(data = us, options = leafletOptions(minZoom = 2, maxZoom = 10), height = 300) %>%
       addProviderTiles(providers$CartoDB.DarkMatter) %>%
       setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
       addGlPolygons( data = us,
         stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
-        fillColor = ~pal.bin(incidence_2wk_10k), fillOpacity = 0.9,
-        label = ~labs.infections, labelOptions = labelOptions(textsize = 20, sticky = F, 
-                                                              direction = "top",
-                                                              offset = c(0, -7),
-                                                              style = list(padding = "3px 3px")),
+        fillColor = mycols.top$colours, fillOpacity = 0.9,
+        label = ~labs.infections, 
+        labelOptions = labelOptions(textsize = 20, sticky = F, 
+                                    direction = "top",
+                                    offset = c(0, -7),
+                                    style = list(padding = "3px 3px")),
                                             fill = T, bringToFront = T
         ) %>%
-      addLegend(
-        na.label = NULL, title = "<font size=2>New Cases<br>per 10k</font>",
-        pal = pal.bin, 
-        values = us$incidence_2wk_10k, 
+       addLegend(
+        na.label = NULL, title = "<font size=2>New Cases<br>per 100,000</font>",
+        colors = mycols.top$summary_colours,
+        labels = mycols.top$summary_values,
         opacity = 0.4) %>%
       addControl(title.infections, position = "topleft", className = 'map-title')
   })
@@ -838,10 +871,11 @@ server <- function(input, output, session) {
       setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
       addGlPolygons( data = us,
         stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
-        fillColor = ~pal.num(eval(as.symbol(input$mapProtect))), fillOpacity = 0.9,
-        label = ~case_when(input$mapProtect == "protection_66" ~ labs.protection66,
-                            input$mapProtect == "protection_90" ~ labs.protection90,
-                            input$mapProtect == "protection_95" ~ labs.protection95),
+        fillColor = mycols.bottom()$colours, 
+        fillOpacity = 0.9,
+        label = ~case_when(input$mapProtect == 66 ~ labs.protection66,
+                            input$mapProtect == 90 ~ labs.protection90,
+                            input$mapProtect == 95 ~ labs.protection95),
         labelOptions = labelOptions(textsize = 20, sticky = F, 
                                     direction = "top",
                                     offset = c(0, -7),
@@ -851,23 +885,25 @@ server <- function(input, output, session) {
         )
       ) %>%
       addLegend(
-        na.label = NULL, 
+        na.label = NULL,
         title = "<font size=2>1-Year<br>Protection<br>Chance",
-        pal = pal.num,
-        values = c(0.90, 1),  
+        colors = mycols.bottom()$summary_colours,
+        labels = mycols.bottom()$summary_values,
         opacity = 0.4,
         labFormat = labelFormat(suffix = "%", digits = 3, transform = function(x) 100*x)) %>%
       addControl(title.protection(), position = "topleft", className = 'map-title')
   })
   
   
-  #combine map
-  map <- reactive({sync(top(), bottom(), ncol = 1)})
+  ## combine map ----
+  map <- eventReactive(input$simulate, {
+    sync(top(), bottom(), ncol = 1)},
+    ignoreNULL=FALSE, ignoreInit = FALSE, label = 'double-map')
   
   
-  # render map 
+  ## render map 
   output$map <- renderUI({map()})
-  output$see <- renderLeaflet({top()})
+  output$see <- renderLeaflet({bottom()})
 
   
   

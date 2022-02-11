@@ -57,7 +57,6 @@
 !/**/*.py
 !/**/*.ipynb
 # Still ignore .ipynb files in checkpoint folders
-.ipynb_checkpoints
 
 # Matlab
 !/**/*.m
@@ -70,3 +69,7 @@
 
 # css
 !/**/*.css
+
+# html, only in www folder
+!/**/www/**/*.html
+.Rproj.user

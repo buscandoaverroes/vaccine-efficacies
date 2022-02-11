@@ -43,7 +43,7 @@ top <-
     setView(cntr_crds[1], cntr_crds[2], zoom = 3) %>%
     addPolygons(
       stroke = T, color = "#969696", weight = 0.2, opacity = 0.4, smoothFactor = 0,
-      fillColor = ~pal.bin(incidence_2wk_10k), fillOpacity = 0.9,
+      fillColor = ~pal.bin(incidence_2wk_100k), fillOpacity = 0.9,
       label = ~labs.infections, labelOptions = labelOptions(textsize = 20, sticky = F, 
                                                             direction = "top",
                                                             offset = c(0, -7),
@@ -54,9 +54,9 @@ top <-
     ) %>%
     addLegend(
       na.label = NULL, title = "<font size=2>New Cases<br>per 10k</font>",
-      pal = colorBin(palette = "OrRd", domain = us_adm2_sf$incidence_2wk_10k, bins = c(0, 10, 20, 50, 100, 300), 
+      pal = colorBin(palette = "OrRd", domain = us_adm2_sf$incidence_2wk_100k, bins = c(0, 10, 20, 50, 100, 300), 
                      na.color = "#00000000",reverse = F),
-      values = us_adm2_sf$incidence_2wk_10k, 
+      values = us_adm2_sf$incidence_2wk_100k, 
       opacity = 0.4) %>%
     addControl(title.infections, position = "topleft", className = 'map-title')
 

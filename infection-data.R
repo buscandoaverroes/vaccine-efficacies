@@ -2,7 +2,6 @@
 # imports historical/recent covid-19 infection data
 
 library(COVID19)
-
 library(mapview)
 library(sf)
 library(tigris)
@@ -15,8 +14,8 @@ library(tigris)
 
 options(tigris_use_cache = FALSE) # set to redownload if FALSE
 
-import   = FALSE  # reimports daily covid data. TRUE = redownload
-download = TRUE # downloads tiger files from census. TRUE = redownload
+import   = TRUE  # reimports daily covid data. TRUE = redownload
+download = FALSE # downloads tiger files from census. TRUE = redownload
 
 us       = TRUE 
 world2   = FALSE 
@@ -52,9 +51,6 @@ if (import == FALSE) { # else reload the previously saved data
   load("/Volumes/PROJECTS/vaccines/data/xy.Rdata")
 }
 
-# save data
-save(x, y, z, file = file.path("/Volumes/PROJECTS/vaccines/data/xy.Rdata"))
-
 
 
 ## create cumulative incidence ----
@@ -66,17 +62,17 @@ data <- x %>%
   mutate(
     confirmed_2wk = max(confirmed) - min(confirmed), # new cases in last 2 weeks
     incidence_2wk = confirmed_2wk / population,
-    incidence_2wk_10k    = incidence_2wk * 10000,
+    incidence_2wk_100k    = incidence_2wk * 100000,
     incidence_2wk_1000py = ((incidence_2wk) * 1000 * (365/14)),
     protection_66    = 1-((incidence_2wk_1000py/1000)*(1-0.66)),
     protection_90    = 1-((incidence_2wk_1000py/1000)*(1-0.90)),
     protection_95    = 1-((incidence_2wk_1000py/1000)*(1-0.95)),
-    lab_incidence_2wk_10k = paste0(round(incidence_2wk_10k),
+    lab_incidence_2wk_100k = paste0(round(incidence_2wk_100k),
                                    " per 1k"),
-    lab_incidence_2wk_10k_long = paste0(administrative_area_level_3, ", ", 
+    lab_incidence_2wk_100k_long = paste0(administrative_area_level_3, ", ", 
                                    administrative_area_level_2, "<br>",
                                    "<b>",
-                                  round(incidence_2wk_10k)," per 10k</b>"),
+                                  round(incidence_2wk_100k)," per 10k</b>"),
     lab_protection_66 = paste0(administrative_area_level_3, ", ", 
                                administrative_area_level_2, "<br>",
                                "<b>", round(100*protection_66,1), "% protect probability<b>"),
@@ -116,7 +112,7 @@ assert_that(n_missing_county_USA <= 2)
 infection_us <- select(data, 
              date, id, vaccines, tests, population, confirmed, recovered, deaths, hosp, vent, icu,
              starts_with("incidence"), starts_with("admin"), starts_with("prote"), starts_with("lab"),
-             key_numeric)
+             key_local)
 
 
 ## load US shapefiles ----
@@ -128,7 +124,7 @@ if (download == TRUE) {
   
   saveRDS(us2_raw, "/Volumes/PROJECTS/vaccines/data/tigris-us2.Rda")
 } else {
-  load("/Volumes/PROJECTS/vaccines/data/tigris-us2.Rda")
+  us2_raw <- readRDS("/Volumes/PROJECTS/vaccines/data/tigris-us2.Rda")
 }
 
 
@@ -138,22 +134,21 @@ if (download == TRUE) {
 ## join with infection data ----
 us_adm2_sf <- us2_raw %>% # use lowest resolution data
   mutate(
-    fips = as.numeric(GEOID)
+    fips = GEOID
   ) %>%
   select(fips, geometry) %>%
   left_join(infection_us,
-            by = c("fips" = "key_numeric")
+            by = c("fips" = "key_local")
   ) %>%
   st_transform(crs = st_crs(., 4326)) # set crs
 
 
 # save the most recent date object
-recent_date <-
-  range(x$date)[2]
+recent_date <- range(x$date)[2]
 
 
 # create citation objects
-x.cite <- covid19cite(x = x)
+x.cite <- "Guidotti and Ardia (2020)"
 
 
 ## check ----
@@ -175,4 +170,9 @@ save(
   us_adm2_sf, recent_date, x.cite, now, ago2wk, 
   file = file.path(root, "data/infection-data.Rdata")
   )
+
+# save data
+save(x, file = file.path("/Volumes/PROJECTS/vaccines/data/covid-raw.Rdata"))
+
+
 
